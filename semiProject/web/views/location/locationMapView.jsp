@@ -20,9 +20,9 @@
 	<form action="/semi/mapselect" method="post">
 	<div align="center">
 		<select id="selectlocation" name="selectlocation">
-			<option selected>전체</option>
+			<option selected>전체 kkkkk</option>
 			<option>강남구 mmm</option>
-			<option>강동구</option>
+			<option>강동구llll</option>
 			<option>강북구</option>
 			<option>강서구</option>
 			<option>관악구</option>
