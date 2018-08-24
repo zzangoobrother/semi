@@ -346,8 +346,8 @@
                     	      localStorage.test = "[]";
                     	    }               
                     	    var list = JSON.parse(localStorage.test);
-                    	    if( list.indexOf($(".pdname").val()) == -1 ){
-                    	      list.push($(".pdname").val());
+                    	    if( list.indexOf($(".pdname").text()) == -1 ){
+                    	      list.push($(".pdname").text());
                     	    }
                     	    localStorage.test = JSON.stringify(list);
                     	    $("#display").html(localStorage.test);
@@ -393,7 +393,7 @@
                                 	<a id="selected"></a><br>
                                 	<a id="dateSelected"></a><br>
                                 	<a id="totalprice">총 금액 : </a><br><br>
-                                	<a id="pdimg"><%= product.getP_main_image().split(",")[0] %></a>
+                                	<a class="pdimg"><%= product.getP_main_image().split(",")[0] %></a>
                                 	<a class="pdname"><%= product.getP_name() %></a>
                                 
                                 <div style="width: 100%; ">
