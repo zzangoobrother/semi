@@ -20,7 +20,7 @@
 	<form action="/semi/mapselect" method="post">
 	<div align="center">
 		<select id="selectlocation" name="selectlocation">
-			<option selected>전체 하하하</option>
+			<option selected>전체</option>
 			<option>강남구</option>
 			<option>강동구</option>
 			<option>강북구</option>
@@ -81,25 +81,8 @@
 		marker.setMap(map);
 		
 		$(function() {
-			var address = $("#address").html()
-			console.log(address);
-		});
-		
-		/* $(function() {
-			$.ajax({
-				url : "maplist",
-				type : "post",
-				dataType : "json",
-				success : function(data) {
-					var jsonStr = JSON.stringify(data);
-					var json = JSON.parse(jsonStr);
-					console.log("123");
-					for(var i in json.list) {
-						console.log(decodeURIComponent(json.list[i].address));	
-					}
-				}
-			});
-		}); */		 
+			var address = $(".addr");
+		});	 
 		
 		/* function addressSelect() {
 			var address = document.getElementById("address").value; // 주소 입력
@@ -142,7 +125,7 @@
 			
 			<% for(LocationInfo l : list) { %>
 			<tr>
-				<td><%= l.getL_Local() %></td><td id="address" name="address"><%= l.getL_Address() %></td><td><%= l.getL_Name() %></td>
+				<td><%= l.getL_Local() %></td><td class="addr"><%= l.getL_Address() %></td><td><%= l.getL_Name() %></td>
 			</tr>
 			<% } %>
 		</table>
