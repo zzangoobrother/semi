@@ -1,6 +1,7 @@
 package semi.products.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -50,9 +51,12 @@ public class ProductDetailServlet extends HttpServlet {
 					//해당 게시글 조회해 옴
 					Product product = pservice.selectProducts(pName);
 					
+					ArrayList<String> list = pservice.selectOffice(pName);
+					
 					if(product != null){
 						view = request.getRequestDispatcher("views/product/productDetailView.jsp");
 						request.setAttribute("product", product);
+						request.setAttribute("list", list);
 						view.forward(request, response);
 					}else{
 						view = request.getRequestDispatcher("views/product/productsError.jsp");

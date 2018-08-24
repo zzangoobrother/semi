@@ -1,30 +1,58 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8" errorPage="productsError.jsp"%>
-<%@ page import="semi.products.model.vo.Product" %>
+<%@ page import="semi.products.model.vo.Product, java.util.ArrayList" %>
 <%
 	Product product = (Product)request.getAttribute("product");
+	ArrayList<String> list = (ArrayList<String>)request.getAttribute("list");
 	String[] slideimg = product.getP_main_image().split(",");
+	
+
 	
 %>
 <%@ include file="../../header.jsp" %>
 
-<script type="text/javascript" src="/semi/resources/js/moment.min.js"></script>
-<script type="text/javascript" src="/semi/resources/js/daterangepicker.js"></script>
-<link rel="stylesheet" href="/semi/resources/css/daterangepicker.css">
-	
-<script>
-	$(function() {
-		$('input[name="daterange"]').daterangepicker(
-				{
-					opens : 'left'
-				},
-				function(start, end, label) {
-					console.log("A new date selection was made: "
-							+ start.format('YYYY-MM-DD') + ' to '
-							+ end.format('YYYY-MM-DD'));
-				});
-	});
-</script>
+		<script type="text/javascript" src="/semi/resources/js/moment.min.js"></script>
+		<script type="text/javascript" src="/semi/resources/js/daterangepicker.js"></script>
+		<link rel="stylesheet" href="/semi/resources/css/daterangepicker.css">
+			
+		<!-- <script type="text/javascript">
+		$(function() {
+		
+		  $('input[name="datefilter"]').daterangepicker({
+		      autoUpdateInput: false,
+		      locale: {
+		          cancelLabel: 'Clear'
+		      }
+		  });
+		
+		  $('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {
+		      $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+		  });
+		
+		  $('input[name="datefilter"]').on('cancel.daterangepicker', function(ev, picker) {
+		      $(this).val('');
+		  });
+		
+		});
+		</script> -->
+		 <script>
+
+		 
+			$(function() {
+			  $('input[name="daterange"]').daterangepicker({
+				  autoUpdateInput: false,
+			    opens: 'left'
+			    
+			  }, function(start, end, label) {
+			    console.log("selected date " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+			    document.getElementById("dateSelected").innerHTML = "선택 날짜 : " + start.format('YYYY-MM-DD') + "부터 " + end.format('YYYY-MM-DD') + "까지";
+			    
+			  });
+			});
+			</script>  
+		
+		
+		
 
 <div class="page-head">
 	<div class="container">
@@ -86,7 +114,7 @@
 
                             <div class="section additional-details">
 
-                                <h4 class="s-property-title">Additional Details</h4>
+                                <h4 class="s-property-title">물품 설명</h4>
 
                                 <ul class="additional-details-list clearfix">
                                     <li>
@@ -105,8 +133,9 @@
 
                                     <li>
                                         <span class="col-xs-6 col-sm-4 col-md-4 add-d-title">보유한 동사무소</span>
-                                        <span class="col-xs-6 col-sm-8 col-md-8 add-d-entry"><%= product.getP_local() %></span>
+                                        <span class="col-xs-6 col-sm-8 col-md-8 add-d-entry"></span>
                                     </li>
+
 
                                     <li>
                                         <span class="col-xs-6 col-sm-4 col-md-4 add-d-title">View</span>
@@ -160,15 +189,7 @@
                             <div class="section property-share"> 
                                 <h4 class="s-property-title">Share width your friends </h4> 
                                 <div class="roperty-social">
-                                    <ul> 
-                                        <li><a title="Share this on dribbble " href="#"><img src="/p9/assets/img/social_big/dribbble_grey.png"></a></li>                                         
-                                        <li><a title="Share this on facebok " href="#"><img src="/p9/assets/img/social_big/facebook_grey.png"></a></li> 
-                                        <li><a title="Share this on delicious " href="#"><img src="/p9/assets/img/social_big/delicious_grey.png"></a></li> 
-                                        <li><a title="Share this on tumblr " href="#"><img src="/p9/assets/img/social_big/tumblr_grey.png"></a></li> 
-                                        <li><a title="Share this on digg " href="#"><img src="/p9/assets/img/social_big/digg_grey.png"></a></li> 
-                                        <li><a title="Share this on twitter " href="#"><img src="/p9/assets/img/social_big/twitter_grey.png"></a></li> 
-                                        <li><a title="Share this on linkedin " href="#"><img src="/p9/assets/img/social_big/linkedin_grey.png"></a></li>                                        
-                                    </ul>
+                                    
                                 </div>
                             </div>
                             <!-- End video area  -->
@@ -196,50 +217,199 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="panel panel-default sidebar-menu similar-property-wdg wow fadeInRight animated">
+						
+						
+						
+						
+						
+                         <div class="panel panel-default sidebar-menu similar-property-wdg wow fadeInRight animated">
                                 <div class="panel-heading">
                                     <h3 class="panel-title">Similar Products</h3>
                                 </div>
                                 <div class="panel-body recent-property-widget">
                                         <ul>
                                         <li>
-                                            <div class="col-md-3 col-sm-3 col-xs-3 blg-thumb p0">
-                                                <a href="single.html"><img src="/p9/assets/img/demo/small-property-2.jpg"></a>
-                                                <span class="property-seeker">
-                                                    <b class="b-1">A</b>
-                                                    <b class="b-2">S</b>
-                                                </span>
+                                            <div class="col-md-3 col-sm-3 col-xs-3 blg-thumb p0" style="width: 85px; height: 35px;">
+                                                <h6>물품&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</h6>
+                                                
                                             </div>
-                                            <div class="col-md-8 col-sm-8 col-xs-8 blg-entry">
-                                                <h6> <a href="single.html">Super nice villa </a></h6>
-                                                <span class="property-price">3000000$</span>
+                                            <div class="col-md-8 col-sm-8 col-xs-8 blg-entry" style="width: 226.66px; height: 71px;">
+                                                <h6><select id="centerSelect" onchange="centerSelect()">
+                                        		<option>주민센터 선택</option>
+                                        		<% for(String of : list ) { %>
+                                        		<option value="<%= of %>"><%= of %></option>
+                                        		<% } %>
+                                        	</select></h6>
+                                        	
+                                        	
+                                        	
+                                                
                                             </div>
+                                            <div class="col-md-3 col-sm-3 col-xs-3 blg-thumb p0" style="width: 85px; height: 35px;">
+                                                <h6>대여가격 : </h6>
+                                                
+                                            </div>
+                                            <div class="col-md-8 col-sm-8 col-xs-8 blg-entry" style="width: 226.66px; height: 71px;">
+                                                <h6><%= product.getP_price() %> 원</h6>
+                                        	
+                                                
+                                            </div>
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            <script>
+                                            	function centerSelect(){
+                                            		var x = document.getElementById("centerSelect").value;
+                                            		document.getElementById("selected").innerHTML = "선택 동사무소 : " + x;
+                                            		
+                                            	}
+                                            
+                                            	function dateSelect(){
+                                            		var d = document.getElementById("dateSelect").value;
+                                            		document.getElementById("dateSelected").innerHTML = "선택 날짜 : " + d;
+                                            	}
+                                            	
+                                            	
+                                            	
+                                            </script>
                                         </li>
                                         
+                                        
                                         <li>
-                                        	<input type="text" name="daterange" class="daterange" value="01/01/2018 - 01/15/2018" />
+                                        	<div class="rentaldate">
+                                        	  <input type="text" id="dateSelect" name="daterange" class="daterange" onchange="dateSelect()" value="대여날짜를 선택하세요" style="outline: 0;
+																																	    border: none;
+																																	    width: 100%;
+																																	    height: inherit;
+																																	    color: #333333;
+																																	    font-size: 16px;
+																																	    padding: 5px 15px;
+																																	    border-radius: 3px;"/> 
+                                        	<!-- <input type="text" id="dateSelect" name="datefilter" onchange="dateSelect()" value="대여날짜를 선택하세요" style="outline: 0;
+																																	    border: none;
+																																	    width: 100%;
+																																	    height: inherit;
+																																	    color: #333333;
+																																	    font-size: 16px;
+																																	    padding: 5px 15px;
+																																	    border-radius: 3px;" /> -->
+                                        	</div>
                                         </li>
-                                        <li style="float:left;">
-                                        	<input style="width: 100px;" type="button" onclick="location.href='/semi/select'" value="장바구니"> </a> &nbsp; &nbsp;
-                                        	<input style="width: 100px;" type="button" value="목록보기"></a> &nbsp; &nbsp;
-                                         	<input style="width: 100px;" type="button" value="대여하기"></a>
-                                         	<input type="button" value="되나되나">
-                                       </li> 
+                                        
+                                      
 
                                     </ul>
                                 </div>
-                            </div>                          
+                            </div>         
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                      <script type="text/javascript">
+                      
+                      $(document).ready(function(){
+                    	  $("#add").click(function(){
+                    	    if( !localStorage.test ){
+                    	      localStorage.test = "[]";
+                    	    }               
+                    	    var list = JSON.parse(localStorage.test);
+                    	    if( list.indexOf($(".pdname").val()) == -1 ){
+                    	      list.push($(".pdname").val());
+                    	    }
+                    	    localStorage.test = JSON.stringify(list);
+                    	    $("#display").html(localStorage.test);
+                    	  }) 
+                    	  
+                    	  $("#remove").click(function(){
+                    	     if(localStorage.test){
+                    	       var list = JSON.parse(localStorage.test);
+                    	       var idx = list.indexOf($(".pdname").val());
+                    	       if( idx > -1 ){
+                    	         list.splice(idx,1);
+                    	       }
+                    	       localStorage.test = JSON.stringify(list);
+                    	     }
+                    	     $("#display").html(localStorage.test);
+                    	  });
+                    	  $("#display").html(localStorage.test);
+                    	});
+                      
+                      
+                      
+                      
+                      
+                      </script>      
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                            
+                                             
 
                             <div class="panel panel-default sidebar-menu wow fadeInRight animated">
                                 <div class="panel-heading">
-                                    <h3 class="panel-title">Ads her  </h3>
+                                    <h3 class="panel-title"> 선택 정보  </h3>
                                 </div>
-                                <div class="panel-body recent-property-widget">
-                                    <img src="/p9/assets/img/ads.jpg">
-                                    
-                                </div>
+                                
+                                	<a id="selected"></a><br>
+                                	<a id="dateSelected"></a><br>
+                                	<a id="totalprice">총 금액 : </a><br><br>
+                                	<a id="pdimg"><%= product.getP_main_image().split(",")[0] %></a>
+                                	<a class="pdname"><%= product.getP_name() %></a>
+                                
+                                <div style="width: 100%; ">
+                                        	<input type="button" id="add" value="add">
+                                        	<input type="button" id="remove" value="remove">
+                                        	<a><input style="width: 30%; border-radius: 3px;" type="button" value="장바구니" onclick="location.href='/semi/select'"  ></a>  &nbsp; 
+                                        	<a><input style="width: 30%;" type="button" value="목록보기" onclick="location.href='/semi/plist'"></a> &nbsp; 
+                                         	<a><input style="width: 30%;" type="button" value="대여하기" onclick="location.href='/semi/views/payment/paymentProgressView.jsp'"></a>
+                                         	
+                                </div> 
+                                <div id="display" style="border:1px solid gray"></div>
+                                
+                                
+                                
                             </div>
+                            
 
                             <div class="panel panel-default sidebar-menu wow fadeInRight animated" >
                                 <div class="panel-heading">

@@ -138,33 +138,46 @@ public class ProductsDao {
 		return product;
 	}
 
-	/*public int addReadCount(Connection con, int pno) throws ProductsException {
+	public ArrayList<String> selectOffice(Connection con, String pName) throws ProductsException{
 		
-		int result = 0;
+		ArrayList<String> list = new ArrayList<String>();
 		PreparedStatement pstmt = null;
+		ResultSet rset = null;
 		
-		String query = "update TB_PRODUCT "
-				+ "set board_readcount = board_readcount + 1 "
-				+ "where board_num = ?";
+		String query = "select P_LOCAL from tb_product where P_NAME = ? ";
+		
+		
 		
 		try {
 			pstmt = con.prepareStatement(query);
-			pstmt.setInt(1, pno);
+			pstmt.setString(1, pName);
 			
-			result = pstmt.executeUpdate();
 			
-			if(result <= 0)
+			rset = pstmt.executeQuery();
+			
+			while(rset.next()){
+			 list.add(rset.getString("P_LOCAL"));
+			}
+			
+			if(list.size() == 0)
 				throw new ProductsException(
-						pno + "번 게시글 조회수 증가 처리 실패!");
+						"물품이 존재하지 않습니다.");
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new ProductsException(e.getMessage());
 		}finally{
+			close(rset);
 			close(pstmt);
 		}
 		
-		return result;
+		return list;
 		
-	}*/
+		
+		
+		
+	}
+
+	
 
 }
