@@ -224,6 +224,7 @@
                                         	<input style="width: 100px;" type="button" onclick="location.href='/semi/select'" value="장바구니"> </a> &nbsp; &nbsp;
                                         	<input style="width: 100px;" type="button" value="목록보기"></a> &nbsp; &nbsp;
                                          	<input style="width: 100px;" type="button" value="대여하기"></a>
+                                         	<input type="button" value="되나되나">
                                        </li> 
 
                                     </ul>
