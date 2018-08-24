@@ -30,7 +30,7 @@
 
 <table id="table" align="center" height="500" width="650" cellspacing="0" border="1" >
 <tr>
-	<th width="50"  style="text-align:center;">번호</th>
+	<th width="50"  style="text-align:center;">번호!!!!</th>
 	<th width="400" style="text-align:center;">제목</th>
 	<th width="70" style="text-align:center;">작성자</th>
 	<th width="100" style="text-align:center;">날짜</th>
