@@ -15,7 +15,7 @@ import semi.member.model.service.MemberService;
 /**
  * Servlet implementation class LoginServlet
  */
-@WebServlet("/login")
+@WebServlet("/login.cp")
 public class LoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -34,7 +34,7 @@ public class LoginServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		String mId = request.getParameter("mid");
 		
-		String mPassword = request.getParameter("mpassword");
+		String mPassword = request.getParameter("m_password1");
 		
 		try {
 			
