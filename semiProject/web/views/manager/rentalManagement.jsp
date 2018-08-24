@@ -1,7 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+
 <%@ include file="../../header.jsp" %>
-	
+	<style type="text/css">
+		
+	</style>
 	<script type="text/javascript">
 
 	//회원 조회용 변수
@@ -18,14 +21,11 @@
 	var sysDate = new Date();
 	var sysYear = sysDate.getFullYear();
 	var sysMonth = sysDate.getMonth() + 1;
-	/* if(sysMonth > 10)
-		sysMonth = "0" + sysMonth; */
 	var sysDay = sysDate.getDate();
-	/* if(sysDay > 10)
-		sysDay = 0 + sysDay; */
 	
-	
-	
+	var localFilter;	//지역명
+	var localNameFilter;	//동사무소명
+	var productName; //물품명
 	
 	$(function(){
 		//#table2 사이즈 변경
@@ -38,11 +38,180 @@
 		$("body").append("<td>");
 		$("#table1 input").css("font-size", "14px");
 		
+		//$("#local1").attr("onChange", "localNamePrint(" + localFilter + ")");
+		
+		/* $("#local1").on("change", 
+				function(){
+				localFilter = $(":selected").val();
+				$("#local2").html("");
+				localNamePrint(localFilter);	//동사무소명 출력함수 호출	
+				return false;
+		}); */
+		
+		
+		
 	}); //document.ready
-
+	
 	//-------------------------------------------------------------
+	//등록 버튼 클릭시 지역명 출력 -> 지역명 select 이벤트 발생시
+	//select 한  filter 에 맞는 동사무소명 출력
+	//동사무소명 select 이벤트 발생시 ->
+	//해당 동사무소에 대여 가능한 && 재고가 존재하는 물품명 출력
+	//물품명 select 이벤트 발생시 select 한 filter에 맞는
+	//물품번호를 물품번호 필드에 출력
+	
+	//지역명 출력 함수
+	function localPrint(){
+		$.ajax({
+			url : "/semi/rmlselect",
+			type : "post",
+			dataType : "json",
+			success : function(data){
+				var jsonStr = JSON.stringify(data);
+				//jsonStr = jsonStr.replace("+", " ");
+				var json = JSON.parse(jsonStr);
+				
+				for(var i = 0; i < json.list.length; i++){
+					$("#local1").append("<option>" + decodeURIComponent(json.list[i].lloca) + "</option>");
+				} //for
+			}, //success
+			error : function(jqXHR, textstatus, errorThrown){
+				console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
+			} // error
+		}); //ajax
+		
+		return false;
+	} //localPrint end-
+	
+	//지역명 select 이벤트 발생시
+	function localSelectEvent(){
+		localFilter = $(":selected").val();
+		$("#local2").html("");
+		localNamePrint(localFilter);	//동사무소명 출력함수 호출	
+		return false;
+	}
+	
+	//동사무소명 출력 함수
+	function localNamePrint(localFilter){
+		$.ajax({
+			url : "/semi/rmlnselect",
+			type : "post",
+			data : {"local" : localFilter},
+			dataType : "json",
+			success : function(data){
+				var jsonStr = JSON.stringify(data);
+				var json = JSON.parse(jsonStr);
+				
+				$("#local2").append("<option>동사무소선택</option>");
+				for(var i = 0; i < json.list.length; i++){
+					json.list[i].lname = json.list[i].lname.replace("+", " ");
+					$("#local2").append("<option>" + decodeURIComponent(json.list[i].lname) + "</option>");
+				} //for
+			}, //success
+			error : function(jqXHR, textstatus, errorThrown){
+				console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
+			} // error
+		}); //ajax
+		return false;
+	}
+	
+	//동사무소명 select 이벤트 발생시
+	function localNameSelectEvent(){
+		$("#pname").html("");
+		localNameFilter = $("#local2 :selected").val();
+		productPtint(localNameFilter);	//동사무소명 출력함수 호출	
+		return false;
+	}
+	
+	//물품명 출력함수
+	function productPtint(localNameFilter){
+		$.ajax({
+			url : "/semi/rmpnselect",
+			type : "post",
+			data : {"lname" : localNameFilter},
+			dataType : "json",
+			success : function(data){
+				
+				var jsonStr = JSON.stringify(data);
+				var json = JSON.parse(jsonStr);
+				$("#pname").append("<option>물품명선택</option>")
+				for(var i = 0; i < json.list.length; i++){
+					$("#pname").append("<option>" + decodeURIComponent(json.list[i].pname) + "</option>");
+				}
+			}, //success
+			error : function(jqXHR, textstatus, errorThrown){
+				console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
+			}
+		}); //ajax	
+		return false;
+	} //productSelectBox_end
+	
+	//물품명 select 이벤트 발생시
+	function productInfoPrint(){
+		//$("#pname").html("");
+		alert($("#pname :selected").val());
+		productName = $("#pname :selected").val();
+		//alert($("#pname :selected").val() + ", " + $("#local2 :selected").val());
+		productInfoPtint(productName, localNameFilter); //물품정보 출력함수 호출
+		return false;
+	}
+	
+	//물품정보 출력함수
+	function productInfoPtint(productName, localNameFilter){
+		/*P_NO	NUMBER	No		1	물품번호
+		P_NAME	VARCHAR2(300 BYTE)	No		2	물품명
+		P_PRICE	NUMBER	Yes		3	물품가격
+		P_COUNT	NUMBER	Yes		4	물품수량
+		P_LOCAL	VARCHAR2(300 BYTE)	No		5	물품보유지역
+		P_ITEM	VARCHAR2(100 BYTE)	No		8	물품품목
+		P_STATE	VARCHAR2(100 BYTE)	Yes	"'대여가능'
+		"	10	물품대여상태*/
+		//alert(productName + ", " + localNameFilter);
+		$.ajax({
+			url : "/semi/rmpiselect",
+			type : "post",
+			data : {"pname" : productName, "lname" : localNameFilter},
+			dataType : "json",
+			success : function(data){
+				var jsonStr = JSON.stringify(data);
+				var json = JSON.parse(jsonStr);
+				alert("석세스?");
+				alert(json.pno + ", " + json.pprice + ", " + json.pcount + ", " + decodeURIComponent(json.pitem)+ ", " + decodeURIComponent(json.pstate));
+				/* $("#pno").val(json.pno);
+				$("#pprice").val(json.pprice);
+				$("#pcount").val(json.pcount);
+				$("#pitem").val(decodeURIComponent(json.pitem));
+				$("#pstate").val(decodeURIComponent(json.pstate)); */
+				
+			}, //success
+			error : function(jqXHR, textstatus, errorThrown){
+				console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
+			}
+		}); //ajax
+		
+		return false;
+	} //productPrint2 end-
+	
+	
+	
+	
+	//등록 | 수정 | 삭제 radio 버튼 checked true 일 경우 버튼 숨기기
+	//등록 | 수정 선택시 readonly 설정 제거
+	//등록 선택시 필드 값 초기화
+	//등록 | 수정 | 삭제 선택시 #form1 의 action 경로 설정
+
+	
 	//등록 radio
 	function enrollChecked(){
+/* 		$("#enrollBtn").attr("style", "display:inline");
+		$("#editBtn").attr("style", "display:none");
+		$("#deleteBtn").attr("style", "display:none");
+		
+		$("#idchkBtn").attr("style", "display:block");
+		
+		$("#table1 input").attr("readonly", false);
+		$("#table1 input").val(""); */
+		
 		$("#saveBtn").attr("style", "display:inline");
 		$("#editSaveBtn").attr("style", "display:none");
 		$("#returnBtn").attr("style", "display:none");
@@ -50,17 +219,9 @@
 		$("#table1 input").not($("#rnum")).not($("#rdate")).not($("#rstartdate")).attr("readonly", false);
 		$("#rrastdate").attr("style", "display:none");
 		$("#rbookdate").attr("style", "display:none");
-		
-		
-		
+	
 		$("#table1 input").val("");
-		//등록 라디오 버튼 클릭시 물품 중에서 대여상태가 대기상태인
-		//품목을 객체로 받아와서 대여상품 콤보박스에 실시간 출력되도록 처리
-		//아이디 입력 후 유효성 조회하기 > 이것도 ajax 호출로
-		//alert 창 띄워서 존재하는 아이디인지 확인 //id말고 다른 것도 받아야 할 듯
-		//일단은 품목출력만
-		
-		
+
 		//대여/반납접수일자, 대여실행일자 기본 값
 		var sysMonth1 = 0;
 		var sysDay1 = 0;
@@ -81,143 +242,213 @@
 		$("#rreturndate").val(sysYear + "-" + sysMonth1 + "-" + (sysDay1+1));
 		$("#rstartdate").val(sysYear + "-" + sysMonth1 + "-" + sysDay1);
 		
-		return false;
-	}
-	//수정 radio
-	function editChecked(){
-		$("#saveBtn").attr("style", "display:none");
-		$("#editSaveBtn").attr("style", "display:inline");
-		$("#returnBtn").attr("style", "display:inline");
 		
-		$("#table1 input").attr("readonly", false);
-		$("#mid").attr("readonly", true);
-		//$("#form1").attr("action", "/semi/medit");
-		return false;
-	}
-
-	//-------------------------------------------------------------
-	
-	//대여 등록
-	function enrollClick(){
+		localPrint();	//지역명 출력 함수 호출
 		
-		//rentalInfo.retalNum = $("#rnum").val();
-		rentalInfo.retalNum = $("#pnum").val();
-		rentalInfo.retalNum = $("#mid").val();
-		rentalInfo.retalNum = $("#rprice").val();
-		rentalInfo.retalNum = $("#rdate").val();
-		rentalInfo.retalNum = $("#rstartdate").val();
-		rentalInfo.retalNum = $("#rreturndate").val();
-		//rentalInfo.retalNum = $("#rrastdate").val();
-		rentalInfo.retalNum = $("#rbookdate").val();
-		rentalInfo.retalNum = $("#pstate").val();
-		rentalInfo.retalNum = $("#rcount").val();
-		
-		var jsonStr = JSON.stringify(rentalInfo);
-		//var json = JSON.parse(jsonStr);
-
-		$.ajax({
-			url : "/semi/renroll",
+		/* $.ajax({
+			url : "/semi/mrplist",
 			type : "post",
-			data : {"jsonStr" : jsonStr},
 			//dataType : "json",
 			success : function(data){
-				if(data >= 1)
-					alert("대여 등록 완료");
-				else
-					alert("대여 등록 실패");
-				paging(currentPage);
+				//리스트에서 꺼내서 물품명 select box for문 돌려서 생성
+				var jsonStr = JSON.stringify(data);
+				var json = JSON.parse(jsonStr);
+			
+				for(var i = 0; i <= json.list.length; i++){
+					$("#pname").append("<option id='pnameChk" + i + "'>" + decodeURIComponent(json.list[i].pname) + "</option>");
+				} //for
+				
 			}, //success
 			error : function(jqXHR, textstatus, errorThrown){
 				console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
-			} //error
-		});//ajax
+			}
+		}); //ajax*/
+
+		return false;
+	}
+
+	//수정 radio
+	function editChecked(){
+		$("#enrollBtn").attr("style", "display:none");
+		$("#editBtn").attr("style", "display:inline");
+		$("#deleteBtn").attr("style", "display:none");
+		
+		$("#table1 input").attr("readonly", false);
+		$("#mid1").attr("readonly", true);
+		$("#idchkBtn").attr("style", "display:none");
+		//$("#form1").attr("action", "/semi/medit");
+		return false;
+	}
+	//삭제 radio
+	function deleteChecked(){
+		$("#enrollBtn").attr("style", "display:none");
+		$("#editBtn").attr("style", "display:none");
+		$("#deleteBtn").attr("style", "display:inline");
+		
+		$("#table1 input").attr("readonly", true);
+		$("#idchkBtn").attr("style", "display:none");
+		
+		//$("#form1").attr("action", "/semi/mdelete");
+		return false;
+	}
+	//-------------------------------------------------------------
+	
+	//회원 등록
+	function enrollClick(){
+		if(confirm("입력한 정보로 신규 회원을 등록 하시겠습니까?")){
+			var birth1 = $("#birth2").val();
+			var birth2 = $("#birth2").val();
+			var b2;
+			if(birth2 < 10)
+				b2 = "0" + birth2;
+			else
+				b2 = birth2;
+			var birth3 = $("#birth3").val();
+			var b3;
+			if(birth3 < 10)
+				b3 = "0" + birth3;
+			else
+				b3 = birth3;
+			memberInfo.mname = $("#mname").val();
+			memberInfo.mid = $("#mid1").val();
+			memberInfo.mnick = $("#mnick").val();
+			memberInfo.mpwd = $("#mpwd").val();
+			memberInfo.msno = (birth1 + "-" + b2 + "-" + b3);
+			if($("#T").is(":checked") == true)
+				memberInfo.mgender = "M";
+			else
+				memberInfo.mgender = "F";
+	
+			memberInfo.mphone = $("#mphone").val();
+			memberInfo.memail = $("#memail").val();
+			
+			var adr1 = $("#sample4_postcode").val();
+			var adr2 = $("$sample4_roadAddress").val();
+			memberInfo.maddress = (adr1 + ", " + adr2);
+			
+			memberInfo.mpoint = $("#mpoint").val(); 
+			
+			var jsonStr = JSON.stringify(memberInfo);
+			//var json = JSON.parse(jsonStr);
+	
+			$.ajax({
+				url : "/semi/mmenroll",
+				type : "post",
+				data : {"jsonStr" : jsonStr},
+				//dataType : "json",
+				success : function(data){
+					if(data >= 1)
+						alert("회원 등록 완료");
+					else
+						alert("회원 등록 실패");
+					paging(currentPage);
+				}, //success
+				error : function(jqXHR, textstatus, errorThrown){
+					console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
+				} //error
+			});//ajax
+			paging(1);
+		}else{
+			alert("회원 등록을 취소합니다.");
+		}
 		return false;
 	} //enrollClick
 	
 	//회원 수정
 	function editClick(memberInfo){
-		var birth1 = $("#birth1").val();
-		var b1 = birth1.substring(2, 4);
-		var birth2 = $("#birth2").val();
-		var b2;
-		if(birth2 < 10)
-			b2 = "0" + birth2;
-		else
-			b2 = birth2;
-		var birth3 = $("#birth3").val();
-		var b3;
-		if(birth3 < 10)
-			b3 = "0" + birth3;
-		else
-			b3 = birth3;
-		memberInfo.mname = $("#mname").val();
-		memberInfo.mid = $("#mid").val();
-		memberInfo.mnick = $("#mnick").val();
-		memberInfo.mpwd = $("#mpwd").val();
-		memberInfo.msno = (b1 + b2 + b3);
 		
-		if($("#T").is(":checked") == true)
-			memberInfo.mgender = "남";
-		else
-			memberInfo.mgender = "여";
-
-		memberInfo.mphone = $("#mphone").val();
-		memberInfo.memail = $("#memail").val();
-		memberInfo.maddress = $("#maddress").val();
-		memberInfo.mpoint = $("#mpoint").val(); 
-		
-		var jsonStr = JSON.stringify(memberInfo);
-
-		$.ajax({
-			url : "/semi/medit",
-			type : "post",
-			data : {"jsonStr" : jsonStr},
-			success : function(data){
-				if(data >= 1)
-					alert("회원 정보 수정 완료");
-				else
-					alert("회원 정보 수정 실패");
-				paging(currentPage);
-			}, //success
-			error : function(jqXHR, textstatus, errorThrown){
-				console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
-			} //error
+		if(confirm("변경된 정보로 정말 수정하시겠습니까?")){
+			var birth1 = $("#birth2").val();
+			var birth2 = $("#birth2").val();
+			var b2;
+			if(birth2 < 10)
+				b2 = "0" + birth2;
+			else
+				b2 = birth2;
+			var birth3 = $("#birth3").val();
+			var b3;
+			if(birth3 < 10)
+				b3 = "0" + birth3;
+			else
+				b3 = birth3;
+			memberInfo.mname = $("#mname").val();
+			memberInfo.mid = $("#mid").val();
+			memberInfo.mnick = $("#mnick").val();
+			memberInfo.mpwd = $("#mpwd").val();
+			memberInfo.msno = (birth1 + "-" + b2 + "-" + b3);
 			
-		});//ajax
-		
-
+			if($("#T").is(":checked") == true)
+				memberInfo.mgender = "남";
+			else
+				memberInfo.mgender = "여";
+	
+			memberInfo.mphone = $("#mphone").val();
+			memberInfo.memail = $("#memail").val();
+			
+			var adr1 = $("#sample4_postcode").val();
+			var adr2 = $("$sample4_roadAddress").val();
+			memberInfo.maddress = (adr1 + ", " + adr2);
+			
+			memberInfo.mpoint = $("#mpoint").val(); 
+			
+			var jsonStr = JSON.stringify(memberInfo);
+	
+			$.ajax({
+				url : "/semi/mmedit",
+				type : "post",
+				data : {"jsonStr" : jsonStr},
+				success : function(data){
+					if(data >= 1)
+						alert("회원 정보 수정 완료");
+					else
+						alert("회원 정보 수정 실패");
+					paging(currentPage);
+				}, //success
+				error : function(jqXHR, textstatus, errorThrown){
+					console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
+				} //error
+				
+			});//ajax
+		}else{
+			alert("변경사항을 저장하지 않고 수정을 취소합니다.");
+		}
+		paging(currentPage);
 		return false;
 	}
 	
 	//회원 삭제
 	function deleteClick(memberInfo){
-		var mId = memberInfo.mid;
-		$.ajax({
-			url : "/semi/mdelete",
-			type : "post",
-			data : {"mId" : mId},
-			success : function(data){
-				if(data >= 1)
-					alert("회원 정보 삭제 완료");
-				else
-					alert(memberInfo.mid + "님의 회원 정보 삭제 실패");
-				$("#table1 input").val("");
-				paging(currentPage);
+		if(confirm("해당 회원을 정말 삭제하시겠습니까?")){
+			var mid = memberInfo.mid;
+			$.ajax({
+				url : "/semi/mmdelete",
+				type : "post",
+				data : {"mid" : mid},
+				success : function(data){
+					if(data >= 1)
+						alert("회원 정보 삭제 완료");
+					else
+						alert(memberInfo.mid + "님의 회원 정보 삭제 실패");
+					$("#table1 input").val("");
+					paging(currentPage);
+					
+				}, //success
+				error : function(jqXHR, textstatus, errorThrown){
+					console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
+				} //error
 				
-			}, //success
-			error : function(jqXHR, textstatus, errorThrown){
-				console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
-			} //error
-			
-		}); //ajax
-		
+			}); //ajax
+		}else{
+			alert("회원 삭제를 취소합니다.");
+		}
+		paging(currentPage);
 		return false;
 	} //deleteClick
 	
 	//-------------------------------------------------------------
 	
 	//회원 선택시 table1 필드에 회원 정보 출력과 memberInfo에 회원 정보 담기
-	function radioCheck(num){		
+	function radioCheck(num){	
 		//select한 회원 정보로 memberInfo 초기화
 		memberInfo.mname = $("#nametd" + num).text();
 		memberInfo.mid = $("#idtd" + num).text();
@@ -233,42 +464,35 @@
 		//table1에 회원 정보 출력
 		//$("#mname").val($("#nametd" + num).text());
 		$("#mname").val(memberInfo.mname);
-		$("#mid").val(memberInfo.mid);
+		$("#mid1").val(memberInfo.mid);
 		$("#mnick").val(memberInfo.mnick);
 		$("#mpwd").val(memberInfo.mpwd);
 		$("#mpwd2").val(memberInfo.mpwd);
 		
 		var sno = memberInfo.msno;	
-		var year = sno.substring(0, 2);
-		if(year < 19)
-			year = (20 + year);
-		
-		else
-			year = (19 + year);
-		
-		var month = parseInt(sno.substring(2, 4));
-		//if(month > 10)
-		//	month = month.substring(1, 2);
-		
-		var day = parseInt(sno.substring(4, 6));
-		//if(day > 10)
-		//	day = day.substring(1, 2);
-		//alert(year + ", " + month + ", " + day);
+		var year = sno.substring(0, 4);
+		var month = sno.substring(6, 7);
+		var day = sno.substring(9, 10);
 		$("#birth1").val(year);
 		$("#birth2").val(month);
 		$("#birth3").val(day);
-			//alert(memberInfo.mgender);
+
 		if(memberInfo.mgender == "남"){
+			//$("#F").attr("checked", false);
 			$("#T").attr("checked", true);
-			$("#F").attr("checked", false);
+			
 		}else if(memberInfo.mgender == "여"){
+			//$("#T").attr("checked", false);
 			$("#F").attr("checked", true);
-			$("#T").attr("checked", false);
 		}
 		
 		$("#mphone").val(memberInfo.mphone);
 		$("#memail").val(memberInfo.memail);
-		$("#maddress").val(memberInfo.maddress);
+		
+		var adrSplit = memberInfo.maddress.split(",");
+		$("#sample4_postcode").val(adrSplit[0]);
+		$("#sample4_roadAddress").val(adrSplit[1]);
+		
 		$("#mpoint").val(memberInfo.mpoint);
 		
 		return false;
@@ -278,10 +502,9 @@
 	
 	//회원 리스트 전체 조회
 	function paging(page){
-		
 
 		$.ajax({
-			url : "/semi/mlist",
+			url : "/semi/mmlist",
 			type : "get",
 			data : {"page" : page},
 			dataType : "json",
@@ -318,17 +541,19 @@
 				$("#t1").html(values); 
 				
 				//페이징 처리
-				for(var p = startPage; p <= endPage; p++){ 
-					if(p == currentPage){
-						$("#domain").html(domainHtml + "<font color='red' size='4'>[" + p + "]</font>");
-					}else{ 
-						$("#domain").html(domainHtml + "<a href='#' onclick='paging(" + p + ")'>" + p + "</a>");
-					}
-					var domainHtml = $("#domain").html();
-				}
+				var firstP = "<li><a id='firstBtn' href='#' onclick='paging(" + startPage + ")'>[처음으로]</a></li>";
+				var finalP = "<li><a id='finalBtn' href='#' onclick='paging(" + endPage + ")'>[끝으로]</a></li>";
 				
-				//맨끝
-				$("#finalBtn").attr("onclick", "paging(" + maxPage + ")");
+				for(var p = startPage; p <= endPage; p++){ 
+					if(p == startPage)
+						$("#domain").html(firstP);
+					
+					//if(p > startPage)
+					$("#domain").append("<li><a href='#' onclick='paging(" + p + ")'>" + p + "</a></li>");
+					
+					if(p == endPage)
+						$("#domain").append(finalP);	
+				} //paging for
 				
 			}, //success
 				error : function(jqXHR, textstatus, errorThrown){
@@ -349,7 +574,7 @@
 		value = $("#searchTF").val();
 
 		$.ajax({
-			url : "/semi/mselect",
+			url : "/semi/mmselect",
 			type : "post",
 			data : {"filter" : filter, "value" : value},
 			dataType : "json",
@@ -383,151 +608,198 @@
 		}); //ajax
 		return false;	
 	}
+	
+	//아이디 중복확인
+	function dupIdCheck() {
+		$.ajax({
+			url : "/semi/idchk",
+			type : "post",
+			data : {
+				m_id : $("#mid1").val()},
+			success : function(data) {
+				console.log("success : " + data);
+				if (data == "ok") {
+					alert("사용 가능한 아이디입니다.");
+					$("#m_name").focus();
+				} else {
+					alert("이미 사용중인 아이디입니다.\n" + "다시 입력하십시오.");
+					$("#m_id").select();
+				}
+			},
+			error : function(jqXHR, textstatus, errorthrown) {
+				console.log("error : " + jqXHR + ", " + textstatus + ", "
+						+ errorthrown);
+			}
+		});
+		return false;
+	}
 
 </script>
 
-        <!-- Left Panel -->
-
-     <aside id="left-panel" class="left-panel" style="background-color:#ffcc00;padding:0px;border:0px;box-sizing:border-box;">
-       <div class="navbar navbar-expand-sm nabar-default" style="background-color:#ffcc00;padding:0px;border:0px;box-sizing:border-box;">
-        <!-- <nav class="navbar navbar-expand-sm navbar-default" style="background-color:#ffcc00;width:350px;box-sizing:border-box;"> -->  
-             <div class="navbar-header">
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#main-menu" aria-controls="main-menu" aria-expanded="false" aria-label="Toggle navigation">
-                    <!-- <i class="fa fa-bars"></i> -->
-                </button>
-               <a class="navbar-brand" href="./"><div style="color:black;">관리자 페이지</div></a>
-                <!-- <a class="navbar-brand hidden" href="./"><img src="images/logo2.png" alt="Logo"></a> -->
-            </div> 
-            <div id="main-menu" class="main-menu collapse navbar-collapse">
-                <ul class="nav navbar-nav">
-                    <li>
-                    <div style="color:black;">
-                        <strong><a href="/semi/memberManagement.jsp">대여관리</a><br>
-                        <a href="">대여관리</a></strong>
-                    </div>
-                    </li>  
-<!-- rentalDetailView
- -->            <div class="col-lg-6">
-            <div class="card-body" style="width:380px;hegiht:550px;">
- 			<div class="card" id="table1">
-                      <div class="card-header">
-                        <strong>대여 상세 정보</strong>
-                        <div align="right">
-                        <input type="radio" id="radio1" name="radioC" onclick="enrollChecked();">등록
-						<input type="radio" id="radio2" name="radioC" onclick="editChecked();">수정
-						</div>
-                      </div>
-                      <div class="card-body card-block" style="font-size:14px;">
-                        <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
-       
-                          <div class="row form-group">
-                            <div class="col col-md-3"><label class=" form-control-label">대여번호</label></div>
-                            <div class="col-12 col-md-9" ><input type="text" id="rnum" name="rnum" placeholder="대여번호" class="form-control"><small class="help-block form-text">신규 등록시 자동 생성됩니다.</small></div>
-                          </div>
-                          <div class="row form-group">
-                            <div class="col col-md-3"><label class=" form-control-label">물품번호</label></div>
-                            <div class="col-12 col-md-9"><input type="text" id="pnum" name="pnum" placeholder="물품번호" class="form-control"></div>
-                          </div>
-                          <div class="row form-group">
-                            <div class="col col-md-3"><label class=" form-control-label">대여상품</label></div>
-                            <div class="col-12 col-md-9"><input type="text" id="rname" name="rname" placeholder="대여상품" class="form-control"></div>
-                          </div>
-                          <div class="row form-group">
-                            <div class="col col-md-3"><label class=" form-control-label">대여금액</label></div>
-                            <div class="col-12 col-md-9"><input type="text" id="rprice" name="rprice" placeholder="대여금액" class="form-control"></div>
-                          </div>                              
-                          <div class="row form-group">
-                            <div class="col col-md-3"><label class=" form-control-label">대여수량</label></div>
-                            <div class="col-12 col-md-9"><input type="text" id="rcount" name="rcount" placeholder="대여수량" class="form-control"></div>
-                          </div>
-                          <div class="row form-group">
-                            <div class="col col-md-3"><label class=" form-control-label">대여접수일자</label></div>
-                            <div class="col-12 col-md-9"><input type="date" id="rdate" name="rdate"></div>
-                          </div>
-                          <div class="row form-group">
-                            <div class="col col-md-3"><label class=" form-control-label">대여실행일자</label></div>
-                            <div class="col-12 col-md-9"><input type="date" id="rstartdate" name="rstartdate"></div>
-                          </div>
-                          <div class="row form-group">
-                            <div class="col col-md-3"><label class=" form-control-label">반납접수일자</label></div>
-                            <div class="col-12 col-md-9"><input type="date" id="rreturndate" name="rreturndate"></div>
-                          </div>
-                          <div class="row form-group">
-                            <div class="col col-md-3"><label class=" form-control-label">반납실행일자</label></div>
-                            <div class="col-12 col-md-9"><input type="date" id="rrastdate" name="rrastdate"></div>
-                          </div>
-                          <div class="row form-group">
-                            <div class="col col-md-3"><label class=" form-control-label">예약일자</label></div>
-                            <div class="col-12 col-md-9"><input type="date" id="rbookdate" name="rbookdate"></div>
-                          </div>
-                          <div class="row form-group">
-                            <div class="col col-md-3"><label class=" form-control-label">대여상태</label></div>
-                            <div class="col-12 col-md-9">
-                            <select id="filter" name="filter">
-							<option>대기</option>
-							<option>대여중</option>						
-							</select>
+<body>
+<div class="properties-area recent-property" style="background-color: #FFF;">
+	<div class="container" style="width:1400px;height:1400px;">  
+                <div class="row">              
+                <div class="col-md-3 p0 padding-top-40" style="width:300px;height:800;">
+                    <div class="blog-asside-right pr0">
+                        <div class="panel panel-default sidebar-menu wow fadeInRight animated animated" style="visibility: visible; animation-name: fadeInRight;">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">대여관리</h3>
                             </div>
-                          </div>
-                          <div class="row form-group">
-                            <div class="col col-md-3"><label class=" form-control-label">대여자아이디</label></div>
-                            <div class="col-12 col-md-9"><input type="text" id="mid" name="mid" placeholder="대여자아이디" class="form-control"></div>
-                          </div>                        	
-
-                         
-                          <div align="center">
-                      		<button type="button" id="saveBtn" name="saveBtn"  onclick="saveClick();" style="display:none;">저장</button>
-							<button type="button" id="editSaveBtn" name="editSaveBtn" onclick="editSaveClick(memberInfo);" style="display:none;">완료</button>
-							<button type="button" id="returnBtn" name="returnBtn" onclick="returnClick(memberInfo);" style="display:none;">반납</button>
-							<button type="reset" id="cancleBtn" name="cancleBtn">취소</button>
-						  </div>
-						 </form>
-                      </div>
-					</div>
-				</div>  
-				
-				
-				
-				
-				
-				            <!-- </div>  -->
-            
-</div></ul>
-            </div>
-            </div>
-        <!-- </nav> -->
-    </aside>  <!-- /#left-panel -->
-        <div class="breadcrumbs" > 
-             <div class="col-sm-4"> 
-                 <div class="page-header float-left">
-                    <div class="page-title">
-                        <h2 >회원관리</h2>                   
-                    </div>                   
-                </div> 
-             </div> 
-        </div>
-
-        <div class="content mt-3" style="width:2000px;height:500px;">
-            <div class="animated fadeIn">
-                <div class="row">
-                <div class="col-lg-6">
-                    <div class="card">
-                        <div class="card-header">
-                        <select class="btn btn-warning" id="filter" name="filter">
-							<option>선택</option>
-							<option>이름</option>	
-							<option>아이디</option>		
-							<option>닉네임</option>	
-							<option>전화번호</option>	
-						</select>
-						<input style="border:3px;" type="search" size="80px" id="searchTF" name="search">
-						<button class="btn btn-warning" type="button" id="selecthBtn" name="selecthBtn" onclick="selectBtnClick();">조회</button>
-		                <button class="btn btn-warning" type="button" id="listBtn" name="listBtn" onclick="paging(1);">전체조회</button>
-
+                            <div class="panel-body search-widget" id="table1">
+                                <!-- <form action="" class=" form-inline">  -->
+                                    <fieldset>
+                                    	<div class="row">
+                                            <div class="col-xs-12">
+                                            	<input type="radio" id="radio1" name="radioC" onclick="enrollChecked();">등록
+												<input type="radio" id="radio2" name="radioC" onclick="editChecked();">수정
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                        	<div class="col-xs-12" style="width:53px;">
+                                            	<label>대여소</label>
+                                            </div>
+                                            <div class="col-xs-12">
+                                            	<select onChange="localSelectEvent();" class="btn dropdown-toggle btn-default" id="local1" name="local1">
+													<option>지역선택</option>
+												</select> 
+												<select onChange="localNameSelectEvent();" class="btn dropdown-toggle btn-default" id="local2" name="local2">
+													<option>동사무소선택</option>
+												</select> 
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                        	<div class="col-xs-12" style="width:53px;">
+                                            	<label>대여번호</label>
+                                            </div>
+                                            <div class="col-xs-12">
+                                            	<input type="text" id="rnum" name="rnum" placeholder="대여번호" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                        	<div class="col-xs-12" style="width:53px;">
+                                            	<label>물품정보</label>
+                                            </div>
+                                            <div class="col-xs-12">
+                                                <select onChange="productInfoPtint();" class="btn dropdown-toggle btn-default" id="pname" name="pname">
+													<option>물품명선택</option>
+												</select> 
+												<input type="text" id="pnum" name="pnum" placeholder="물품번호" class="form-control">
+                                            </div>                    
+                                        </div>
+                                        <div class="row">
+                                        	<div class="col-xs-12" style="width:53px;">
+                                            	<label>대여금액</label>
+                                            </div>
+                                            <div class="col-xs-12">
+                                                <input type="text" id="rprice" name="rprice" placeholder="대여금액" class="form-control" style="width: 90px;">1개
+                                                1개
+                                                <input type="text" id="rcount" name="rcount" placeholder="대여수량" class="form-control" style="width: 47px;">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                        	<div class="col-xs-12" style="width:53px;">
+                                            	<label>대여접수일자</label>
+                                            </div>
+                                            <div class="col-xs-12">
+                                                <input type="date" id="rdate" name="rdate">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                        	<div class="col-xs-12" style="width:53px;">
+                                            	<label>대여실행일자</label>
+                                            </div>
+                                            <div class="col-xs-12">
+                                                <input type="date" id="rstartdate" name="rstartdate">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                        	<div class="col-xs-12" style="width:53px;">
+                                            	<label>반납접수일자</label>
+                                            </div>
+                                            <div class="col-xs-12">
+												<input type="date" id="rreturndate" name="rreturndate">                                
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                        	<div class="col-xs-12" style="width:53px;">
+                                            	<label>반납실행일자</label>
+                                            </div>
+                                            <div class="col-xs-12">
+                                                <input type="date" id="rrastdate" name="rrastdate">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                        	<div class="col-xs-12" style="width:53px;">
+                                            	<label>예약일자</label>
+                                            </div>
+                                            <div class="col-xs-12">
+                                                <input type="date" id="rbookdate" name="rbookdate">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                        	<div class="col-xs-12" style="width:53px;">
+                                            	<label>대여상태</label>
+                                            </div>
+                                            <div class="col-xs-12">
+                                                <select id="filter" name="filter">
+												<option>대기</option>
+												<option>대여중</option>						
+												</select>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                        	<div class="col-xs-12" style="width:53px;">
+                                            	<label>대여자아이디</label>
+                                            </div>
+                                            <div class="col-xs-12">
+                                                <input type="text" id="mid1" name="mid1" placeholder="대여자아이디" class="form-control">
+                                            </div>                                           
+                                        </div>                                      
+                                        <div class="row" style="display:flex;align-items:center;justify-content:center;">
+                                            <div class="col-xs-12">
+                                                <button type="button" id="saveBtn" name="saveBtn" onclick="saveClick();" style="display:none;" class="btn btn-finish btn-primary">저장</button>
+												<button type="button" id="editSaveBtn" name="editSaveBtn" onclick="editSaveClick(memberInfo);" style="display:none;" class="btn btn-finish btn-primary">완료</button>
+												<button type="button" id="returnBtn" name="returnBtn" onclick="returnClick(memberInfo);" style="display:none;" class="btn btn-finish btn-primary">반납</button>
+												<button type="reset" id="cancleBtn" name="cancleBtn" class="btn btn-finish btn-primary">취소</button>
+                                            </div>
+                                        </div>
+                                        
+                                    </fieldset>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <table class="table" id="table2">
-                              <thead>
+                    </div>
+                </div>
+                <div class="col-md-9  pr0 padding-top-40 properties-page" style="width:950px;height:1000px;">
+                    <div class="col-md-12 clear"> 
+                        <div class="col-xs-10 page-subheader sorting pl0">
+                           <ul class="sort-by-list">
+                                <li class="active">
+                                	<select class="btn dropdown-toggle btn-default" id="filter" name="filter">
+		                              <!-- <select class="selectpicker" id="filter" name="filter"> -->
+										<option>선택</option>
+										<option>이름</option>	
+										<option>아이디</option>		
+										<option>닉네임</option>	
+										<option>전화번호</option>	
+									</select>                                      
+                                </li>
+                                <li class="">
+                                    <input style="width:400px;" class="form-control" type="search" size="80px" id="searchTF" name="search">
+                                </li>
+                                <li class="">
+                                    <button class="btn btn-finish btn-primary" type="button" id="selecthBtn" name="selecthBtn" onclick="selectBtnClick();">조회</button>
+                                </li>
+                                <li class="">
+                                    <button class="btn btn-finish btn-primary" type="button" id="listBtn" name="listBtn" onclick="paging(1);">전체조회</button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 clear"> 
+                    	<table class="table" id="table2">
+                    		<thead>
                             <tr>
 								<th width="25">선택</th>
 								<th width="100">이름</th>
@@ -540,29 +812,24 @@
 								<th width="100">주소</th>
 								<th width="100">포인트</th>
 							</tr>
-                          </thead>
-                          <tbody id="t1">
-                           
-                      </tbody>
-                  </table>
-
-				
-                      <!-- 페이징 처리 -->
-					<div id="paging1" align="center" style="text-align: center">
-					<a id="firstBtn" href="#" onclick="paging(1);">[처음으로]</a>
-					<div id="domain" style="text-align: center"></div>
-					<a id="finalBtn" href="#" onclick="">[끝으로]</a>
-					</div>
-                        </div>
+							</thead>
+							<tbody id="t1">
+							</tbody>
+						</table>
                     </div>
-                </div>
+                    <div class="col-md-12"> 
+                        <div class="pull-right">
+                            <div class="pagination">
+                                <ul id="domain">
+        
+                                </ul>
+                            </div>
+                        </div>                
+                    </div>    
+                </div>  
+                </div>              
+            </div>
+</div><!-- properties-area -->
 
-                </div>
-            </div><!-- .animated -->
-        </div><!-- .content -->
-    </div><!-- /#right-panel -->
 
-    <!-- Right Panel -->
-
-
-<%@ include file="../../footer.jsp" %>
+<%@ include file="../../footer.jsp"%>
