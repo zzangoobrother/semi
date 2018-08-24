@@ -144,6 +144,7 @@ $(function(){
 <!-- <button style="position:absolute; right:0px; bottom:0px;">결제하기</button> -->
 <button width="90" height="50" style="width: 150px; height: 40px;" class="btn btn-warning">결제하기</button> &nbsp; &nbsp;
 <button style="width: 150px; height: 40px;" onclick="location.href='/gonggu/index.jsp'" class="btn btn-warning">취소</button>
+<button>test</button>
 </td>
 </tr>
 </table>
