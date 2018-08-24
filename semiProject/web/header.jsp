@@ -90,7 +90,7 @@
                    
                         <% if(mName == null){ %>
                         <input type="button" id="loginradio" name="loginradio" value="관리자로 전환" onclick="goPage();">
-                        <form action="/semi/login" method="post">
+                        <form action="/semi/login.cp" method="post">
                         <table width="250" height="75" cellspacing="0" cellpadding="0">
 					<tr><td width="200">
 					
@@ -101,7 +101,7 @@
 					</td></tr>
 				<tr><td>
 					<!-- <input type="password" name="userpwd" size="15"> -->
-					<input type="password" id="mpassword" name="mpassword" size="15" required placeholder="비밀번호를 입력하세요">
+					<input type="password" id="mpassword" name="m_password1" size="15" required placeholder="비밀번호를 입력하세요">
 				   </td></tr>
 				   <tr><td colspan="2">
 					<a href="/semi/views/member/memberEnroll.jsp">회원가입</a> &nbsp;
