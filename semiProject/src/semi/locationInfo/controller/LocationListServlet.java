@@ -1,8 +1,6 @@
 package semi.locationInfo.controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 
 import javax.servlet.RequestDispatcher;
@@ -11,9 +9,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 
 import semi.locationInfo.model.service.LocationInfoService;
 import semi.locationInfo.model.vo.LocationInfo;
@@ -37,9 +32,9 @@ public class LocationListServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-response.setContentType("text/html; charset=utf-8");
+		response.setContentType("text/html; charset=utf-8");
 		
-		int currentPage = 1;
+		/*int currentPage = 1;
 
 		int limit = 10;
 
@@ -65,7 +60,7 @@ response.setContentType("text/html; charset=utf-8");
 			}
 			
 			JSONObject json = new JSONObject();
-			//list는 json 배열에 저장하고, json 배열을 전송용 json 객체에 저장함
+			
 			JSONArray jarr = new JSONArray();
 			
 			for(LocationInfo l : list) {
@@ -80,7 +75,7 @@ response.setContentType("text/html; charset=utf-8");
 			}
 			
 			json.put("list", jarr);
-			//확인
+			
 			System.out.println(json.toJSONString());
 			
 			response.setContentType("application/json; charset=utf-8");
@@ -88,13 +83,14 @@ response.setContentType("text/html; charset=utf-8");
 			out.print(json.toJSONString());
 			out.flush();
 			out.close();
+			
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		}*/
 		
 		
 
-		/*int currentPage = 1;
+		int currentPage = 1;
 		
 		int limit = 10;
 		
@@ -139,7 +135,7 @@ response.setContentType("text/html; charset=utf-8");
 			view = request.getRequestDispatcher("views/location/locationErroe.jsp");
 			request.setAttribute("message", e.getMessage());
 			view.forward(request, response);
-		}*/
+		}
 	}
 
 	/**

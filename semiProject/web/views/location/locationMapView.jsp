@@ -3,12 +3,12 @@
     pageEncoding="UTF-8"%>
 <%@ page import="semi.locationInfo.model.vo.LocationInfo, java.util.ArrayList" %>
 <%
-	/* ArrayList<LocationInfo> list = (ArrayList<LocationInfo>) request.getAttribute("list");*/
-	int currentPage = ((Integer) request.getAttribute("currentPage")).intValue();
+	ArrayList<LocationInfo> list = (ArrayList<LocationInfo>) request.getAttribute("list");
+	 int currentPage = ((Integer) request.getAttribute("currentPage")).intValue();
 	int maxPage = ((Integer) request.getAttribute("maxPage")).intValue();
 	int startPage = ((Integer) request.getAttribute("startPage")).intValue();
 	int endPage = ((Integer) request.getAttribute("endPage")).intValue();
-	int listCount = ((Integer) request.getAttribute("listCount")).intValue();
+	int listCount = ((Integer) request.getAttribute("listCount")).intValue(); 
 %>
 
 <%@ include file="../../header.jsp" %>
@@ -80,9 +80,30 @@
 		
 		marker.setMap(map);
 		
+		$(function() {
+			var address = $("#address").html()
+			console.log(address);
+			for(a in address) {
+				console.log(a);
+			}
+			
+		});
 		
-		console.log(json.list);
-		 
+		/* $(function() {
+			$.ajax({
+				url : "maplist",
+				type : "post",
+				dataType : "json",
+				success : function(data) {
+					var jsonStr = JSON.stringify(data);
+					var json = JSON.parse(jsonStr);
+					console.log("123");
+					for(var i in json.list) {
+						console.log(decodeURIComponent(json.list[i].address));	
+					}
+				}
+			});
+		}); */		 
 		
 		/* function addressSelect() {
 			var address = document.getElementById("address").value; // 주소 입력
@@ -123,11 +144,11 @@
 				<th>주민센터</th>
 			</tr>
 			
-			<%-- <% for(LocationInfo l : list) { %>
+			<% for(LocationInfo l : list) { %>
 			<tr>
-				<td><%= l.getL_Local() %></td><td id="address"><%= l.getL_Address() %></td><td><%= l.getL_Name() %></td>
+				<td><%= l.getL_Local() %></td><td id="address" name="address"><%= l.getL_Address() %></td><td><%= l.getL_Name() %></td>
 			</tr>
-			<% } %> --%>
+			<% } %>
 		</table>
 	</div>
 
