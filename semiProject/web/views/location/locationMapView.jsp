@@ -21,7 +21,7 @@
 	<div align="center">
 		<select id="selectlocation" name="selectlocation">
 			<option selected>전체</option>
-			<option>강남구 다시한번</option>
+			<option>강남구</option>
 			<option>강동구</option>
 			<option>강북구</option>
 			<option>강서구</option>
@@ -83,10 +83,6 @@
 		$(function() {
 			var address = $("#address").html()
 			console.log(address);
-			for(a in address) {
-				console.log(a);
-			}
-			
 		});
 		
 		/* $(function() {
