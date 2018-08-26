@@ -1,8 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@	page import="semi.products.model.vo.Product, java.util.ArrayList" %>
+<%@	page import="semi.cart.model.vo.Cart, java.util.*, java.sql.*" %>
 <%
-	ArrayList<Product> list = (ArrayList<Product>)request.getAttribute("list");
+	ArrayList<Cart> list = (ArrayList<Cart>)request.getAttribute("list");
 	System.out.print(list.toString());
 	//Product p = new Product();
 	/* for(int i = 0; i < list.size(); i++){
@@ -78,8 +78,8 @@ $(function(){
 <input type="checkbox" rowspan="2" colspan="0" style="width: 20px; height: 20px;" id="allCheck" ><hr>
 </td></tr>
 <% for(int i = 0; i < list.size(); i++){
-	//p = list.get(i);
-	// Product p = list.get(i);%>
+	Cart c = list.get(i);
+	c = list.get(i);%>
 <tr>
 <td rowspan="3" colspan="2" align="center">
 <input type="checkbox" name="listChk[]" style="width: 15px; height: 15px;">
@@ -87,56 +87,32 @@ $(function(){
 
 <td rowspan="3" colspan="0" width="200">
 
-<img src="" width="200" height="150" vaule="되라">
+<img src="<%= c.getP_Main_Image() %>" width="200" height="150" vaule="되라">
 </td>
 <th>대여 물품명</th>
 <td> 
 <input type="text" style="width:200px; height:30px; text-align:right; border-radius: 4px;" class="form-control" 
-			<%-- value="<%= p.getP_name() %>" --%> readonly>
+			value="<%= c.getP_Name() %>" readonly>
 </td></tr>
 <tr>
 <th>대여 물품가격</th>
 <td>
 <input type="text" style="width: 200px; height: 30px; text-align: right; border-radius: 4px;" class="form-control"
-			 <%-- value="<%= list.get(i).getP_price() %>" --%> readonly name=mae[]>
+			 value="<%= c.getP_Price()%>" readonly name=mae[]>
+			 <!-- list.get(i).getP_price() -->
 </td></tr>
 <tr>
 <th>대여 가능일</th>
 <td>
 <input type="text" style="width: 200px; height: 30px; text-align: right; border-radius: 4px;" class="form-control"
-			 <%-- value="<%= list.get(i).getP_state() %>" --%> readonly>
+			 value="<%= c.getP_State() %>" readonly>
 </td></tr>
  <% } %> 
-
-<!-- 두번째 정보 -->
-<%-- <tr id="list_area_1">
-<td rowspan="3" colspan="2" align="center">
-<input type="checkbox" name="listChk[]" style="width: 15px; height: 15px;">
-</td>
-<td rowspan="3" colspan="0" width="200">
-<img src="/semi/resources/images/main/02_1.jpg" width="200" height="110" value="<%= c1.getP_main_image() %>">
-</td>
-<th>대여 물품명</th>
-<td> 
-<input type="text" style="width:200px; height:30px; text-align:right; border-radius: 4px;" class="form-control" 
-			value="<%= c1.getP_name() %>" readonly >
-</td></tr>
-<tr>
-<th>대여 물품가격</th>
-<td>
-<input type="text" style="width: 200px; height: 30px; text-align: right; border-radius: 4px;" class="form-control"
-			 value="<%= c1.getP_price() %>" readonly name=mae[]>
-</td></tr>
-<tr>
-<th>대여 가능일</th>
-<td>
-<input type="text" style="width: 200px; height: 30px; text-align: right; border-radius: 4px;" class="form-control"
-			 value="<%= c1.getP_state() %>" readonly>
-</td></tr> --%>
 </table>
 </form><br>
 </div>
 
+<!-- 오른쪽화면 -->
 <script type="text/javascript">
 	function chkProduct(){
 		alert("선택하신 물품 개수는 "+$("input[name='listChk[]']:checked").length + " 개 입니다.");
