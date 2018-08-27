@@ -1,4 +1,4 @@
-package semi.notice.controller;
+package semi.board.controller;
 
 import java.io.IOException;
 
@@ -9,20 +9,21 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import semi.notice.model.service.NoticeGongService;
+import semi.board.model.service.BoardService;
+import semi.board.model.vo.Board;
 import semi.notice.model.vo.Notice;
 
 /**
- * Servlet implementation class NoticeUpdateViewServlet
+ * Servlet implementation class BoardDetailServlet
  */
-@WebServlet("/ngupview")
-public class NoticeGongUpdateViewServlet extends HttpServlet {
+@WebServlet("/bdetail")
+public class BoardDetailServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public NoticeGongUpdateViewServlet() {
+    public BoardDetailServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -31,32 +32,35 @@ public class NoticeGongUpdateViewServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		//게시글 수정페이지 출력 처리용
+		//공지글 상세보기 처리용 컨트롤러
 		response.setContentType("text/html; charset=utf-8");
 		
-		int noticeNo = Integer.parseInt(request.getParameter("no"));
+		int boardNo = Integer.parseInt(request.getParameter("no"));
 		int currentPage = Integer.parseInt(request.getParameter("page"));
 		
+		BoardService bservice = new BoardService();
 		
-		RequestDispatcher view =null;
-		
+		RequestDispatcher view = null;
 		try {
-			Notice notice = new NoticeGongService().selectNotice(noticeNo);
+			//상세보기시 조회수 1 증가 처리
+			bservice.addReadCount(boardNo);
+			//해당 게시글 조회
+			Board board = bservice.selectNotice(boardNo);
+		
 			
-			if(notice != null){
-				view = request.getRequestDispatcher("views/notice/noticeGongUpdateView.jsp");
-				request.setAttribute("notice", notice);
-				request.setAttribute("page", currentPage);
+			if(board != null){
+				view = request.getRequestDispatcher("views/board/boardDetailView.jsp");
+				request.setAttribute("board", board);
+				request.setAttribute("currentPage", currentPage);
 				view.forward(request, response);
-				
 			}else{
-				view = request.getRequestDispatcher("views/notice/noticeGongError.jsp");
-				request.setAttribute("message", "수정페이지 이동 실패!!!");
+				view = request.getRequestDispatcher("views/board/boardError.jsp");
+				request.setAttribute("message", boardNo + "번 글 조회실패!!!!!!!");
 				view.forward(request, response);
 			}
 			
 		} catch (Exception e) {
-			view = request.getRequestDispatcher("views/notice/noticeGongError.jsp");
+			view = request.getRequestDispatcher("views/board/boardError.jsp");
 			request.setAttribute("message", e.getMessage());
 			view.forward(request, response);
 		}

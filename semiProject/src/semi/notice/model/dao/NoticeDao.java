@@ -29,7 +29,7 @@ public class NoticeDao {
 				+ "n_date, n_grade, "
 				+ "n_file1, n_file2, a_id "
 				+ "from (select * from tb_notice "
-				+ "order by n_no desc)) "
+				+ "order by n_grade desc, n_no desc)) "
 				+ "where rnum >= ? and rnum <= ?";
 				
 		int startRow = (currentPage - 1) * limit + 1;
@@ -80,15 +80,16 @@ public class NoticeDao {
 		
 		String query = "insert into tb_notice values " 
 					+ "((select max(n_no) + 1 from tb_notice), "
-					+ "?, ?, ?, ?, sysdate, default, ?)"	;
+					+ "?, ?, default, sysdate, ?, ?, ?, ?)" ;
 		
 		try {
 			pstmt = con.prepareStatement(query);
 			pstmt.setString(1, notice.getN_title());
-			pstmt.setString(2, notice.getA_id());
-			pstmt.setString(3, notice.getN_content());
+			pstmt.setString(2, notice.getN_content());
+			pstmt.setString(3, notice.getN_grade());
 			pstmt.setString(4, notice.getN_file1());
 			pstmt.setString(5, notice.getN_file2());
+			pstmt.setString(6, notice.getA_id());
 			
 			result = pstmt.executeUpdate();
 			
@@ -106,7 +107,8 @@ public class NoticeDao {
 		return result;
 	}
 
-	public Notice selectNotice(Connection con, int noticeNo) throws NoticeException{
+	public Notice selectNotice(Connection con, int noticeNo) 
+			throws NoticeException{
 		Notice notice = null;
 		PreparedStatement pstmt = null;
 		ResultSet rset = null;
@@ -126,6 +128,7 @@ public class NoticeDao {
 				notice.setN_no(noticeNo);
 				notice.setN_title(rset.getString("n_title"));
 				notice.setA_id(rset.getString("a_id"));
+				notice.setN_grade(rset.getString("n_grade"));
 				notice.setN_content(rset.getString("n_content"));
 				notice.setN_file1(rset.getString("n_file1"));
 				notice.setN_date(rset.getDate("n_date"));
@@ -227,34 +230,39 @@ public class NoticeDao {
 		return result;
 	}
 	
-	
-	
+
 	public int updateNotice(Connection con, Notice notice) 
 			throws NoticeException{
 		int result = 0;
 		PreparedStatement pstmt = null;
 		
 		String query = "";
-		if(notice.getN_file1() != null && notice.getN_file2() != null){
-			query = "update tb_notice set " + "n_title = ?, " + "n_content = ?, " + "n_file1 = ?, "
-					 + "n_file2 = ?, " + "where n_no = ?";
+		if(notice.getN_file1() != null){
+			query = "update tb_notice set " + "n_title = ?, " + "n_content = ?, " + "n_grade = ?, " 
+						+ "n_file1 = ?, " + "n_file2 = ? "  + "where n_no = ?";
 		}else{
-			query = "update tb_notice set " + "n_title = ?, " + "n_content = ? " + "where n_no = ?";
+			query = "update tb_notice set " 
+						+ "n_title = ?, " 
+						+ "n_content = ?, " 
+						+ "n_grade = ? " 
+						+ "where n_no = ?";
 		}
 		
 		try {
 			pstmt = con.prepareStatement(query);
 			
-		if(notice.getN_file1() != null){
+		if(notice.getN_file1() != null || notice.getN_file2() != null){
 			pstmt.setString(1, notice.getN_title());
 			pstmt.setString(2, notice.getN_content());
-			pstmt.setString(3, notice.getN_file1());
-			pstmt.setString(4, notice.getN_file2());
-			pstmt.setInt(5, notice.getN_no());
+			pstmt.setString(3, notice.getN_grade());
+			pstmt.setString(4, notice.getN_file1());
+			pstmt.setString(5, notice.getN_file2());
+			pstmt.setInt(6, notice.getN_no());
 		}else{
 			pstmt.setString(1, notice.getN_title());
 			pstmt.setString(2, notice.getN_content());
-			pstmt.setInt(3, notice.getN_no());
+			pstmt.setString(3, notice.getN_grade());
+			pstmt.setInt(4, notice.getN_no());
 		}
 			result = pstmt.executeUpdate();
 			

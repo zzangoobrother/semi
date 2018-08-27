@@ -1,4 +1,4 @@
-package semi.notice.controller;
+package semi.qna.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,21 +11,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import semi.notice.model.service.NoticeGongService;
-import semi.notice.model.vo.Notice;
-
+import semi.board.model.vo.Board;
+import semi.qna.model.service.QnaService;
+import semi.qna.model.vo.QnaBoard;
 
 /**
- * Servlet implementation class NoticeGongListServlet
+ * Servlet implementation class ReviewViewServlet
  */
-@WebServlet("/nglist")
-public class NoticeGongListServlet extends HttpServlet {
+@WebServlet("/qlist")
+public class QnaListServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public NoticeGongListServlet() {
+    public QnaListServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -34,9 +34,9 @@ public class NoticeGongListServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// 공지사항 전체 글 조회 컨트롤러
+		//문의게시판 전체 글 조회 컨트롤러
 		
-		response.setContentType("text/html; charset=utf-8");
+response.setContentType("text/html; charset=utf-8");
 		
 		//페이지 값 처리용 변수
 		int currentPage = 1;
@@ -47,16 +47,16 @@ public class NoticeGongListServlet extends HttpServlet {
 		if(request.getParameter("page") != null){
 			currentPage = Integer.parseInt(request.getParameter("page"));
 		}		
-		NoticeGongService ngservice = new NoticeGongService();	
 		
+		QnaService qservice = new QnaService();
 		
-		RequestDispatcher view = null;
+			RequestDispatcher view = null;
 		
 		try {
 			 //전체 목록 갯수 조회함
-			int listCount = ngservice.getListConut();
+			int listCount = qservice.getListConut();
 			//해당 페이지에 보이게할 목록 조회
-			ArrayList<Notice> list = ngservice.selectList(currentPage, limit	);
+			ArrayList<QnaBoard> list = qservice.selectList(currentPage, limit	);
 			
 			//총 페이지수 계산
 			//목록이 최소 1개일 때 1페이지로 처리하기
@@ -73,44 +73,24 @@ public class NoticeGongListServlet extends HttpServlet {
 			int endPage = startPage + limit - 1;
 			if(maxPage < endPage)
 				endPage = maxPage;
-			
+		
 			if(list.size() > 0){
 				
-				/*JSONObject job = new JSONObject();
-				job.put("list", list);
-				job.put("currentPage", currentPage);
-				job.put("maxPage", maxPage);
-				job.put("startPage", startPage);
-				job.put("endPage", endPage);
-				job.put("listCount", listCount);
-				
-				System.out.println(job.toJSONString());
-				
-				response.setContentType("application/json; charset=utf-8");
-				PrintWriter out = response.getWriter();
-				
-				out.println();
-				out.close();*/
-				
-				
-			
 				HttpSession session = request.getSession();
 				
 				view = request.getRequestDispatcher(
-						"views/notice/noticeGongListView.jsp");
+						"views/qna/qnaListView.jsp");
 				request.setAttribute("list", list);
 				request.setAttribute("currentPage", currentPage);
 				request.setAttribute("maxPage", maxPage);
 				request.setAttribute("startPage", startPage);
 				request.setAttribute("endPage", endPage);
 				request.setAttribute("listCount", listCount);
-				//session.setAttribute("a_Id", aId);
-				//request.setAttribute("a_Id", aId);
 				
 				view.forward(request, response);
 			}else{
 				view = request.getRequestDispatcher(
-						"views/notice/noticeGognError.jsp");
+						"views/qna/qnaError.jsp");
 				request.setAttribute("message", "게시글이 없습니다!");
 				view.forward(request, response);
 			}
@@ -118,14 +98,11 @@ public class NoticeGongListServlet extends HttpServlet {
 			
 		} catch (Exception e) {
 			view = request.getRequestDispatcher(
-					"views/notice/noticeGongError.jsp");
+					"views/qna/qnaError.jsp");
 			System.out.println("catch");
 			request.setAttribute("message", e.getMessage());
 			view.forward(request, response);
 		}
-		
-		
-		
 	}
 
 	/**

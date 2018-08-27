@@ -1,4 +1,4 @@
-package semi.notice.controller;
+package semi.qna.controller;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,19 +17,20 @@ import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
 
 import semi.notice.model.service.NoticeGongService;
 import semi.notice.model.vo.Notice;
-
+import semi.qna.model.service.QnaService;
+import semi.qna.model.vo.QnaBoard;
 
 /**
- * Servlet implementation class NoticeGongOriginUpdateServlet
+ * Servlet implementation class QnaOriginUpdateServlet
  */
-@WebServlet("/ngoriginup")
-public class NoticeGongOriginUpdateServlet extends HttpServlet {
+@WebServlet("/qoriginup")
+public class QnaOriginUpdateServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public NoticeGongOriginUpdateServlet() {
+    public QnaOriginUpdateServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -38,12 +39,10 @@ public class NoticeGongOriginUpdateServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		//파일첨부 기능 게시글 수정 처리용
-		
-		RequestDispatcher view = null;
+RequestDispatcher view = null;
 		
 		if(!ServletFileUpload.isMultipartContent(request)) {
-			view = request.getRequestDispatcher("views/notice/noticeGongError.jsp");
+			view = request.getRequestDispatcher("views/qna/qnaError.jsp");
 			request.setAttribute("message", "enctype 속성에 multipart 사용안 함");
 			view.forward(request, response);
 		}
@@ -57,7 +56,7 @@ public class NoticeGongOriginUpdateServlet extends HttpServlet {
 	      // String savePath = "c:\\work\\save";
 	      // 현재 구동중인 애플리케이션 폴더 안에 저장시에는
 		 String savePath = request.getSession()
-				 .getServletContext().getRealPath("/semi/ngupfiles");
+				 .getServletContext().getRealPath("/semi/qupfiles");
 		 
 		 // cos.jar 라이브러리 사용한 경우
 	      // request 를 multipart request 객체로 변환함
@@ -65,20 +64,20 @@ public class NoticeGongOriginUpdateServlet extends HttpServlet {
 	            new DefaultFileRenamePolicy());
 	      // 객체 생성과 동시에 파일 업로드 처리됨
 		
-	      Notice notice = new Notice();
-	      notice.setN_no(Integer.parseInt(mrequest.getParameter("no")));
-	      notice.setN_title(mrequest.getParameter("ngtitle"));
-	      notice.setN_content(mrequest.getParameter("ngcontent"));
-	      notice.setN_grade(mrequest.getParameter("grade"));
+	      QnaBoard qna = new QnaBoard();
+	      qna.setQ_no(Integer.parseInt(mrequest.getParameter("no")));
+	      qna.setQ_title(mrequest.getParameter("qtitle"));
+	      qna.setQ_content(mrequest.getParameter("qcontent"));
+	     
 	     
 	      
 	      // 새로운 첨부파일이 있다면
 	      // 저장폴더에 기록된 원래 파일명 조회
-	      String originalFileName = mrequest.getFilesystemName("gupfile");
-	      String originalFileName2 = mrequest.getFilesystemName("gupfile2");
+	      String originalFileName = mrequest.getFilesystemName("qupfile");
+	      String originalFileName2 = mrequest.getFilesystemName("qupfile2");
 	      if(originalFileName != null && originalFileName2 != null) {
-	    	  notice.setN_file1(originalFileName);
-	    	  notice.setN_file2(originalFileName2);
+	    	  qna.setQ_file1(originalFileName);
+	    	  qna.setQ_file2(originalFileName2);
 	    	  
 	    	  String removeFileName = mrequest.getParameter("rfile");
 	          File removeFile = new File(savePath + "\\" + removeFileName);
@@ -87,18 +86,19 @@ public class NoticeGongOriginUpdateServlet extends HttpServlet {
 	      }
 	      
 		try {
-			if(new NoticeGongService().updateNotice(notice) > 0) {
-				response.sendRedirect("/semi/nglist");
+			if(new QnaService().updateNotice(qna) > 0) {
+				response.sendRedirect("/semi/qlist");
 			}else{
-				view = request.getRequestDispatcher("views/notice/noticeGongError.jsp");
+				view = request.getRequestDispatcher("views/qna/qnaError.jsp");
 				request.setAttribute("message", "게시글 수정 실패!!!");
 				view.forward(request, response);
 			}
 		} catch (Exception e) {
-			view = request.getRequestDispatcher("views/notice/noticeGongError.jsp");
+			view = request.getRequestDispatcher("views/qna/qnaError.jsp");
 			request.setAttribute("message", e.getMessage());
 			view.forward(request, response);
 		}
+		
 		
 	}
 

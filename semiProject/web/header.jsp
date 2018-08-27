@@ -163,10 +163,10 @@
                                     <a href="/semi/nglist">- 공지사항</a>
                                 </li>
                                 <li>
-                                    <a href="Qna.jsp">- 문    의</a>
+                                    <a href="/semi/qlist">- 문    의</a>
                                 </li>
                                 <li>
-                                    <a href="reboard.jsp">- 후    기</a>
+                                    <a href="/semi/blist">- 후    기</a>
                                 </li>
                             </ul>
                         </li>

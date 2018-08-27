@@ -1,4 +1,4 @@
-package semi.board.controller;
+package semi.qna.controller;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,22 +10,22 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import semi.board.model.service.BoardService;
-import semi.board.model.vo.Board;
 import semi.notice.model.service.NoticeGongService;
 import semi.notice.model.vo.Notice;
+import semi.qna.model.service.QnaService;
+import semi.qna.model.vo.QnaBoard;
 
 /**
- * Servlet implementation class BoardDeleteServlet
+ * Servlet implementation class QnaDeleteServlet
  */
-@WebServlet("/bdelete")
-public class BoardDeleteServlet extends HttpServlet {
+@WebServlet("/qdelete")
+public class QnaDeleteServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public BoardDeleteServlet() {
+    public QnaDeleteServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -35,29 +35,29 @@ public class BoardDeleteServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		//게시글 삭제 처리용 컨트롤러
-				int boardNo = Integer.parseInt(request.getParameter("no"));
+				int qnaNo = Integer.parseInt(request.getParameter("no"));
 				
 				RequestDispatcher view = null;
 				try {
-					BoardService bservice = new BoardService();
-					Board board = bservice.selectNotice(boardNo);
+					QnaService qservice = new QnaService();
+					QnaBoard qna = qservice.selectNotice(qnaNo);
 					
-					if(bservice.deleteNotice(boardNo) > 0){
+					if(qservice.deleteNotice(qnaNo) > 0){
 						//삭제 성공시 첨부파일 있을 경우 ngupfiles 해당 파일 삭제
-						if(board.getRb_file1() != null && board.getRb_file2() != null){
+						if(qna.getQ_file1() != null && qna.getQ_file2() != null){
 							String savePath = request.getSession()
-									.getServletContext().getRealPath("ngupfiles");
-							File removeFile = new File(savePath + "\\" + board.getRb_file1());
-							File removeFile2 = new File(savePath + "\\" + board.getRb_file2());
+									.getServletContext().getRealPath("qupfiles");
+							File removeFile = new File(savePath + "\\" + qna.getQ_file1());
+							File removeFile2 = new File(savePath + "\\" + qna.getQ_file2());
 							
 							removeFile.delete();
 							removeFile2.delete();
 						}
 						
-						response.sendRedirect("/semi/blist");
+						response.sendRedirect("/semi/qlist");
 					}else{
-						view = request.getRequestDispatcher("views/board/boardError.jsp");
-						request.setAttribute("message", board + "번글 삭제 실패!");
+						view = request.getRequestDispatcher("views/qna/qnaError.jsp");
+						request.setAttribute("message", qna + "번글 삭제 실패!");
 						view.forward(request, response);
 					}
 					
@@ -67,6 +67,8 @@ public class BoardDeleteServlet extends HttpServlet {
 					view.forward(request, response);
 					
 				}
+		
+		
 	}
 
 	/**

@@ -162,7 +162,7 @@ String aId = (String)session.getAttribute("a_Id");
                         	<a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="200">게시판 <b class="caret"></b></a>
                         	<ul class="dropdown-menu navbar-nav">
                                 <li>
-                                    <a href="#">- 공지사항</a>
+                                    <a href="/semi/nglist">- 공지사항</a>
                                 </li>
                                 <li>
                                     <a href="#">- 문    의</a>

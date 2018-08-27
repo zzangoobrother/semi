@@ -7,7 +7,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>NoticeGongErrorPage!!!</title>
+<title>qnaErrorPage</title>
 </head>
 <body>
 <h1>공지사항 서비스 오류 : </h1>

@@ -7,14 +7,14 @@ import static semi.common.JDBCTemplat.*;
 public class Notice implements Serializable{
 	private final static long serialVersionUID = 3L;
 	
-	private int n_no;					//글번호
+	private int n_no;				//글번호
 	private String n_title;			//제목
 	private String n_content;		//내용
-	private int n_count;		//조회수
-	private Date n_date;				//작성날짜
-	private String n_grade;			//공지등급
-	private String n_file1;		//첨부파일1
-	private String n_file2;	//첨부파일2
+	private int n_count;			//조회수
+	private Date n_date;			//작성날짜
+	private String n_grade;		//공지등급
+	private String n_file1;			//첨부파일1
+	private String n_file2;			//첨부파일2
 	private String a_id;			//작성자(관리자 아이디)
 	
 	public Notice(){}

@@ -1,4 +1,4 @@
-package semi.notice.controller;
+package semi.board.controller;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,21 +15,22 @@ import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import com.oreilly.servlet.MultipartRequest;
 import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
 
+import semi.board.model.service.BoardService;
+import semi.board.model.vo.Board;
 import semi.notice.model.service.NoticeGongService;
 import semi.notice.model.vo.Notice;
 
-
 /**
- * Servlet implementation class NoticeGongOriginUpdateServlet
+ * Servlet implementation class BoardOriginUpdateServlet
  */
-@WebServlet("/ngoriginup")
-public class NoticeGongOriginUpdateServlet extends HttpServlet {
+@WebServlet("/boriginup")
+public class BoardOriginUpdateServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public NoticeGongOriginUpdateServlet() {
+    public BoardOriginUpdateServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -38,18 +39,15 @@ public class NoticeGongOriginUpdateServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		//파일첨부 기능 게시글 수정 처리용
-		
-		RequestDispatcher view = null;
+	
+RequestDispatcher view = null;
 		
 		if(!ServletFileUpload.isMultipartContent(request)) {
-			view = request.getRequestDispatcher("views/notice/noticeGongError.jsp");
+			view = request.getRequestDispatcher("views/board/boardError.jsp");
 			request.setAttribute("message", "enctype 속성에 multipart 사용안 함");
 			view.forward(request, response);
 		}
 		
-		// request.setCharacterEncoding("utf-8");
-		 
 		 //업로드할 파일 용량 제한 : 10Mbyte
 		 int maxSize = 1024 * 1024 * 10;
 		 
@@ -57,7 +55,7 @@ public class NoticeGongOriginUpdateServlet extends HttpServlet {
 	      // String savePath = "c:\\work\\save";
 	      // 현재 구동중인 애플리케이션 폴더 안에 저장시에는
 		 String savePath = request.getSession()
-				 .getServletContext().getRealPath("/semi/ngupfiles");
+				 .getServletContext().getRealPath("/semi/bupfiles");
 		 
 		 // cos.jar 라이브러리 사용한 경우
 	      // request 를 multipart request 객체로 변환함
@@ -65,20 +63,19 @@ public class NoticeGongOriginUpdateServlet extends HttpServlet {
 	            new DefaultFileRenamePolicy());
 	      // 객체 생성과 동시에 파일 업로드 처리됨
 		
-	      Notice notice = new Notice();
-	      notice.setN_no(Integer.parseInt(mrequest.getParameter("no")));
-	      notice.setN_title(mrequest.getParameter("ngtitle"));
-	      notice.setN_content(mrequest.getParameter("ngcontent"));
-	      notice.setN_grade(mrequest.getParameter("grade"));
-	     
-	      
+	      Board board = new Board();
+	      board.setRb_no(Integer.parseInt(mrequest.getParameter("no")));
+	      board.setRb_title(mrequest.getParameter("btitle"));
+	      board.setRb_content(mrequest.getParameter("bcontent"));
+	      board.setP_no(Integer.parseInt(mrequest.getParameter("pro")));
+	   
 	      // 새로운 첨부파일이 있다면
 	      // 저장폴더에 기록된 원래 파일명 조회
-	      String originalFileName = mrequest.getFilesystemName("gupfile");
-	      String originalFileName2 = mrequest.getFilesystemName("gupfile2");
+	      String originalFileName = mrequest.getFilesystemName("bupfile");
+	      String originalFileName2 = mrequest.getFilesystemName("bupfile2");
 	      if(originalFileName != null && originalFileName2 != null) {
-	    	  notice.setN_file1(originalFileName);
-	    	  notice.setN_file2(originalFileName2);
+	    	  board.setRb_file1(originalFileName);
+	    	  board.setRb_file2(originalFileName2);
 	    	  
 	    	  String removeFileName = mrequest.getParameter("rfile");
 	          File removeFile = new File(savePath + "\\" + removeFileName);
@@ -87,19 +84,18 @@ public class NoticeGongOriginUpdateServlet extends HttpServlet {
 	      }
 	      
 		try {
-			if(new NoticeGongService().updateNotice(notice) > 0) {
-				response.sendRedirect("/semi/nglist");
+			if(new BoardService().updateNotice(board) > 0) {
+				response.sendRedirect("/semi/blist");
 			}else{
-				view = request.getRequestDispatcher("views/notice/noticeGongError.jsp");
+				view = request.getRequestDispatcher("views/board/boardError.jsp");
 				request.setAttribute("message", "게시글 수정 실패!!!");
 				view.forward(request, response);
 			}
 		} catch (Exception e) {
-			view = request.getRequestDispatcher("views/notice/noticeGongError.jsp");
+			view = request.getRequestDispatcher("views/board/boardError.jsp");
 			request.setAttribute("message", e.getMessage());
 			view.forward(request, response);
 		}
-		
 	}
 
 	/**

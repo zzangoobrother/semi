@@ -14,9 +14,6 @@ import semi.notice.model.vo.Notice;
 import semi.notice.model.vo.NoticeComment;
 
 
-
-
-
 public class NoticeGongService {
 	public NoticeGongService(){}
 
