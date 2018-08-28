@@ -40,7 +40,7 @@ public class ProductListServlet extends HttpServlet {
 				//페이지 값 처리용 변수
 				int currentPage = 1;
 				//한 페이지당 출력할 목록 갯수 
-				int limit = 8;
+				int limit = 9;
 				
 				//전달된 페이지값 추출
 				if(request.getParameter("page") != null){

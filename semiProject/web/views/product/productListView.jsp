@@ -174,40 +174,8 @@
 				</div>
 			</div>
 
-			<div class="col-md-12  clear">
-				<div class="col-xs-10 page-subheader sorting pl0">
-					<ul class="sort-by-list">
-						<li class="active"><a href="javascript:void(0);"
-							class="order_by_date" data-orderby="property_date"
-							data-order="ASC"> Property Date <i
-								class="fa fa-sort-amount-asc"></i>
-						</a></li>
-						<li class=""><a href="javascript:void(0);"
-							class="order_by_price" data-orderby="property_price"
-							data-order="DESC"> Property Price <i
-								class="fa fa-sort-numeric-desc"></i>
-						</a></li>
-					</ul>
-					<!--/ .sort-by-list-->
-
-					<div class="items-per-page">
-						<label for="items_per_page"><b>Property per page :</b></label>
-						<div class="sel">
-							<select id="items_per_page" name="per_page">
-								<option value="3">3</option>
-								<option value="6">6</option>
-								<option value="9">9</option>
-								<option selected="selected" value="12">8</option>
-								<option value="15">15</option>
-								<option value="30">30</option>
-								<option value="45">45</option>
-								<option value="60">60</option>
-							</select>
-						</div>
-						<!--/ .sel-->
-					</div>
-					<!--/ .items-per-page-->
-				</div>
+			 <div class="col-md-12  clear">
+				
 
 				<div class="col-xs-2 layout-switcher">
 					<a class="layout-list" href="javascript:void(0);"> <i
@@ -216,8 +184,8 @@
 						class="fa fa-th"></i>
 					</a>
 				</div>
-				<!--/ .layout-switcher-->
-			</div>
+				
+			</div> 
 
 			<div class="col-md-12 clear ">
 				<div id="list-type" class="proerty-th">
@@ -226,26 +194,19 @@
 						<div class="box-two proerty-item">
 							<div class="item-thumb">
 								<a
-									href="/semi/pdetail.bd?pname=<%=p.getP_name()%>&page=<%=currentPage%>"><img
+									href="/semi/pdetail.bd?pname=<%=p.getP_name()%>"><img
 									src="<%=p.getP_main_image().split(",")[0]%>"></a>
 							</div>
 
 							<div class="item-entry overflow">
 								<h5>
-									<a
-										href="/semi/pdetail.bd?pname=<%=p.getP_name()%>&page=<%=currentPage%>"><%=p.getP_name() %></a>
+									<a href="/semi/pdetail.bd?pname=<%=p.getP_name()%>"><%=p.getP_name() %></a>
 								</h5>
 								<div class="dot-hr"></div>
 								<span class="pull-left"><b> 가격 :</b></span> <span
 									class="proerty-price pull-right"><%=p.getP_price()%>원</span>
-								<p style="display: none;">Suspendisse ultricies Suspendisse
-									ultricies Nulla quis dapibus nisl. Suspendisse ultricies
-									commodo arcu nec pretium ...</p>
-								<div class="property-icon">
-									<img src="/semi/assets/img/icon/bed.png">(5)| <img
-										src="/semi/assets/img/icon/shawer.png">(2)| <img
-										src="/semi/assets/img/icon/cars.png">(1)
-								</div>
+								<p style="display: none;"></p>
+								
 							</div>
 
 

@@ -40,15 +40,15 @@ public class ProductsService {
 		return product;
 	}
 
-	/*public void addReadCount(int pno) throws ProductsException {
+	public ArrayList<String> selectOffice(String pName) throws ProductsException{
 		Connection con = getConnection();
-		int result = new ProductsDao().addReadCount(
-				con, pno);
-		if(result > 0)
-			commit(con);
-		else
-			rollback(con);
+		ArrayList<String> list = new ProductsDao().selectOffice(con, pName);
 		close(con);
-	}*/
+		
+	      return list;
+	
+	}
+
+	
 
 }
