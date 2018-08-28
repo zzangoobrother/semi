@@ -2,14 +2,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="semi.locationInfo.model.vo.LocationInfo, java.util.ArrayList" %>
-<%
-	ArrayList<LocationInfo> list = (ArrayList<LocationInfo>) request.getAttribute("list");
-	 int currentPage = ((Integer) request.getAttribute("currentPage")).intValue();
-	int maxPage = ((Integer) request.getAttribute("maxPage")).intValue();
-	int startPage = ((Integer) request.getAttribute("startPage")).intValue();
-	int endPage = ((Integer) request.getAttribute("endPage")).intValue();
-	int listCount = ((Integer) request.getAttribute("listCount")).intValue(); 
-%>
 
 <%@ include file="../../header.jsp" %>
 
@@ -17,9 +9,8 @@
 
 <div>
 	<!-- 검색구역 -->
-	<form action="/semi/mapselect" method="post">
-	<div align="center">
-		<select id="selectlocation" name="selectlocation">
+	<div align="center" margin-top="10px">
+		<select id="selectlocation" name="selectlocation" style="border-radius: 1px; padding: 10px 20px; border: 1px solid #fdc600; color: #000; background-color: #fdc600; border-color:#f0f0f0; font-weight: 600; margin-right: 5px; margin-top: 10px; margin-bottom: 10px;">
 			<option selected>전체</option>
 			<option>강남구</option>
 			<option>강동구</option>
@@ -47,140 +38,301 @@
 			<option>중구</option>
 			<option>중랑구</option>
 		</select> 
-		<input type="search" id="searchinput" name="searchinput" placeholder="주소 또는 주민센터">
-		<input type="submit">검색</button>
+		<input type="search" id="searchinput" name="searchinput" placeholder="주민센터" size="80px" style="width: 400px; height:44px; box-sizing: content-box; font-size: 20; margin-right: 5px; margin-top: 10px; margin-bottom: 10px;">
+		<input type="button" onclick="selectAddress(1);" value="찾기" style="color: #fff; background-color: #fdc600; border-color: fdc600; border-radius: 1px; padding: 10px 20px; font-weight: 600; margin-right: 5px; margin-top: 10px; margin-bottom: 10px;">
 	</div>
-	</form>
 
 	<!-- 지도 출력 -->
-	<div id="map" align="center" style="width: 100%; height: 550px;"></div>
+	<div id="map" style="width: 90%; height: 550px; margin-left: 5%"></div>
 
 	<script>
-		var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
-		mapOption = {
-			center : new daum.maps.LatLng(37.499257, 127.032909), // 지도의 중심좌표
-			level : 3
-		// 지도의 확대 레벨
-		};
-
-		// 지도를 생성합니다    
-		var map = new daum.maps.Map(mapContainer, mapOption);
-
-		// 주소-좌표 변환 객체를 생성합니다
-		var geocoder = new daum.maps.services.Geocoder();
-		
-		console.log('123');
-		// 주소로 좌표를 검색합니다
-		
-		var markerPosition = new daum.maps.LatLng(37.499257, 127.032909);
-		
-		var marker = new daum.maps.Marker({
-		    position: markerPosition
-		});
-		
-		marker.setMap(map);
-		
 		$(function() {
-			var address = $("#address").html()
-			console.log(address);
-		});
-		
-		/* $(function() {
+			var currentPage;
+			var maxPage;
+			var startPage;
+			var endPage;
+			
 			$.ajax({
-				url : "maplist",
-				type : "post",
+				url : "/semi/mappage",
+				type : "get",
+				data : {"page" : 1},
 				dataType : "json",
 				success : function(data) {
+					mapView(data);
+					
 					var jsonStr = JSON.stringify(data);
 					var json = JSON.parse(jsonStr);
-					console.log("123");
-					for(var i in json.list) {
-						console.log(decodeURIComponent(json.list[i].address));	
+					
+					console.log("aaa");
+					currentPage = json.currentPage;
+					maxPage = json.maxPage;
+					startPage = json.startPage;
+					endPage = json.endPage;
+					
+					$(".page").html("");
+					if(currentPage <= 1) {	
+					} else {
+						$(".page").append("<li><a href='#' onclick='paging(1)'><<</a></li>");
 					}
+					
+					if(currentPage == 1) {
+					} else {
+						$(".page").append("<li><a href='#' onclick='paging(" + currentPage + " - 1)'><</a></li>");
+					}
+					
+					for (var p = startPage; p <= endPage; p++) { 
+						if (p == currentPage) {
+							$(".page").append("<li><a href='#'><font color='red'>" + p + "</font></a></li>");
+						} else {
+							$(".page").append("<li><a href='#' onclick='paging(" + p + ")'>" + p + "</a></li>");
+						}
+					}
+					
+					if (currentPage == maxPage) {
+					} else {
+						$(".page").append("<li><a href='#' onclick='paging(" + currentPage + " + 1)'> ></a></li>");
+					}
+
+					if (currentPage >= maxPage) {
+					} else {
+						$(".page").append("<li><a href='#' onclick='paging(" + maxPage + ")'> >> </a></li>");
+					}
+				},
+					error : function(jqXHR, textstatus, errorThrown){
+						console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
+					}
+			});		
+		});
+		
+		
+		function paging(page) {
+			var currentPage;
+			var maxPage;
+			var startPage;
+			var endPage;
+			
+			$.ajax({
+				url : "/semi/mappage",
+				type : "get",
+				data : {"page" : page},
+				dataType : "json",
+				success : function(data) {
+					mapView(data);
+					
+					var jsonStr = JSON.stringify(data);
+					var json = JSON.parse(jsonStr);
+					
+					console.log("aaa");
+					currentPage = json.currentPage;
+					maxPage = json.maxPage;
+					startPage = json.startPage;
+					endPage = json.endPage;
+					
+					$(".page").html("");
+					if(currentPage <= 1) {	
+					} else {
+						$(".page").append("<li><a href='#' onclick='paging(1)'><<</a></li>");
+					}
+					
+					if(currentPage == 1) {
+					} else {
+						$(".page").append("<li><a href='#' onclick='paging(" + currentPage + " - 1)'><</a></li>");
+					}
+					
+					for (var p = startPage; p <= endPage; p++) { 
+						if (p == currentPage) {
+							$(".page").append("<li><a href='#'><font color='red'>" + p + "</font></a></li>");
+						} else {
+							$(".page").append("<li><a href='#' onclick='paging(" + p + ")'>" + p + "</a></li>");
+						}
+					}
+					
+					if (currentPage == maxPage) {
+					} else {
+						$(".page").append("<li><a href='#' onclick='paging(" + currentPage + " + 1)'> ></a></li>");
+					}
+
+					if (currentPage >= maxPage) {
+					} else {
+						$(".page").append("<li><a href='#' onclick='paging(" + maxPage + ")'> >> </a></li>");
+					}
+				},
+					error : function(jqXHR, textstatus, errorThrown){
+						console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
+					}
+			});
+		}
+		
+		function mapView(data) {
+			var jsonStr = JSON.stringify(data);
+			var json = JSON.parse(jsonStr);
+
+			var values = "<tr><th style='width: 15%; border-bottom: 2px solid rgb(221, 221, 221);'>구 이름</th><th style='width: 65%; border-bottom: 2px solid rgb(221, 221, 221);'>상세 주소</th><th style='width: 20%; border-bottom: 2px solid rgb(221, 221, 221);'>주민센터</th></tr>";
+			for(var i in json.list){
+				values += "<tr class='markadd'><td style='border-bottom: 2px solid rgb(221, 221, 221); padding: .75rem;'>" + 
+				decodeURIComponent(json.list[i].local) + "</td><td class='address' style='border-bottom: 2px solid rgb(221, 221, 221); padding: .75rem;'>" + 
+				decodeURIComponent(json.list[i].address).replace("+", " ").replace("+", " ").replace("+", " ").replace("+", " ").replace("+", " ").replace("+", " ").replace("+", " ").replace("+", " ") + 
+				"</td><td class='servicecenter' style='border-bottom: 2px solid rgb(221, 221, 221); padding: .75rem;'>" + 
+				decodeURIComponent(json.list[i].name).replace("+", " ") + "</td></tr>";
+			}
+			 
+			$(".listtable").html(values);
+			
+			var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+			mapOption = {
+				center : new daum.maps.LatLng(37.499257, 127.032909), // 지도의 중심좌표
+				level : 7
+			// 지도의 확대 레벨
+			};
+			// 지도를 생성합니다    
+			var map = new daum.maps.Map(mapContainer, mapOption);
+
+			// 주소-좌표 변환 객체를 생성합니다
+			var geocoder = new daum.maps.services.Geocoder();
+			var address = $(".address");
+			var sc = $(".servicecenter");
+			
+			console.log(address);
+			var coords;
+			var marker;
+			
+			// 지도를 재설정할 범위정보를 가지고 있을 LatLngBounds 객체를 생성합니다
+			var bounds = new daum.maps.LatLngBounds();
+			
+			var imageSrc = "http://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png";
+			
+			$.each(address,function(i, o) {
+				var imageSize = new daum.maps.Size(24, 35); 
+				var markerImage = new daum.maps.MarkerImage(imageSrc, imageSize); 
+				
+				geocoder.addressSearch(o.innerText, function(result, status) {
+					if(status == daum.maps.services.Status.OK) {
+						coords = new daum.maps.LatLng(result[0].y, result[0].x);
+						
+						marker = new daum.maps.Marker({
+				            map: map,
+				            position: coords,
+				            image : markerImage
+				        });
+						
+						// LatLngBounds 객체에 좌표를 추가합니다
+					    bounds.extend(coords);
+						
+						// LatLngBounds 객체에 추가된 좌표들을 기준으로 지도의 범위를 재설정합니다
+				        // 이때 지도의 중심좌표와 레벨이 변경될 수 있습니다
+				        map.setBounds(bounds);
+						
+						var infowindow = new daum.maps.InfoWindow({
+					        content: sc[i].innerText // 인포윈도우에 표시할 내용
+					    });
+						
+						daum.maps.event.addListener(marker, 'mouseover', makeOverListener(map, marker, infowindow));
+					    daum.maps.event.addListener(marker, 'mouseout', makeOutListener(infowindow));
+					   	$(".markadd").onmouseoveer = function () {
+					   		makeOverListener(map, marker, infowindow);
+					   	}
+					}
+				});
+				
+			});
+		}
+		
+		function makeOverListener(map, marker, infowindow) {
+		    return function() {
+		        infowindow.open(map, marker);
+		    };
+		}
+		
+		function makeOutListener(infowindow) {
+		    return function() {
+		        infowindow.close();
+		    };
+		}
+		
+		function selectAddress(page) {
+			var selectGu = $("#selectlocation").val();
+			var inputText = $("#searchinput").val();
+			
+			var currentPage;
+			var maxPage;
+			var startPage;
+			var endPage;
+			
+			var selectText;
+				
+			if(inputText == "") {
+				selectText = {"selectGu" : selectGu, "page" : page};
+			} else {
+				selectText = {"selectGu" : selectGu, "inputText" : inputText, "page" : page};
+			}
+			
+			$.ajax({
+				url : "/semi/lSelect",
+				type : "get",
+				data : selectText,
+				dataType : "json",
+				success : function(data) {
+					mapView(data);
+					
+					var jsonStr = JSON.stringify(data);
+					var json = JSON.parse(jsonStr);
+					
+					console.log("aaa");
+					currentPage = json.currentPage;
+					maxPage = json.maxPage;
+					startPage = json.startPage;
+					endPage = json.endPage;
+					listCount = json.listCount;
+					
+					$(".page").html("");
+					if(currentPage <= 1) {	
+					} else {
+						$(".page").append("<li><a href='#' onclick='selectAddress(1)'><<</a></li>");
+					}
+					
+					if(currentPage == 1) {
+					} else {
+						$(".page").append("<li><a href='#' onclick='selectAddress(" + currentPage + " - 1)'><</a></li>");
+					}
+					
+					for (var p = startPage; p <= endPage; p++) { 
+						if (p == currentPage) {
+							$(".page").append("<li><a href='#'><font color='red'>" + p + "</font></a></li>");
+						} else {
+							$(".page").append("<li><a href='#' onclick='selectAddress(" + p + ")'>" + p + "</a></li>");
+						}
+					}
+					
+					if (currentPage == maxPage || listCount == 0) {
+						if(listCount == 0) {
+							alert("입력하신 주민센터를 찾을 수 없습니다.");
+							paging(1);
+						}
+					} else {
+						$(".page").append("<li><a href='#' onclick='selectAddress(" + currentPage + " + 1)'> ></a></li>");
+					}
+
+					if (currentPage >= maxPage) {
+					} else {
+						$(".page").append("<li><a href='#' onclick='selectAddress(" + maxPage + ")'> >> </a></li>");
+					}
+				},
+				error : function(jqXHR, textstatus, errorThrown){
+							console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
 				}
 			});
-		}); */		 
-		
-		/* function addressSelect() {
-			var address = document.getElementById("address").value; // 주소 입력
-			console.log(address);
-			geocoder.addressSearch(
-							address,
-							function(result, status) {
-
-								// 정상적으로 검색이 완료됐으면 
-								if (status === daum.maps.services.Status.OK) {
-
-									var coords = new daum.maps.LatLng(result[0].y, result[0].x);
-
-									// 결과값으로 받은 위치를 마커로 표시합니다
-									var marker = new daum.maps.Marker({
-										map : map,
-										position : coords
-									});
-
-									// 인포윈도우로 장소에 대한 설명을 표시합니다
-									var infowindow = new daum.maps.InfoWindow({
-											content : '<div style="width:150px;text-align:center;padding:6px 0;">우리회사</div>'
-										});
-									infowindow.open(map, marker);
-
-									// 지도의 중심을 결과값으로 받은 위치로 이동시킵니다
-									map.setCenter(coords);
-								}
-							});
-		} */
+		}
 	</script>
 	<!-- 주소 리스트 -->	
 	<div align="center">
-		<table cellspacing="0" border="1">
-			<tr>
-				<th>구 이름</th>
-				<th>상세 주소</th>
-				<th>주민센터</th>
-			</tr>
-			
-			<% for(LocationInfo l : list) { %>
-			<tr>
-				<td><%= l.getL_Local() %></td><td id="address" name="address"><%= l.getL_Address() %></td><td><%= l.getL_Name() %></td>
-			</tr>
-			<% } %>
+		<table class="listtable" style="width: 60%; min-width:50%; margin-top: 20px; margin-bottom: 15px;">
 		</table>
 	</div>
 
 	<div class="col-md-12 clear">
 		<div class="pull-right">
 			<div class="pagination">
-				<ul id="page">
-					<% if(currentPage <= 1) { %>
-					<% } else { %>
-					<li><a href="/semi/maplist?page=1"><<</a></li>
-					<% } %>
-
-					<% if(currentPage == 1) { %>
-					<% } else { %>
-					<li><a href="/semi/maplist?page=<%= currentPage - 1%>"><</a></li>
-					<% } %>
-
-					<% for (int p = startPage; p <= endPage; p++) { 
-					if (p == currentPage) { %>
-					<li><a href="#"> <font color="red"><%=p%></font>
-					</a></li>
-					<% } else { %>
-					<li><a href="/semi/maplist?page=<%=p%>"> <%=p%>
-					</a></li>
-					<%}} %>
-
-					<% if (currentPage == maxPage) { %>
-					<% } else { %>
-					<li><a href="/semi/maplist?page=<%= currentPage + 1 %>"> >
-					</a></li>
-					<% } %>
-
-					<% if (currentPage >= maxPage) { %>
-					<% } else { %>
-					<li><a href="/semi/maplist?page=<%= maxPage %>"> >> </a></li>
-					<% } %>
+				<ul class="page" style="margin-left: 50%">
 				</ul>
 			</div>
 		</div>

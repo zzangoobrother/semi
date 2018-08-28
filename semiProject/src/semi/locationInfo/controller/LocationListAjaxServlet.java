@@ -18,16 +18,16 @@ import semi.locationInfo.model.service.LocationInfoService;
 import semi.locationInfo.model.vo.LocationInfo;
 
 /**
- * Servlet implementation class LocationSelectServlet
+ * Servlet implementation class LocationListAjaxServlet
  */
-@WebServlet("/lSelect")
-public class LocationSelectServlet extends HttpServlet {
+@WebServlet("/mappage")
+public class LocationListAjaxServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public LocationSelectServlet() {
+    public LocationListAjaxServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -37,28 +37,24 @@ public class LocationSelectServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("text/html; charset=utf-8");
-		System.out.println("select");
+		System.out.println("ajax");
 		
 		JSONObject json = null;
 		
-		String selectGu = request.getParameter("selectGu");
 		int currentPage = Integer.parseInt(request.getParameter("page"));
 		
 		int limit = 10;
 		
-		String inputText = "";
-		
-		if(request.getParameter("inputText") != null){
-			inputText = request.getParameter("inputText");
+		if(request.getParameter("page") != null){
+			currentPage = Integer.parseInt(request.getParameter("page"));
 		}
 		
-		System.out.println(selectGu + ", " + currentPage + "," + inputText);
 		LocationInfoService infoService = new LocationInfoService();
 		
 		try {
-			int listCount = infoService.getSelectCount(selectGu, inputText);
+			int listCount = infoService.getListCount();
 			
-			ArrayList<LocationInfo> list = infoService.selectList(currentPage, limit, selectGu, inputText);
+			ArrayList<LocationInfo> list = infoService.allSelectList(currentPage, limit);
 			
 			int maxPage = (int) Math.ceil(((double)listCount / limit));
 			
@@ -91,7 +87,6 @@ public class LocationSelectServlet extends HttpServlet {
 			json.put("maxPage", maxPage);
 			json.put("startPage", startPage);
 			json.put("endPage", endPage);
-			json.put("listCount", listCount);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

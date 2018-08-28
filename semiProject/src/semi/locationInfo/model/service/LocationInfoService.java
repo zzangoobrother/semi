@@ -11,22 +11,6 @@ import semi.locationInfo.model.vo.LocationInfo;
 
 public class LocationInfoService {
 
-	public String toolSelect(String borough) {
-		return null;
-	}
-	
-	public ArrayList<LocationInfo> boroughSelect(String borough) {
-		ArrayList<LocationInfo> list = new ArrayList<LocationInfo>();
-		
-		return list;
-	}
-	
-	public ArrayList<LocationInfo> listView() {
-		ArrayList<LocationInfo> list = new ArrayList<LocationInfo>();
-		
-		return list;
-	}
-	
 	public int getListCount() {
 		Connection conn = getConnection();
 		int listCount = new LocationInfoDao().getListCount(conn);
@@ -35,9 +19,24 @@ public class LocationInfoService {
 		return listCount;
 	}
 
-	public ArrayList<LocationInfo> selectList(int currentPage, int limit) {
+	public ArrayList<LocationInfo> allSelectList(int currentPage, int limit) {
 		Connection conn = getConnection();
-		ArrayList<LocationInfo> list = new LocationInfoDao().selectList(conn, currentPage, limit);
+		ArrayList<LocationInfo> list = new LocationInfoDao().allSelectList(conn, currentPage, limit);
+		close(conn);
+		return list;
+	}
+
+	public int getSelectCount(String selectGu, String inputText) {
+		Connection conn = getConnection();
+		int listCount = new LocationInfoDao().getSelectCount(conn, selectGu, inputText);
+		close(conn);
+		
+		return listCount;
+	}
+
+	public ArrayList<LocationInfo> selectList(int currentPage, int limit, String selectGu, String inputText) {
+		Connection conn = getConnection();
+		ArrayList<LocationInfo> list = new LocationInfoDao().selectList(conn, currentPage, limit, selectGu, inputText);
 		close(conn);
 		return list;
 	}

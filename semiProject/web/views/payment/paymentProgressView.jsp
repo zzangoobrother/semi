@@ -17,91 +17,129 @@
 		$("input[type=radio]").change(function() {
 			if($(this).is(":checked")) {
 				if($(this).val() == "card") {
-					$("#payselect").html("카드선택");
+					$("#payselect").html("<label style='font-size: 14px; font-weight: 700; color: #333; margint: 0 5px 0 10px;'>카드선택</label>");
 				} else {
-					$("#payselect").html("은행선택<select><option>국민은행 464646-01-282828 예금주 : 홍길동</option><option>우리은행 263251-02-158965 예금주 : 홍길동</option></select>입금자명<input type=/'text/' name=/'sellname/' id=/'sellname/'>");
+					$("#payselect").html("<label style='font-size: 14px; font-weight: 700; color: #333; margint: 0 5px 0 10px;'>은행선택</label>" + 
+										"<select style='height: 30px; padding: 0 10px;'>" + 
+										"<option>국민은행 464646-01-282828 예금주 : 홍길동</option>" + 
+										"<option>우리은행 263251-02-158965 예금주 : 신사임당</option>" + 
+										"</select>" + 
+										"<label style='font-size: 14px; font-weight: 700; color: #333; margin: 0 5px 0 10px;'>입금자명</label>" +
+										"<input type='text' name='sellname' id='sellname' style='height: 30px; width: 150px; padding: 0 10px;'>");
 				}
 			}
 		});
 	});
 </script>
 <div>
-	<div>
+	<form action="/semi/rlist" id="fsubmit" method="post">
+	<div style="width: 70%; margin: 30px auto 80px auto; display: block;">
+
+		<ul style="padding: 0px; margin: 0px;">
+			<li style="list-style: none; float: left;"><span
+				style="display: block; font-size: 22px; font-weight: 700; padding-right: 25px; margin-top: 8px;">장바구니</span>
+				<span style="display: block; font-size: 9px; font-weight: 700;">SHOPPING
+					CART</span></li>
+			<li style="list-style: none; float: left; margin-right: 20px;">
+				<span style="font-weight: 700; font-size: 33px;"> > </span>
+			</li>
+			<li style="list-style: none; float: left;"><span
+				style="font-size: 30px; display: block; font-weight: 700; padding-right: 25px; margin-top: 8px; color: rgb(253, 198, 0);">주문/결제</span>
+				<span
+				style="display: block; font-size: 9px; font-weight: 700; color: rgb(253, 198, 0);">ORDER
+					SHEET</span></li>
+			<li style="list-style: none; float: left; margin-right: 20px;">
+				<span style="font-weight: 700; font-size: 33px;"> > </span>
+			</li>
+			<li style="list-style: none; float: left;"><span
+				style="display: block; font-size: 22px; font-weight: 700; padding-right: 25px; margin-top: 8px;">주문완료</span>
+				<span style="display: block; font-size: 9px; font-weight: 700;">COMPLETION</span>
+			</li>
+		</ul>
+
+		<!-- 결제할 상품 출력 -->		
+
+		<!-- 서블릿에 전달해야하느 값들 -->
+		<input type="hidden" name="loginId" id="loginId" value=" <%=mId%>">
+		<input type="hidden" name="totalcount" id="totlcount" value="1">
+		<input type="hidden" name="productNo" id="productNo" value="03">
+
 		<div>
-			장바구니 > <strong>주문/결제</strong> > 주문완료
+			<h4 style="width: 20%; font-size: 17px; color: #333; margin: 40px 0 5px 0;">주문상품 확인</h4>
+		</div>
+		
+		<table style="width: 100%;">
+			<tr>
+				<th style="width: 50%; height: 42px; border-bottom: 1px solid rgb(221, 221, 221); border-top: 2px solid rgb(221, 221, 221); margin: 0; text-align: center;">상품/옵션정보</th>
+				<th style="width: 10%; height: 42px; border-bottom: 1px solid rgb(221, 221, 221); border-top: 2px solid rgb(221, 221, 221); border-left: 1px solid rgb(221, 221, 221); text-align: center;">대여가</th>
+				<th style="width: 40%; height: 42px; border-bottom: 1px solid rgb(221, 221, 221); border-top: 2px solid rgb(221, 221, 221); border-left: 1px solid rgb(221, 221, 221); text-align: center;">대여일</th>
+			</tr>
+			<tr>
+				<td style="border-bottom: 1px solid #dcdcdc;  margin: 0px; padding: 10px;">
+				<figure style="margin: 0px;">
+					<div style="width: 125px; float: left; margin: 0px;"><a href="/semi/pdetail.bd?pname=포터블그라인더"><img src="/semi/resources/images/main/01_1.jpg"></a></div>
+					<figcaption style="float: left; margin-left: 15px; width: 70%; margin: 0px;">
+						<dl style="margin: 0px;">
+							<dt style="line-height: 44px; border-top: 1px solid #e6e6e6; border-bottom: 1px solid #e6e6e6; padding: 0 10px; color: #333; font-size: 16px; margin: 0px; padding: 0px; background: #f8f8f8;">
+								<a href="/semi/pdetail.bd?pname=포터블그라인더">LED후레쉬(LF-1418Z)</a>
+							</dt>
+						</dl>
+					</figcaption>
+				</figure>
+				</td>
+				<td style="border-bottom: 1px solid #dcdcdc; border-left: 1px solid #dcdcdc; font-size; text-align: center;"><span style="color: #ff6e2b; font-weight: 700;">10000원</span></td>
+				<td style="border-bottom: 1px solid #dcdcdc; border-left: 1px solid #dcdcdc; font-size: 15px; text-align: center;">
+					<span style="color: #3c72bc; font-weight: 700;">시작일</span> : <input type="hidden" name="startday" id="startday" value="2018-08-20">2018-08-20 ~ 
+					<span style="color: #3c72bc; font-weight: 700;">종료일</span> : <input type="hidden" name="endday" id="endday" value="2018-08-21">2018-08-21
+				</td>
+			</tr>
+		</table>
+
+		<!-- 결제 금액과 결제 방법 선택 -->
+		<div>
+			<h4 style="font-size: 17px; color: #333; margin: 40px 0 5px 0;">결제 정보</h4>
+		</div>
+		<table style="width: 100%;">
+			<tr>
+				<td style="width: 15%; height: 42px; border: 1px solid #dcdcdc; color: #26267f; text-align: center;"><label>결제금액</label></td>
+				<td style="width: 35%; padding-right: 10px; text-align: right; border: 1px solid #dcdcdc; color: #26267f;"><input type="hidden" name="orderpay" id="orderpay"value="12000">12000원</td>
+				<td style="width: 15%; height: 42px; border: 1px solid #dcdcdc; color: #26267f; text-align: center;"><label>총 결제금액</label></td> 
+				<td style="width: 35%; padding-right: 10px; text-align: right; border: 1px solid #dcdcdc; color: #26267f;">12000원</td>
+			</tr>
+		</table>
+
+		<div>
+			<h4 style="font-size: 17px; color: #333; margin: 40px 0 5px 0;">결제선택</h4>
+		</div>
+		
+		<div style="padding: 20px; border-top: 2px solid rgb(221, 221, 221); border-bottom: 2px solid rgb(221, 221, 221);">
+			<table id="pay" style="width: 100%;">
+				<tr>
+					<td>
+						<span style="display: block; margin-bottom: 10px; text-align: center;">
+							<input name="payselect" type="radio" value="card"><label style="font-size: 17px; color: #333; font-weight: 700; margint: 0 20px 0 8px;">신용카드</label> 
+							<input name="payselect" type="radio" value="money" checked><label style="font-size: 17px; color: #333; font-weight: 700; margint: 0 20px 0 8px;">무통장입금</label>
+						</span>
+						<div style="text-align: center; margin: 0px; padding: 0px;">
+							<span id="payselect" style="display: inline-block; width: 95%; background: #f5f5f5; border-radius: 50px; border: 1px solid #cecece; height: 50px; padding: 10px 0 0 0;">
+								<label style="font-size: 14px; font-weight: 700; color: #333; margin: 0 5px 0 10px;">은행선택</label>
+								<select style="height: 30px; padding: 0 10px;">
+									<option>국민은행 464646-01-282828 예금주 : 홍길동</option>
+									<option>우리은행 263251-02-158965 예금주 : 신사임당</option>
+								</select> 
+								<label style="font-size: 14px; font-weight: 700; color: #333; margin: 0 5px 0 10px;">입금자명</label>
+								<input type="text" name="sellname" id="sellname" style="height: 30px; width: 150px; padding: 0 10px;">
+							</span>
+						</div>
+					</td>
+				</tr>
+			</table>
 		</div>
 	</div>
 
-	<!-- 결제할 상품 출력 -->
-	<div align="center">
-		<div>
-			주문상품 확인
-		</div>
-		<form action="/semi/rlist" id="fsubmit" method="post">
-		
-		<!-- 서블릿에 전달해야하느 값들 -->
-		<input type="hidden" name="loginId" id = "loginId" value=" <%= mId %>">
-		<input type="hidden" name="totalcount" id="totlcount" value="1">
-		<input type="hidden" name="productNo" id="productNo" value="03">
-		
-		<div>
-			<table cellspacing="0" border="1">
-				<tr>
-					<th colspan="2">상품/옵션정보</th><th>대여가</th><th>대여일</th>
-				</tr>
-				<tr>
-					<td rowspan="2">
-						<a href="/semi/pdetail.bd?pname=포터블그라인더"><img src="/semi/resources/images/main/01_1.jpg"></a>
-					</td>
-					<td><a href="/semi/pdetail.bd?pname=포터블그라인더">LED후레쉬(LF-1418Z)</a></td>
-					<td rowspan="2">10000원</td>
-					<td rowspan="2">시작일 : <input type="hidden" name="startday" id="startday" value="2018-08-20">2018-08-20 ~ 종료일 : <input type="hidden" name="endday" id="endday" value="2018-08-21">2018-08-21</td>
-				</tr>
-				<tr>
-					<td>옵션을 선택하지 않으셨습니다.</td>
-				</tr>
-			</table>
-		</div>		
-	</div>
-	
-	<!-- 결제 금액과 결제 방법 선택 -->
-	<div align="center">
-		<div>결제 정보</div>
-		<div>
-			<table cellspacing="0" border="1">
-				<tr>
-					<td><label>결제금액</label></td><td><input type="hidden" name="orderpay" id="orderpay" value="12000">12000원</td>
-					<td><label>총 결제금액</label></td><td>12000원</td>
-				</tr>
-			</table>
-		</div>
-	</div>
-	
-	<div align="center">
-		<div>
-			결제선택
-			<table cellspacing="0" border="1" id="pay">
-				<tr>
-					<td align="center">
-					<input name="payselect" type="radio" value="card">신용카드
-					<input name="payselect" type="radio" value="money" checked>무통장입금
-					<br>
-					<span id="payselect">은행선택
-					<select>
-						<option>국민은행 464646-01-282828 예금주 : 홍길동</option>
-						<option>우리은행 263251-02-158965 예금주 : 홍길동</option>
-					</select>
-					입금자명<input type="text" name="sellname" id="sellname"></span>
-					</td>
-				</tr>
-			</table>
-		</div>
-	</div>
-	
-	<div align="center">
-		
-		<input type="button" id="checkcard" value="결제하기">
-		<input type="button" onclick="backmain();" value="취소하기">
+	<div style="margin-top: 10px; margin-bottom: 20px; text-align: center;">
+		<input type="button" id="checkcard" value="결제하기" style="color: #fff; background-color: #fdc600; border-color: fdc600; border-radius: 1px; padding: 10px 20px; font-weight: 600; margin-right: 5px; margin-top: 10px; margin-bottom: 10px;">
+		<input type="button" onclick="backmain();" value="취소하기" style="color: #333; background-color: rgb(221, 221, 221); border-color: fdc600; border-radius: 1px; padding: 10px 20px; font-weight: 600; margin-right: 5px; margin-top: 10px; margin-bottom: 10px;">
 	</div>
 	</form>
 </div>
