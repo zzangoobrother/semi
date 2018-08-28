@@ -104,7 +104,7 @@ public class LocationListServlet extends HttpServlet {
 		try {
 			int listCount = infoService.getListCount();
 			
-			ArrayList<LocationInfo> list = infoService.selectList(currentPage, limit);
+			ArrayList<LocationInfo> list = infoService.allSelectList(currentPage, limit);
 			
 			int maxPage = (int) Math.ceil(((double)listCount / limit));
 			
