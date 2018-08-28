@@ -180,13 +180,13 @@ String aId = (String)session.getAttribute("a_Id");
                         	<a href="index.html" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="200">관   리 <b class="caret"></b></a>
                         <ul class="dropdown-menu navbar-nav">
                                 <li>
-                                    <a href="/semi/views/manager/memberManagement.jsp">- 회원관리</a>
+                                    <a href="/semi/views/manager/memberManagementView.jsp">- 회원관리</a>
                                 </li>
                                 <li>
                                     <a href="#">- 재고관리</a>
                                 </li>
                                 <li>
-                                    <a href="/semi/views/manager/rentalManagement.jsp">- 대여관리</a>
+                                    <a href="/semi/views/manager/rentalManagementView.jsp">- 대여관리</a>
                                 </li> 
 
                             </ul>
