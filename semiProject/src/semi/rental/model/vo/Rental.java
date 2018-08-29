@@ -18,11 +18,12 @@ public class Rental implements Serializable {
 	private String RReturnLastDate;
 	private String rBookingDate;
 	private String pState;
+	private String pName;
 	
 	public Rental() {}
 
 	public Rental(String rNo, String mId, int pNo, int pCount, int rPrice, String rDate, String rStartDate,
-			String rReturnDate, String rReturnLastDate, String rBookingDate, String pState) {
+			String rReturnDate, String rReturnLastDate, String rBookingDate, String pState, String pName) {
 		super();
 		this.rNo = rNo;
 		this.mId = mId;
@@ -35,8 +36,15 @@ public class Rental implements Serializable {
 		RReturnLastDate = rReturnLastDate;
 		this.rBookingDate = rBookingDate;
 		this.pState = pState;
+		this.pName = pName;
 	}
 
+	public String getpName(){
+		return pName;
+	}
+	public void setpName(String pName){
+		this.pName = pName;
+	}
 	public String getrNo() {
 		return rNo;
 	}

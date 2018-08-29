@@ -49,8 +49,6 @@ public class RentalManagementLocalSelectServlet extends HttpServlet {
 		PrintWriter out = response.getWriter();
 
 		try {
-
-			System.out.println("아 지역 선택됐는데 왜?");
 			list = new RentalService().rentalLocalList();
 
 			json = new JSONObject();
