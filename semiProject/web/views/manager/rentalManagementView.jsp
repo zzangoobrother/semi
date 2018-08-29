@@ -26,201 +26,48 @@
 	var localFilter;	//지역명
 	var localNameFilter;	//동사무소명
 	var productName; //물품명
+	var radioFilter;	//table2 radio filter
+	
+	//table 2 data
+	var value;
+	var mainFilter;
+	var sFilter;
+	
+	var rNo;
+	
 	
 	$(function(){
-		//#table2 사이즈 변경
-		//$("#table2 tr").not($("td")).css("width", "100px");
-
-		//#table1 의 모든 필드에 readonly 속성 추가
 		$("#table1 input").attr("readonly", true);
+		$("#table1 input").css("font-size", "14px");	
 		
-		//$("#table1 input").attr("readonly", false);
-		$("body").append("<td>");
-		$("#table1 input").css("font-size", "14px");
-		
-		//$("#local1").attr("onChange", "localNamePrint(" + localFilter + ")");
-		
-		/* $("#local1").on("change", 
-				function(){
-				localFilter = $(":selected").val();
-				$("#local2").html("");
-				localNamePrint(localFilter);	//동사무소명 출력함수 호출	
-				return false;
-		}); */
-		
-		
-		
+		//지역명 select 이벤트 발생시
+		$("#local1").on("change", function(){
+			localFilter = $("#local1 :selected").val();
+			$("#local2").html("");
+			localNamePrint(localFilter);
+			return false;
+		});
+		//동사무소명 select 이벤트 발생시
+		$("#local2").on("change", function(){
+			$("#pname").html("");
+			localNameFilter = $("#local2 :selected").val();
+			productPtint(localNameFilter);	//물품명 출력함수 호출	
+			return false;
+		});
 	}); //document.ready
 	
-	//-------------------------------------------------------------
-	//등록 버튼 클릭시 지역명 출력 -> 지역명 select 이벤트 발생시
-	//select 한  filter 에 맞는 동사무소명 출력
-	//동사무소명 select 이벤트 발생시 ->
-	//해당 동사무소에 대여 가능한 && 재고가 존재하는 물품명 출력
-	//물품명 select 이벤트 발생시 select 한 filter에 맞는
-	//물품번호를 물품번호 필드에 출력
-	
-	//지역명 출력 함수
-	function localPrint(){
-		$.ajax({
-			url : "/semi/rmlselect",
-			type : "post",
-			dataType : "json",
-			success : function(data){
-				var jsonStr = JSON.stringify(data);
-				//jsonStr = jsonStr.replace("+", " ");
-				var json = JSON.parse(jsonStr);
-				
-				for(var i = 0; i < json.list.length; i++){
-					$("#local1").append("<option>" + decodeURIComponent(json.list[i].lloca) + "</option>");
-				} //for
-			}, //success
-			error : function(jqXHR, textstatus, errorThrown){
-				console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
-			} // error
-		}); //ajax
-		
-		return false;
-	} //localPrint end-
-	
-	//지역명 select 이벤트 발생시
-	function localSelectEvent(){
-		localFilter = $(":selected").val();
-		$("#local2").html("");
-		localNamePrint(localFilter);	//동사무소명 출력함수 호출	
-		return false;
-	}
-	
-	//동사무소명 출력 함수
-	function localNamePrint(localFilter){
-		$.ajax({
-			url : "/semi/rmlnselect",
-			type : "post",
-			data : {"local" : localFilter},
-			dataType : "json",
-			success : function(data){
-				var jsonStr = JSON.stringify(data);
-				var json = JSON.parse(jsonStr);
-				
-				$("#local2").append("<option>동사무소선택</option>");
-				for(var i = 0; i < json.list.length; i++){
-					json.list[i].lname = json.list[i].lname.replace("+", " ");
-					$("#local2").append("<option>" + decodeURIComponent(json.list[i].lname) + "</option>");
-				} //for
-			}, //success
-			error : function(jqXHR, textstatus, errorThrown){
-				console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
-			} // error
-		}); //ajax
-		return false;
-	}
-	
-	//동사무소명 select 이벤트 발생시
-	function localNameSelectEvent(){
-		$("#pname").html("");
-		localNameFilter = $("#local2 :selected").val();
-		productPtint(localNameFilter);	//동사무소명 출력함수 호출	
-		return false;
-	}
-	
-	//물품명 출력함수
-	function productPtint(localNameFilter){
-		$.ajax({
-			url : "/semi/rmpnselect",
-			type : "post",
-			data : {"lname" : localNameFilter},
-			dataType : "json",
-			success : function(data){
-				
-				var jsonStr = JSON.stringify(data);
-				var json = JSON.parse(jsonStr);
-				$("#pname").append("<option>물품명선택</option>")
-				for(var i = 0; i < json.list.length; i++){
-					$("#pname").append("<option>" + decodeURIComponent(json.list[i].pname) + "</option>");
-				}
-			}, //success
-			error : function(jqXHR, textstatus, errorThrown){
-				console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
-			}
-		}); //ajax	
-		return false;
-	} //productSelectBox_end
-	
-	//물품명 select 이벤트 발생시
-	function productInfoPrint(){
-		//$("#pname").html("");
-		alert($("#pname :selected").val());
-		productName = $("#pname :selected").val();
-		//alert($("#pname :selected").val() + ", " + $("#local2 :selected").val());
-		productInfoPtint(productName, localNameFilter); //물품정보 출력함수 호출
-		return false;
-	}
-	
-	//물품정보 출력함수
-	function productInfoPtint(productName, localNameFilter){
-		/*P_NO	NUMBER	No		1	물품번호
-		P_NAME	VARCHAR2(300 BYTE)	No		2	물품명
-		P_PRICE	NUMBER	Yes		3	물품가격
-		P_COUNT	NUMBER	Yes		4	물품수량
-		P_LOCAL	VARCHAR2(300 BYTE)	No		5	물품보유지역
-		P_ITEM	VARCHAR2(100 BYTE)	No		8	물품품목
-		P_STATE	VARCHAR2(100 BYTE)	Yes	"'대여가능'
-		"	10	물품대여상태*/
-		//alert(productName + ", " + localNameFilter);
-		$.ajax({
-			url : "/semi/rmpiselect",
-			type : "post",
-			data : {"pname" : productName, "lname" : localNameFilter},
-			dataType : "json",
-			success : function(data){
-				var jsonStr = JSON.stringify(data);
-				var json = JSON.parse(jsonStr);
-				alert("석세스?");
-				alert(json.pno + ", " + json.pprice + ", " + json.pcount + ", " + decodeURIComponent(json.pitem)+ ", " + decodeURIComponent(json.pstate));
-				/* $("#pno").val(json.pno);
-				$("#pprice").val(json.pprice);
-				$("#pcount").val(json.pcount);
-				$("#pitem").val(decodeURIComponent(json.pitem));
-				$("#pstate").val(decodeURIComponent(json.pstate)); */
-				
-			}, //success
-			error : function(jqXHR, textstatus, errorThrown){
-				console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
-			}
-		}); //ajax
-		
-		return false;
-	} //productPrint2 end-
-	
-	
-	
-	
-	//등록 | 수정 | 삭제 radio 버튼 checked true 일 경우 버튼 숨기기
-	//등록 | 수정 선택시 readonly 설정 제거
-	//등록 선택시 필드 값 초기화
-	//등록 | 수정 | 삭제 선택시 #form1 의 action 경로 설정
-
-	
+	//-------------------------------------------------------------function
 	//등록 radio
-	function enrollChecked(){
-/* 		$("#enrollBtn").attr("style", "display:inline");
-		$("#editBtn").attr("style", "display:none");
-		$("#deleteBtn").attr("style", "display:none");
-		
-		$("#idchkBtn").attr("style", "display:block");
-		
-		$("#table1 input").attr("readonly", false);
-		$("#table1 input").val(""); */
-		
+	function enrollChecked(){	
 		$("#saveBtn").attr("style", "display:inline");
 		$("#editSaveBtn").attr("style", "display:none");
-		$("#returnBtn").attr("style", "display:none");
-		
-		$("#table1 input").not($("#rnum")).not($("#rdate")).not($("#rstartdate")).attr("readonly", false);
-		$("#rrastdate").attr("style", "display:none");
-		$("#rbookdate").attr("style", "display:none");
-	
+		$("#returnBtn").attr("style", "display:none");	
+		$("#table1 input").not("#pitem").not($("#rnum")).not($("#rdate")).not($("#rstartdate")).not("#pnum").not("#pcount").not("#rprice").not("#rstate").attr("readonly", false);
+		$("#rnum").attr("readonly", true);
+		$("#daydiv1").attr("style", "display:none");
+		$("#daydiv2").attr("style", "display:none");
 		$("#table1 input").val("");
+		$("#idCheck").attr("style", "display:inline-block");
 
 		//대여/반납접수일자, 대여실행일자 기본 값
 		var sysMonth1 = 0;
@@ -235,277 +82,144 @@
 			sysDay1 = "0" + sysDay;
 		}else{
 			sysDay1 = sysDay;
-		}
-		
+		}		
 		$("#rdate").val(sysYear + "-" + sysMonth1 + "-" + sysDay1);
-		//$("#rdate").attr("readonly", true);
 		$("#rreturndate").val(sysYear + "-" + sysMonth1 + "-" + (sysDay1+1));
 		$("#rstartdate").val(sysYear + "-" + sysMonth1 + "-" + sysDay1);
 		
-		
-		localPrint();	//지역명 출력 함수 호출
-		
-		/* $.ajax({
-			url : "/semi/mrplist",
+		localPrint(1);	//지역명 출력 함수 호출
+
+		return false;
+	}
+	
+	//수정 radio
+	function editChecked(){
+		$("#saveBtn").attr("style", "display:none");
+		$("#editSaveBtn").attr("style", "display:inline-block");
+		$("#returnBtn").attr("style", "display:inline-block");	
+		$("#rstartdate").attr("readonly", false);
+		$("#rrastdate").attr("readonly", false);		
+		$("#rstartdate").attr("readonly", true);
+		$("#rreturndate").attr("readonly", false);
+		$("#idchkBtn").attr("style", "display:none");
+		$("#daydiv1").attr("style", "display:inline-block");
+		$("#daydiv2").attr("style", "display:inline-block");
+		$("#idCheck").attr("style", "display:none");
+		return false;
+	}
+	
+	//지역명 출력 함수
+	function localPrint(){
+		$.ajax({
+			url : "/semi/rmlselect",
 			type : "post",
-			//dataType : "json",
+			dataType : "json",
 			success : function(data){
-				//리스트에서 꺼내서 물품명 select box for문 돌려서 생성
 				var jsonStr = JSON.stringify(data);
 				var json = JSON.parse(jsonStr);
-			
-				for(var i = 0; i <= json.list.length; i++){
-					$("#pname").append("<option id='pnameChk" + i + "'>" + decodeURIComponent(json.list[i].pname) + "</option>");
-				} //for
 				
+				for(var i = 0; i < json.list.length; i++){
+						$("#local1").append("<option>" + decodeURIComponent(json.list[i].lloca) + "</option>");
+				} //for
+			}, //success
+			error : function(jqXHR, textstatus, errorThrown){
+				console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
+			} // error
+		}); //ajax
+		
+		return false;
+	} //localPrint end-
+
+	//동사무소명 출력 함수
+	function localNamePrint(localFilter){
+		$.ajax({
+			url : "/semi/rmlnselect",
+			type : "post",
+			data : {"local" : localFilter},
+			dataType : "json",
+			success : function(data){
+				var jsonStr = JSON.stringify(data);
+				var json = JSON.parse(jsonStr);
+				
+					$("#local2").append("<option>동사무소전체</option>");				
+				for(var i = 0; i < json.list.length; i++){
+					json.list[i].lname = json.list[i].lname.replace("+", " ");
+					//if(num == 1)
+						$("#local2").append("<option>" + decodeURIComponent(json.list[i].lname) + "</option>");
+				} //for
+			}, //success
+			error : function(jqXHR, textstatus, errorThrown){
+				console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
+			} // error
+		}); //ajax
+		return false;
+	}	
+	
+	//물품명 출력함수
+	function productPtint(localNameFilter){
+		$.ajax({
+			url : "/semi/rmpnselect",
+			type : "post",
+			data : {"lname" : localNameFilter},
+			dataType : "json",
+			success : function(data){
+				
+				var jsonStr = JSON.stringify(data);
+				var json = JSON.parse(jsonStr);
+				
+					$("#pname").append("<option>물품전체</option>");
+				for(var i = 0; i < json.list.length; i++){
+						$("#pname").append("<option>" + decodeURIComponent(json.list[i].pname) + "</option>");
+				}
 			}, //success
 			error : function(jqXHR, textstatus, errorThrown){
 				console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
 			}
-		}); //ajax*/
-
+		}); //ajax	
 		return false;
-	}
-
-	//수정 radio
-	function editChecked(){
-		$("#enrollBtn").attr("style", "display:none");
-		$("#editBtn").attr("style", "display:inline");
-		$("#deleteBtn").attr("style", "display:none");
-		
-		$("#table1 input").attr("readonly", false);
-		$("#mid1").attr("readonly", true);
-		$("#idchkBtn").attr("style", "display:none");
-		//$("#form1").attr("action", "/semi/medit");
+	} 
+	
+	//table1 물품명 select 이벤트 발생시
+	function productNameSelectEvent(){
+		//$("#pname").html("");
+		productName = $("#pname :selected").val();
+		productInfoPtint(productName, localNameFilter); //물품정보 출력함수 호출
 		return false;
-	}
-	//삭제 radio
-	function deleteChecked(){
-		$("#enrollBtn").attr("style", "display:none");
-		$("#editBtn").attr("style", "display:none");
-		$("#deleteBtn").attr("style", "display:inline");
-		
-		$("#table1 input").attr("readonly", true);
-		$("#idchkBtn").attr("style", "display:none");
-		
-		//$("#form1").attr("action", "/semi/mdelete");
-		return false;
-	}
-	//-------------------------------------------------------------
+	}	
 	
-	//회원 등록
-	function enrollClick(){
-		if(confirm("입력한 정보로 신규 회원을 등록 하시겠습니까?")){
-			var birth1 = $("#birth2").val();
-			var birth2 = $("#birth2").val();
-			var b2;
-			if(birth2 < 10)
-				b2 = "0" + birth2;
-			else
-				b2 = birth2;
-			var birth3 = $("#birth3").val();
-			var b3;
-			if(birth3 < 10)
-				b3 = "0" + birth3;
-			else
-				b3 = birth3;
-			memberInfo.mname = $("#mname").val();
-			memberInfo.mid = $("#mid1").val();
-			memberInfo.mnick = $("#mnick").val();
-			memberInfo.mpwd = $("#mpwd").val();
-			memberInfo.msno = (birth1 + "-" + b2 + "-" + b3);
-			if($("#T").is(":checked") == true)
-				memberInfo.mgender = "M";
-			else
-				memberInfo.mgender = "F";
-	
-			memberInfo.mphone = $("#mphone").val();
-			memberInfo.memail = $("#memail").val();
-			
-			var adr1 = $("#sample4_postcode").val();
-			var adr2 = $("$sample4_roadAddress").val();
-			memberInfo.maddress = (adr1 + ", " + adr2);
-			
-			memberInfo.mpoint = $("#mpoint").val(); 
-			
-			var jsonStr = JSON.stringify(memberInfo);
-			//var json = JSON.parse(jsonStr);
-	
-			$.ajax({
-				url : "/semi/mmenroll",
-				type : "post",
-				data : {"jsonStr" : jsonStr},
-				//dataType : "json",
-				success : function(data){
-					if(data >= 1)
-						alert("회원 등록 완료");
-					else
-						alert("회원 등록 실패");
-					paging(currentPage);
-				}, //success
-				error : function(jqXHR, textstatus, errorThrown){
-					console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
-				} //error
-			});//ajax
-			paging(1);
-		}else{
-			alert("회원 등록을 취소합니다.");
-		}
-		return false;
-	} //enrollClick
-	
-	//회원 수정
-	function editClick(memberInfo){
-		
-		if(confirm("변경된 정보로 정말 수정하시겠습니까?")){
-			var birth1 = $("#birth2").val();
-			var birth2 = $("#birth2").val();
-			var b2;
-			if(birth2 < 10)
-				b2 = "0" + birth2;
-			else
-				b2 = birth2;
-			var birth3 = $("#birth3").val();
-			var b3;
-			if(birth3 < 10)
-				b3 = "0" + birth3;
-			else
-				b3 = birth3;
-			memberInfo.mname = $("#mname").val();
-			memberInfo.mid = $("#mid").val();
-			memberInfo.mnick = $("#mnick").val();
-			memberInfo.mpwd = $("#mpwd").val();
-			memberInfo.msno = (birth1 + "-" + b2 + "-" + b3);
-			
-			if($("#T").is(":checked") == true)
-				memberInfo.mgender = "남";
-			else
-				memberInfo.mgender = "여";
-	
-			memberInfo.mphone = $("#mphone").val();
-			memberInfo.memail = $("#memail").val();
-			
-			var adr1 = $("#sample4_postcode").val();
-			var adr2 = $("$sample4_roadAddress").val();
-			memberInfo.maddress = (adr1 + ", " + adr2);
-			
-			memberInfo.mpoint = $("#mpoint").val(); 
-			
-			var jsonStr = JSON.stringify(memberInfo);
-	
-			$.ajax({
-				url : "/semi/mmedit",
-				type : "post",
-				data : {"jsonStr" : jsonStr},
-				success : function(data){
-					if(data >= 1)
-						alert("회원 정보 수정 완료");
-					else
-						alert("회원 정보 수정 실패");
-					paging(currentPage);
-				}, //success
-				error : function(jqXHR, textstatus, errorThrown){
-					console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
-				} //error
-				
-			});//ajax
-		}else{
-			alert("변경사항을 저장하지 않고 수정을 취소합니다.");
-		}
-		paging(currentPage);
-		return false;
-	}
-	
-	//회원 삭제
-	function deleteClick(memberInfo){
-		if(confirm("해당 회원을 정말 삭제하시겠습니까?")){
-			var mid = memberInfo.mid;
-			$.ajax({
-				url : "/semi/mmdelete",
-				type : "post",
-				data : {"mid" : mid},
-				success : function(data){
-					if(data >= 1)
-						alert("회원 정보 삭제 완료");
-					else
-						alert(memberInfo.mid + "님의 회원 정보 삭제 실패");
-					$("#table1 input").val("");
-					paging(currentPage);
-					
-				}, //success
-				error : function(jqXHR, textstatus, errorThrown){
-					console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
-				} //error
-				
-			}); //ajax
-		}else{
-			alert("회원 삭제를 취소합니다.");
-		}
-		paging(currentPage);
-		return false;
-	} //deleteClick
-	
-	//-------------------------------------------------------------
-	
-	//회원 선택시 table1 필드에 회원 정보 출력과 memberInfo에 회원 정보 담기
-	function radioCheck(num){	
-		//select한 회원 정보로 memberInfo 초기화
-		memberInfo.mname = $("#nametd" + num).text();
-		memberInfo.mid = $("#idtd" + num).text();
-		memberInfo.mnick = $("#nicktd" + num).text();
-		memberInfo.mpwd = pwdList[num];
-		memberInfo.msno = $("#snotd" + num).text();
-		memberInfo.mgender = $("#gendertd" + num).text();
-		memberInfo.mphone = $("#phonetd" + num).text();
-		memberInfo.memail = $("#emailtd" + num).text();
-		memberInfo.maddress = $("#addresstd" + num).text();
-		memberInfo.mpoint = $("#pointtd" + num).text();
-
-		//table1에 회원 정보 출력
-		//$("#mname").val($("#nametd" + num).text());
-		$("#mname").val(memberInfo.mname);
-		$("#mid1").val(memberInfo.mid);
-		$("#mnick").val(memberInfo.mnick);
-		$("#mpwd").val(memberInfo.mpwd);
-		$("#mpwd2").val(memberInfo.mpwd);
-		
-		var sno = memberInfo.msno;	
-		var year = sno.substring(0, 4);
-		var month = sno.substring(6, 7);
-		var day = sno.substring(9, 10);
-		$("#birth1").val(year);
-		$("#birth2").val(month);
-		$("#birth3").val(day);
-
-		if(memberInfo.mgender == "남"){
-			//$("#F").attr("checked", false);
-			$("#T").attr("checked", true);
-			
-		}else if(memberInfo.mgender == "여"){
-			//$("#T").attr("checked", false);
-			$("#F").attr("checked", true);
-		}
-		
-		$("#mphone").val(memberInfo.mphone);
-		$("#memail").val(memberInfo.memail);
-		
-		var adrSplit = memberInfo.maddress.split(",");
-		$("#sample4_postcode").val(adrSplit[0]);
-		$("#sample4_roadAddress").val(adrSplit[1]);
-		
-		$("#mpoint").val(memberInfo.mpoint);
-		
-		return false;
-
-	}
-	//-------------------------------------------------------------
-	
-	//회원 리스트 전체 조회
-	function paging(page){
-
+	//tabl1 물품정보 출력함수
+	function productInfoPtint(productName, localNameFilter){	
 		$.ajax({
-			url : "/semi/mmlist",
-			type : "get",
+			url : "/semi/rmpiselect",
+			type : "post",
+			data : {"pname" : productName, "lname" : localNameFilter},
+			dataType : "json",
+			success : function(data){
+				var jsonStr = JSON.stringify(data);
+				var json = JSON.parse(jsonStr);				
+				
+				$("#pnum").val(json.pno);
+				$("#rprice").val(json.pprice);
+				$("#pcount").val(json.pcount);
+				$("#rstate").val(decodeURIComponent(json.pstate));	
+				$("#pitem").val(decodeURIComponent(json.pitem));
+			}, //success
+			error : function(jqXHR, textstatus, errorThrown){
+				console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
+			}
+		}); //ajax		
+		return false;
+	} //productPrint2 end-
+
+	//-----------------------------------------------------------------------table1 function end--
+
+	//--------------------------------------------------table2 function start
+	
+	//대여목록 전체 조회
+	function allselectClick(page){
+		$.ajax({
+			url : "/semi/rmslist",
+			type : "post",
 			data : {"page" : page},
 			dataType : "json",
 			success : function(data){
@@ -520,23 +234,22 @@
 				endPage = json.endPage;
 				listCount = json.listCount;
 				jsonListSize = json.list.length;
-				jsonPwd = json.list
+				jsonPwd = json.list;
 				
 				var values = "";
 				for(var i in json.list){
 					values += "<tr><td><input type='radio' onclick='radioCheck(" + i + ")' name='choice' id='choice" + i + "'></td>"
-					+ "<td id='nametd" + i + "'>" + decodeURIComponent(json.list[i].mname) + "</td>"
-					+ "<td id='idtd" + i + "'>" + decodeURIComponent(json.list[i].mid) + "</td>"
-					+ "<td id='nicktd" + i + "'>" + decodeURIComponent(json.list[i].mnick) + "</td>"
-					+ "<td id='snotd" + i + "'>" + decodeURIComponent(json.list[i].msno) + "</td>"
-					+ "<td id='gendertd" + i + "'>" + decodeURIComponent(json.list[i].mgender) + "</td>"
-					+ "<td id='phonetd" + i + "'>" + decodeURIComponent(json.list[i].mphone) + "</td>"
-					+ "<td id='emailtd" + i + "'>" + decodeURIComponent(json.list[i].memail) + "</td>"
-					+ "<td id='addresstd" + i + "'>" + decodeURIComponent(json.list[i].maddress) + "</td>"
-					+ "<td id='pointtd" + i + "'>" +  json.list[i].mpoint + "</td></tr>";
-					
-					pwdList.push(json.list[i].mpwd);
-					
+					+ "<td id='rnotd" + i + "'>" + decodeURIComponent(json.list[i].rno) + "</td>"
+					+ "<td id='pnotd" + i + "'>" + decodeURIComponent(json.list[i].pno) + "</td>"
+					+ "<td id='pcounttd" + i + "'>" + json.list[i].pcount + "</td>"
+					+ "<td id='rpricetd" + i + "'>" + json.list[i].rprice + "</td>"
+					+ "<td id='midtd" + i + "'>" + decodeURIComponent(json.list[i].mid) + "</td>"
+					+ "<td id='rdatetd" + i + "'>" + decodeURIComponent(json.list[i].rdate) + "</td>"
+					+ "<td id='rstartdatetd" + i + "'>" + decodeURIComponent(json.list[i].rstartdate) + "</td>"
+					+ "<td id='rreturntd" + i + "'>" + decodeURIComponent(json.list[i].rreturndate) + "</td>"
+					+ "<td id='rlasttd" + i + "'>" + decodeURIComponent(json.list[i].rlastdate) + "</td>"
+					+ "<td id='pstatetd" + i + "'>" +  decodeURIComponent(json.list[i].pstate) + "</td></tr>";
+										
 				} //for
 				$("#t1").html(values); 
 				
@@ -548,7 +261,6 @@
 					if(p == startPage)
 						$("#domain").html(firstP);
 					
-					//if(p > startPage)
 					$("#domain").append("<li><a href='#' onclick='paging(" + p + ")'>" + p + "</a></li>");
 					
 					if(p == endPage)
@@ -566,50 +278,7 @@
 	}
 	
 	//-------------------------------------------------------------
-	
-	//필터 선택 조회 
-	function selectBtnClick(){
-			
-		filter = $("#filter").val();
-		value = $("#searchTF").val();
-
-		$.ajax({
-			url : "/semi/mmselect",
-			type : "post",
-			data : {"filter" : filter, "value" : value},
-			dataType : "json",
-			success : function(data){
-				//회원 리스트 직렬화
-				var jsonStr = JSON.stringify(data);
-				var json = JSON.parse(jsonStr);
-				
-				var values = "";
-				for(var i in json.list){
-					values += "<tr><td><input type='radio' onclick='radioCheck(" + i + ")' name='choice' id='choice" + i + "'></td>"
-					+ "<td id='nametd" + i + "'>" + decodeURIComponent(json.list[i].mname) + "</td>"
-					+ "<td id='idtd" + i + "'>" + decodeURIComponent(json.list[i].mid) + "</td>"
-					+ "<td id='nicktd" + i + "'>" + decodeURIComponent(json.list[i].mnick) + "</td>"
-					+ "<td id='snotd" + i + "'>" + decodeURIComponent(json.list[i].msno) + "</td>"
-					+ "<td id='gendertd" + i + "'>" + decodeURIComponent(json.list[i].mgender) + "</td>"
-					+ "<td id='phonetd" + i + "'>" + decodeURIComponent(json.list[i].mphone) + "</td>"
-					+ "<td id='emailtd" + i + "'>" + decodeURIComponent(json.list[i].memail) + "</td>"
-					+ "<td id='addresstd" + i + "'>" + decodeURIComponent(json.list[i].maddress) + "</td>"
-					+ "<td id='pointtd" + i + "'>" +  json.list[i].mpoint + "</td></tr>";
-					
-					pwdList.push(json.list[i].mpwd);
-				} //for
-
-				$("#t1").html(values); 
-				
-			}, //success
-			error : function(jqXHR, textstatus, errorThrown){
-				console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
-			} //error
-		}); //ajax
-		return false;	
-	}
-	
-	//아이디 중복확인
+	//아이디 유효성검사
 	function dupIdCheck() {
 		$.ajax({
 			url : "/semi/idchk",
@@ -619,10 +288,10 @@
 			success : function(data) {
 				console.log("success : " + data);
 				if (data == "ok") {
-					alert("사용 가능한 아이디입니다.");
+					alert("등록된 회원이 아닙니다.");
 					$("#m_name").focus();
 				} else {
-					alert("이미 사용중인 아이디입니다.\n" + "다시 입력하십시오.");
+					alert("등록된 회원입니다.");
 					$("#m_id").select();
 				}
 			},
@@ -633,6 +302,250 @@
 		});
 		return false;
 	}
+	
+	//조회 버튼 클릭시 
+	function selectBtnClick(){
+
+		sFilter = $("#searchfilter :selected").val();
+		if($("#searchTF").val() == ""){
+			value = "no";
+		}else{
+			value = $("#searchTF").val();
+		}	
+		if($("#allselect").is(":checked") == true && value == "no" && sFilter == "전체")// && $("#searchTF").val() == null && )
+			allselectClick(1);
+		else if($("#allselect").is(":checked") == true && sFilter == "전체" && value != "no")
+			alert("조회항목을 선택하고 조회내용을 입력하십시오.");
+		else// if($("#dayselect").is(":checked") == true || $("#monthselect").is(":checked") == true)
+			filterSearch();
+		return false;
+	}
+	
+	//필터 선택 조회 
+	function filterSearch(){
+	//value, sFilter
+		var fVal;
+	
+		if($("#dayselect").is(":checked") == true){		
+			mainFilter = "day";
+			fVal = $("#dayselectinput").val();
+			
+		}else if($("#monthselect").is(":checked") == true){
+			mainFilter = "month";
+			fVal = $("#monthselectinput").val();
+		}else{
+			mainFilter = "all";
+			fVal = "all";
+		}
+		
+		$.ajax({
+			url : "/semi/rmfselect",
+			type : "post",
+			data : { 
+				"value" : value, 
+				"mainFilter" : mainFilter,
+				"fVal" : fVal, 
+				"sFilter" : sFilter},
+			dataType : "json",
+			success : function(data){
+				//회원 리스트 직렬화
+				var jsonStr = JSON.stringify(data);
+				var json = JSON.parse(jsonStr);
+				
+				var values = "";
+				for(var i in json.list){
+					values += "<tr><td><input type='radio' onclick='radioCheck(" + i + ")' name='choice' id='choice" + i + "'></td>"
+					+ "<td id='rnotd" + i + "'>" + decodeURIComponent(json.list[i].rno) + "</td>"
+					+ "<td id='pnotd" + i + "'>" + decodeURIComponent(json.list[i].pno) + "</td>"
+					+ "<td id='pcounttd" + i + "'>" + json.list[i].pcount + "</td>"
+					+ "<td id='rpricetd" + i + "'>" + json.list[i].rprice + "</td>"
+					+ "<td id='midtd" + i + "'>" + decodeURIComponent(json.list[i].mid) + "</td>"
+					+ "<td id='rdatetd" + i + "'>" + decodeURIComponent(json.list[i].rdate) + "</td>"
+					+ "<td id='rstartdatetd" + i + "'>" + decodeURIComponent(json.list[i].rstartdate) + "</td>"
+					+ "<td id='rreturntd" + i + "'>" + decodeURIComponent(json.list[i].rreturndate) + "</td>"
+					+ "<td id='rlasttd" + i + "'>" + decodeURIComponent(json.list[i].rlastdate) + "</td>"
+					+ "<td id='pstatetd" + i + "'>" +  decodeURIComponent(json.list[i].pstate) + "</td></tr>";
+										
+				} //for
+				$("#t1").html(values); 
+				
+			}, //success
+			error : function(jqXHR, textstatus, errorThrown){
+				console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
+			} //error
+		}); //ajax
+		return false;	
+	}
+	
+	//대여정보 선택시 table1 필드에 출력
+	function radioCheck(num){	
+	
+		//선택한 대여정보 담기
+		rentalInfo.rno = $("#rnotd" + num).text();
+		rentalInfo.pno = $("#pnotd" + num).text();
+		rentalInfo.pcount = $("#pcounttd" + num).text();
+		rentalInfo.rprice = $("#rpricetd" + num).text();
+		rentalInfo.mid = $("#midtd" + num).text();
+		rentalInfo.rdate = $("#rdatetd" + num).text();
+		rentalInfo.rstartdate = $("#rstartdatetd" + num).text();
+		rentalInfo.rreturn = $("#rreturntd" + num).text();
+		rentalInfo.rlast = $("#rlasttd" + num).text();
+		rentalInfo.pstate = $("#pstatetd" + num).text();
+
+		//table1에 대여 정보 출력
+		$("#rnum").val(rentalInfo.rno);
+		$("#pnum").val(rentalInfo.pno);
+		$("#pcount").val(rentalInfo.pcount);
+		$("#rprice").val(rentalInfo.rprice);
+		$("#mid1").val(rentalInfo.mid);
+		$("#rdate").val(rentalInfo.rdate);
+		if(rentalInfo.rstartdate == "2011-11-11")
+			$("#rstartdate").val();
+		else
+			$("#rstartdate").val(rentalInfo.rstartdate);
+		
+		$("#rreturndate").val(rentalInfo.rreturn);
+		if(rentalInfo.rlast == "2011-11-11")
+			$("#rlastdate").val();
+		else
+			$("#rlastdate").val(rentalInfo.rlast);
+		$("#rstate").val(rentalInfo.pstate);
+		
+		$.ajax({
+			url : "/semi/rmtp",
+			type : "post",
+			data : {"pno" : rentalInfo.pno},
+			dataType : "json",
+			success : function(data){
+				
+				var jsonStr = JSON.stringify(data);
+				var json = JSON.parse(jsonStr);		
+				
+				$("#local1").html("<option>" + decodeURIComponent(json.local1) + "</option>");
+				json.local2 = json.local2.replace("+", " ");
+				$("#local2").html("<option>" + decodeURIComponent(json.local2) + "</option>");	
+				$("#pname").html("<option>" + decodeURIComponent(json.pname) + "</option>");		
+				$("#pitem").val(decodeURIComponent(decodeURIComponent(json.pitem)));
+				if(decodeURIComponent(json.rbookdate) == "2011-11-11")
+					$("#rbookdate").val();
+				else
+					$("#rbookdate").val(decodeURIComponent(json.rbookdate));
+			},	//success
+			error : function(jqXHR, textstatus, errorThrown){
+				console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
+			}
+		}); 
+		return false;
+	}
+	
+	//반납 처리
+	function returnClick(){
+		rentalInfo.rno = $("#rnum").val();
+		rentalInfo.pno = $("#pnum").val();
+		
+		$.ajax({
+			url : "/semi/rmpreturn",
+			type : "post",
+			data : {"rno" : rentalInfo.rno, 
+				"pno" : rentalInfo.pno},
+			success : function(data){
+				if(data > 0)
+					alert("반납 처리 완료");
+				else
+					alert("반납 처리 실패");
+			}, 
+			error : function(jqXHR, textstatus, errorThrown){
+				console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
+			}
+		});
+		
+		allselectClick(1);
+		return false;
+	}
+	
+	//대여기간 연장
+	function updateReturnDate(){
+		rentalInfo.rno = $("#rnum").val();
+		rentalInfo.rreturn = $("#rreturndate").val();
+		//alert("return : " + rentalInfo.rreturn);
+		
+		$.ajax({
+			url : "/semi/rmupreturn",
+			type : "post",
+			data : {"rno" : rentalInfo.rno, 
+				"returndate" : rentalInfo.rreturn},
+			success : function(data){
+				if(data > 0)
+					alert("반납기간이 연장되었습니다.");
+				else
+					alert("반납기간 연장 실패");
+			},
+			error : function(jqXHR, textstatus, errorThrown){
+				console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
+			}
+		});
+		allselectClick(1);
+		return false;
+	}
+	
+	
+	//대여목록 등록
+	function insertClick(){
+		//rentalInfo.rno = $("#rnum").val();
+		rentalInfo.pno = $("#pnum").val();
+		rentalInfo.mid = $("#mid1").val();
+		rentalInfo.pcount = $("#pcount").val();
+		rentalInfo.rprice = $("#rprice").val();
+		rentalInfo.rreturn = $("#rreturndate").val();
+		
+		if(confirm("입력한 정보로 대여 등록 하시겠습니까?")){
+			var jsonStr = JSON.stringify(rentalInfo);
+			$.ajax({
+				url : "/semi/mrlinsert",
+				type : "post",
+				data : {"jsonStr" : jsonStr},
+				//dataType : "json",
+				success : function(data){
+					//alert("석세스?");
+					if(data != null){
+						rentalInfo.rno = data;
+						insertRental(rentalInfo);	
+					}else{
+						alert("대여 목록 등록 실패");
+					}
+				}, //success
+				error : function(jqXHR, textstatus, errorThrown){
+					console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
+				} //error
+			});//ajax
+		}else{
+			alert("대여 등록을 취소합니다.");
+		}	
+		return false;		
+	} //enrollClick
+	
+	function insertRental(rentalInfo){
+		var jsonStr = JSON.stringify(rentalInfo);
+		$.ajax({
+			url : "/semi/rmrinsert",
+			type : "post",
+			data : {"jsonStr" : jsonStr},
+			//dataType : "json",
+			success : function(data){
+				if(data >= 1)
+					alert("대여 등록 완료");
+				else
+					alert("대여 등록 실패");
+			}, //success
+			error : function(jqXHR, textstatus, errorThrown){
+				console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
+			} //error
+		});//ajax
+		allselectClick(1);
+	return false;
+	}
+	
+	//-------------------------------------------------------------
 
 </script>
 
@@ -657,110 +570,127 @@
                                         </div>
                                         <div class="row">
                                         	<div class="col-xs-12" style="width:53px;">
-                                            	<label>대여소</label>
-                                            </div>
-                                            <div class="col-xs-12">
-                                            	<select onChange="localSelectEvent();" class="btn dropdown-toggle btn-default" id="local1" name="local1">
-													<option>지역선택</option>
-												</select> 
-												<select onChange="localNameSelectEvent();" class="btn dropdown-toggle btn-default" id="local2" name="local2">
-													<option>동사무소선택</option>
-												</select> 
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                        	<div class="col-xs-12" style="width:53px;">
                                             	<label>대여번호</label>
                                             </div>
                                             <div class="col-xs-12">
-                                            	<input type="text" id="rnum" name="rnum" placeholder="대여번호" class="form-control">
+                                            	<input type="text" id="rnum" placeholder="대여번호" class="form-control">
                                             </div>
                                         </div>
                                         <div class="row">
                                         	<div class="col-xs-12" style="width:53px;">
-                                            	<label>물품정보</label>
+                                            	<label>대여소</label>
                                             </div>
                                             <div class="col-xs-12">
-                                                <select onChange="productInfoPtint();" class="btn dropdown-toggle btn-default" id="pname" name="pname">
-													<option>물품명선택</option>
+                                            	<select class="btn dropdown-toggle btn-default" id="local1">
+													<option>지역전체</option>
 												</select> 
-												<input type="text" id="pnum" name="pnum" placeholder="물품번호" class="form-control">
+												<select class="btn dropdown-toggle btn-default" id="local2">
+													<option>동사무소전체</option>
+												</select> 
+                                            </div>
+                                        </div>                                       
+                                        <div class="row">
+                                        	<div class="col-xs-12" style="width:53px;">
+                                            	<label>물품명</label>
+                                            </div>
+                                            <div class="col-xs-12">
+                                                <select onChange="productNameSelectEvent();" class="btn dropdown-toggle btn-default" id="pname" style="width:223px;">
+													<option>물품전체</option>
+												</select> 
                                             </div>                    
                                         </div>
                                         <div class="row">
                                         	<div class="col-xs-12" style="width:53px;">
+                                            	<label>품목</label>
+                                            </div>
+                                            <div class="col-xs-12">
+												<input type="text" id="pitem" placeholder="품목" class="form-control" readonly>
+                                            </div>                    
+                                        </div>   
+                                        <div class="row">
+                                        	<div class="col-xs-12" style="width:53px;">
+                                            	<label>물품번호</label>
+                                            </div>
+                                            <div class="col-xs-12">
+												<input type="text" id="pnum" placeholder="물품번호" class="form-control" readonly>
+                                            </div>                    
+                                        </div>                    
+                                        <div class="row">
+                                        	<div class="col-xs-12" style="width:53px;">
+                                            	<label>수량</label>
+                                            </div>                                            
+                                            <div class="col-xs-12" style="width:53px;">
+												<input type="number" id="pcount" placeholder="수량" class="form-control" readonly>
+                                            </div>    
+                                            <div class="col-xs-12" style="width:55px;">
                                             	<label>대여금액</label>
                                             </div>
                                             <div class="col-xs-12">
-                                                <input type="text" id="rprice" name="rprice" placeholder="대여금액" class="form-control" style="width: 90px;">1개
-                                                1개
-                                                <input type="text" id="rcount" name="rcount" placeholder="대여수량" class="form-control" style="width: 47px;">
-                                            </div>
+                                                <input type="text" id="rprice" placeholder="대여금액" class="form-control" style="width: 100px;" readonly>                                           	
+                                            </div>            
                                         </div>
-                                        <div class="row">
+                                         <div class="row">
                                         	<div class="col-xs-12" style="width:53px;">
+                                            	<label>물품상태</label>
+                                            </div>
+                                            <div class="col-xs-12">
+                                            	<input type="text" id="rstate" class="form-control" readonly>
+                                            </div>
+                                        </div>                                        
+                                        <div class="row">
+                                        	<div class="col-xs-12" style="width:90px;">
                                             	<label>대여접수일자</label>
                                             </div>
                                             <div class="col-xs-12">
-                                                <input type="date" id="rdate" name="rdate">
+                                                <input type="date" id="rdate" class="form-control" >
                                             </div>
                                         </div>
                                         <div class="row">
-                                        	<div class="col-xs-12" style="width:53px;">
+                                        	<div class="col-xs-12" style="width:90px;">
                                             	<label>대여실행일자</label>
                                             </div>
                                             <div class="col-xs-12">
-                                                <input type="date" id="rstartdate" name="rstartdate">
+                                                <input type="date" id="rstartdate" class="form-control">
                                             </div>
                                         </div>
                                         <div class="row">
-                                        	<div class="col-xs-12" style="width:53px;">
+                                        	<div class="col-xs-12" style="width:90px;">
                                             	<label>반납접수일자</label>
                                             </div>
                                             <div class="col-xs-12">
-												<input type="date" id="rreturndate" name="rreturndate">                                
+												<input type="date" id="rreturndate" class="form-control">                                
                                             </div>
                                         </div>
-                                        <div class="row">
-                                        	<div class="col-xs-12" style="width:53px;">
+                                        <div class="row" id="daydiv1">
+                                        	<div class="col-xs-12" style="width:90px;" >
                                             	<label>반납실행일자</label>
                                             </div>
                                             <div class="col-xs-12">
-                                                <input type="date" id="rrastdate" name="rrastdate">
+                                                <input type="date" id="rlastdate" class="form-control">
                                             </div>
                                         </div>
-                                        <div class="row">
-                                        	<div class="col-xs-12" style="width:53px;">
+                                        <div class="row" id="daydiv2">
+                                        	<div class="col-xs-12" style="width:90px;">
                                             	<label>예약일자</label>
                                             </div>
                                             <div class="col-xs-12">
-                                                <input type="date" id="rbookdate" name="rbookdate">
+                                                <input type="date" id="rbookdate" class="form-control">
                                             </div>
-                                        </div>
+                                        </div>                                      
                                         <div class="row">
-                                        	<div class="col-xs-12" style="width:53px;">
-                                            	<label>대여상태</label>
-                                            </div>
-                                            <div class="col-xs-12">
-                                                <select id="filter" name="filter">
-												<option>대기</option>
-												<option>대여중</option>						
-												</select>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                        	<div class="col-xs-12" style="width:53px;">
+                                        	<div class="col-xs-12" style="width:90px;">
                                             	<label>대여자아이디</label>
+                                            	<button id="idCheck" onclick="dupIdCheck()">유효성검사</button>
                                             </div>
-                                            <div class="col-xs-12">
-                                                <input type="text" id="mid1" name="mid1" placeholder="대여자아이디" class="form-control">
+                                            <div class="col-xs-12" style="width:170px;">
+                                                <input type="text" id="mid1" placeholder="대여자아이디" class="form-control">
                                             </div>                                           
                                         </div>                                      
                                         <div class="row" style="display:flex;align-items:center;justify-content:center;">
                                             <div class="col-xs-12">
-                                                <button type="button" id="saveBtn" name="saveBtn" onclick="saveClick();" style="display:none;" class="btn btn-finish btn-primary">저장</button>
-												<button type="button" id="editSaveBtn" name="editSaveBtn" onclick="editSaveClick(memberInfo);" style="display:none;" class="btn btn-finish btn-primary">완료</button>
-												<button type="button" id="returnBtn" name="returnBtn" onclick="returnClick(memberInfo);" style="display:none;" class="btn btn-finish btn-primary">반납</button>
+                                                <button type="button" id="saveBtn" name="saveBtn" onclick="insertClick();" style="display:none;" class="btn btn-finish btn-primary">저장</button>
+												<button type="button" id="editSaveBtn" name="editSaveBtn" onclick="updateReturnDate();" style="display:none;" class="btn btn-finish btn-primary">연장</button>
+												<button type="button" id="returnBtn" name="returnBtn" onclick="returnClick();" style="display:none;" class="btn btn-finish btn-primary">반납</button>
 												<button type="reset" id="cancleBtn" name="cancleBtn" class="btn btn-finish btn-primary">취소</button>
                                             </div>
                                         </div>
@@ -775,42 +705,66 @@
                         <div class="col-xs-10 page-subheader sorting pl0">
                            <ul class="sort-by-list">
                                 <li class="active">
-                                	<select class="btn dropdown-toggle btn-default" id="filter" name="filter">
-		                              <!-- <select class="selectpicker" id="filter" name="filter"> -->
-										<option>선택</option>
-										<option>이름</option>	
-										<option>아이디</option>		
-										<option>닉네임</option>	
-										<option>전화번호</option>	
-									</select>                                      
+                                	<input type="radio" id="dayselect" name="filter">일별조회                                	                                  
                                 </li>
-                                <li class="">
-                                    <input style="width:400px;" class="form-control" type="search" size="80px" id="searchTF" name="search">
+                                <li>
+                                	<input type="date" id="dayselectinput" class="form-control">  
                                 </li>
-                                <li class="">
-                                    <button class="btn btn-finish btn-primary" type="button" id="selecthBtn" name="selecthBtn" onclick="selectBtnClick();">조회</button>
+                                <li class="active">
+                                    <input type="radio" id="monthselect" name="filter">월별조회	                                    
                                 </li>
-                                <li class="">
-                                    <button class="btn btn-finish btn-primary" type="button" id="listBtn" name="listBtn" onclick="paging(1);">전체조회</button>
+                                <li>
+                                	<script type="text/javascript">	                                    	
+	                                    	for(var i = 1; i < 13; i++){
+	                                    		if(i == 1)
+	                                    			document.write("<select id='monthselectinput' class='form-control'>");
+	                                    		document.write("<option>" + i + "<option>");
+	                                    		if(i == 12)
+	                                    			document.write("</select>");
+	                                    	}
+	                            	</script>
                                 </li>
+                                <li>
+                                	<input type="radio" id="allselect" name="filter" checked>전체조회
+                                </li>                         
                             </ul>
                         </div>
                     </div>
-
+                    
+					<div class="col-md-12 clear"> 
+                        <div class="col-xs-10 page-subheader sorting pl0">
+                           <ul class="sort-by-list">
+                           		<li class="active">
+                                	<select class="btn dropdown-toggle btn-default" id="searchfilter">
+										<option>전체</option>
+										<option>대여번호</option>
+										<option>아이디</option>
+									</select>                                      
+                                </li>
+                                <li class="">
+                                    <input style="width:550px;" class="form-control" type="search" id="searchTF" name="search">
+                                </li>
+                                <li class="">
+                                    <button class="btn btn-finish btn-primary" type="button" id="selecthBtn" name="selecthBtn" onclick="selectBtnClick();">조회</button>
+                                </li>                               
+                            </ul>
+                        </div>
+                    </div>
                     <div class="col-md-12 clear"> 
                     	<table class="table" id="table2">
                     		<thead>
                             <tr>
 								<th width="25">선택</th>
-								<th width="100">이름</th>
-								<th width="100">아이디</th>
-								<th width="100">닉네임</th>
-								<th width="100">생년월일</th>
-								<th width="100">성별</th>
-								<th width="100">전화번호</th>
-								<th width="100">이메일</th>
-								<th width="100">주소</th>
-								<th width="100">포인트</th>
+								<th width="180">대여번호</th>
+								<th width="180">물품번호</th>
+								<th width="100">수량</th>
+								<th width="100">금액</th>
+								<th width="150">대여자 ID</th>
+								<th width="150">대여접수일자</th>
+								<th width="150">대여실행일자</th>
+								<th width="150">반납접수일자</th>
+								<th width="150">반납실행일자</th>
+								<th width="150">상태</th>
 							</tr>
 							</thead>
 							<tbody id="t1">

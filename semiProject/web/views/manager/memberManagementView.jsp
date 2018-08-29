@@ -18,23 +18,14 @@
 	var filter;
 	
 	$(function(){
-
-		//#table1 의 모든 필드에 readonly 속성 추가
 		$("#table1 input").attr("readonly", true);
-		
-		//$("#table1 input").attr("readonly", false);
 		$("body").append("<td>");
-		$("#table1 input").css("font-size", "14px");
-		
+		$("#table1 input").css("font-size", "14px");		
 		$("#idchkBtn").attr("style", "display:none");
 
 	}); //document.ready
 
 	//-------------------------------------------------------------
-	//등록 | 수정 | 삭제 radio 버튼 checked true 일 경우 버튼 숨기기
-	//등록 | 수정 선택시 readonly 설정 제거
-	//등록 선택시 필드 값 초기화
-	//등록 | 수정 | 삭제 선택시 #form1 의 action 경로 설정
 	//등록 radio
 	function enrollChecked(){
 		$("#enrollBtn").attr("style", "display:inline");
@@ -45,7 +36,6 @@
 		
 		$("#table1 input").attr("readonly", false);
 		$("#table1 input").val("");
-		
 
 		return false;
 	}
@@ -58,7 +48,6 @@
 		$("#table1 input").attr("readonly", false);
 		$("#mid1").attr("readonly", true);
 		$("#idchkBtn").attr("style", "display:none");
-		//$("#form1").attr("action", "/semi/medit");
 		return false;
 	}
 	//삭제 radio
@@ -70,7 +59,6 @@
 		$("#table1 input").attr("readonly", true);
 		$("#idchkBtn").attr("style", "display:none");
 		
-		//$("#form1").attr("action", "/semi/mdelete");
 		return false;
 	}
 	//-------------------------------------------------------------
@@ -111,13 +99,11 @@
 			memberInfo.mpoint = $("#mpoint").val(); 
 			
 			var jsonStr = JSON.stringify(memberInfo);
-			//var json = JSON.parse(jsonStr);
 	
 			$.ajax({
 				url : "/semi/mmenroll",
 				type : "post",
 				data : {"jsonStr" : jsonStr},
-				//dataType : "json",
 				success : function(data){
 					if(data >= 1)
 						alert("회원 등록 완료");

@@ -10,21 +10,36 @@ import java.sql.Connection;
 
 public class RentalListService {
 
-	public RentalListService() {}
-	
+	public RentalListService() {
+	}
+
 	public String insertRentalList(RentalList rlist) throws RentalListException {
 		Connection conn = getConnection();
-		
+
 		String rentalNo = new RentalListDao().insertRentalList(conn, rlist);
 		System.out.println("service");
-		if(rentalNo != null) {
+		if (rentalNo != null) {
 			commit(conn);
 		} else {
 			rollback(conn);
 		}
-		
+
 		close(conn);
-		
+
+		return rentalNo;
+	}
+
+	//관리자용 대여목록 생성
+	public String minsertRentalList(RentalList rlist) throws RentalListException{
+		Connection conn = getConnection();
+		String rentalNo = new RentalListDao().minsertRentalList(conn, rlist);
+		if (rentalNo != null) {
+			commit(conn);
+		} else {
+			rollback(conn);
+		}
+		close(conn);
+
 		return rentalNo;
 	}
 }
