@@ -13,11 +13,12 @@ public class Member implements java.io.Serializable{
 	private int mPoint;
 	private String mSno;
 	private String mGender;
+	private String mPwd;
 	
 	public Member(){}
 
 	public Member(String mId, String mPassword, String mName, String mNickname, String mPhone, String mAddress,
-			String mEmail, int mPoint, String mSno, String mGender) {
+			String mEmail, int mPoint, String mSno, String mGender, String mPwd) {
 		super();
 		this.mId = mId;
 		this.mPassword = mPassword;
@@ -29,6 +30,7 @@ public class Member implements java.io.Serializable{
 		this.mPoint = mPoint;
 		this.mSno = mSno;
 		this.mGender = mGender;
+		this.mPwd = mPwd;
 	}
 
 	public String getmId() {
@@ -110,6 +112,12 @@ public class Member implements java.io.Serializable{
 	public void setmGender(String mGender) {
 		this.mGender = mGender;
 	}
+	public String getmPwd(){
+		return mPwd;
+	}
+	public void setmPwd(String mPwd){
+		this.mPwd = mPwd;
+	}
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
@@ -126,7 +134,8 @@ public class Member implements java.io.Serializable{
 				+ mEmail + ", "
 				+ mPoint + ", "
 				+ mSno + ", "
-				+ mGender;
+				+ mGender + ", "
+				+ mPwd;
 	}
 	
 	

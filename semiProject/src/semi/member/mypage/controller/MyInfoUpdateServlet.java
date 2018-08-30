@@ -15,7 +15,7 @@ import semi.member.model.vo.Member;
 /**
  * Servlet implementation class MemberUpdateServlet
  */
-@WebServlet("/mupdate")
+@WebServlet("/mupdate.cp")
 public class MyInfoUpdateServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -47,8 +47,9 @@ public class MyInfoUpdateServlet extends HttpServlet {
 		member.setmAddress(request.getParameter("maddress"));
 		member.setmEmail(request.getParameter("memail"));
 		member.setmGender(request.getParameter("mgender"));
-		member.setmPassword(request.getParameter("mpassword"));
+		member.setmPassword(request.getParameter("m_password1"));
 		member.setmSno(request.getParameter("msno"));
+		member.setmPwd(request.getParameter("m_password2"));
 		
 		try {
 			if(new MemberService().updateMember(member) > 0){

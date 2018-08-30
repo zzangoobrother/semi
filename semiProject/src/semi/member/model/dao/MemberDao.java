@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import semi.member.exception.MemberException;
 import semi.member.model.vo.Member;
 
+import semi.review.model.vo.ReviewBoard;
+
 public class MemberDao {
 	
 	public MemberDao(){}
@@ -53,7 +55,7 @@ public class MemberDao {
 		PreparedStatement pstmt = null;
 		
 		String query = "delete from tb_member where m_id = ?";
-		System.out.println("mid : " + mId);
+		
 		try {
 			pstmt = con.prepareStatement(query);
 			pstmt.setString(1, mId);
@@ -117,7 +119,7 @@ public class MemberDao {
 		PreparedStatement pstmt = null;
 		
 		
-		String query = "update tb_member set m_password = ?, m_nickname = ?, m_gender = ?, m_address = ?, m_phone = ?, m_email = ?, m_sno = ? where m_id = ?";
+		String query = "update tb_member set m_password = ?, m_nickname = ?, m_gender = ?, m_address = ?, m_phone = ?, m_email = ?, m_sno = ?, m_pwd = ? where m_id = ?";
 		
 		try {
 			pstmt = con.prepareStatement(query);			
@@ -128,7 +130,8 @@ public class MemberDao {
 			pstmt.setString(5, member.getmPhone());
 			pstmt.setString(6, member.getmEmail());
 			pstmt.setString(7, member.getmSno());
-			pstmt.setString(8, member.getmId());
+			pstmt.setString(8, member.getmPwd());
+			pstmt.setString(9, member.getmId());
 						
 			result = pstmt.executeUpdate();
 			
@@ -139,6 +142,7 @@ public class MemberDao {
 			throw new MemberException(e.getMessage());
 		}finally{
 			close(pstmt);
+			
 		}
 		return result;
 	}
@@ -190,11 +194,11 @@ public class MemberDao {
 		PreparedStatement pstmt = null;
 		ResultSet rset = null;
 		
-		String query = "";
+		String query = "select * from tb_rental where m_id = ?";
 		
 		try {
 			pstmt = con.prepareStatement(query);
-			//pstmt.setString(1, mId);
+			pstmt.setString(1, mId);
 			
 			rset = pstmt.executeQuery();
 			
@@ -249,7 +253,7 @@ public class MemberDao {
 		int result = 0;
 		PreparedStatement pstmt = null;
 		
-		String query = "insert into tb_member values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		String query = "insert into tb_member values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		System.out.println(m.toString());
 		try {
 			pstmt = con.prepareStatement(query);
@@ -264,6 +268,7 @@ public class MemberDao {
 			pstmt.setInt(8, 0);
 			pstmt.setString(9, m.getmSno());
 			pstmt.setString(10, m.getmGender());
+			pstmt.setString(11, m.getmPwd());
 			
 			result = pstmt.executeUpdate();
 			
@@ -279,7 +284,7 @@ public class MemberDao {
 		return result;
 	}
 
-	public int selectCheckId(Connection con, String m_Id) throws MemberException {
+	public int selectCheckId(Connection con, String m_Id) {
 		int idCount = -1;
 		PreparedStatement pstmt = null;
 		ResultSet rset = null;
@@ -296,7 +301,6 @@ public class MemberDao {
 			if(rset.next()) {
 				idCount = rset.getInt(1);
 			}
-			System.out.println("idCount: " + idCount);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally {
@@ -306,6 +310,117 @@ public class MemberDao {
 		
 		return idCount;
 	}
+	public String findId(Connection con, String fName, String fEmail) throws MemberException{
+		String result = null;
+		PreparedStatement pstmt = null;
+		ResultSet rset = null;
+		
+		
+		String query = "select m_id from tb_member where m_name = ? and m_email = ?";
+		
+		try {
+			pstmt = con.prepareStatement(query);
+			pstmt.setString(1, fName);
+			pstmt.setString(2, fEmail);
+			
+			
+			rset = pstmt.executeQuery();
+	
+			while(rset.next()){
+				
+				System.out.println("아이디비번찾기성공");
+				result = rset.getString("m_id");
+				
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new MemberException(e.getMessage());
+		}finally{
+			close(rset);
+			close(pstmt);
+		}
+		return result;
+	}
+	
+	public String findPw(Connection con, String fName, String fEmail, String fId) throws MemberException{
+		String resultpw = null;
+		PreparedStatement pstmt = null;
+		ResultSet rset = null;
+		
+		
+		String query = "select m_pwd from tb_member where m_name = ? and m_email = ? and m_id = ?";
+		
+		try {
+			pstmt = con.prepareStatement(query);
+			pstmt.setString(1, fName);
+			pstmt.setString(2, fEmail);
+			pstmt.setString(3, fId);
+			
+			
+			rset = pstmt.executeQuery();
+	
+			while(rset.next()){
+				
+				System.out.println("아이디비번찾기성공");
+				resultpw = rset.getString("m_pwd");
+				
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new MemberException(e.getMessage());
+		}finally{
+			close(rset);
+			close(pstmt);
+		}
+		return resultpw;
+	}
+	
+	public ArrayList<ReviewBoard> myboard(Connection con, String mId) throws MemberException{
+		
+		PreparedStatement pstmt = null;
+		ResultSet rset = null;
+		ArrayList<ReviewBoard> list = new ArrayList<ReviewBoard>();
+		
+		String query = "select * from tb_reviewboard where m_id = ?";
+		try {
+			pstmt = con.prepareStatement(query);
+			pstmt.setString(1, mId);
+			
+			rset = pstmt.executeQuery();
+			
+			while(rset.next()){
+				ReviewBoard reviewboard = new ReviewBoard();
+				
+				reviewboard.setmId(mId);
+				reviewboard.setRbNo(rset.getInt("rb_no"));
+				reviewboard.setRbTitle(rset.getString("rb_title"));
+				reviewboard.setRbContent(rset.getString("rb_content"));
+				reviewboard.setRbCount(rset.getInt("rb_count"));
+				reviewboard.setRbDate(rset.getDate("rb_date"));
+				reviewboard.setRbFile1(rset.getString("rb_file1"));
+				reviewboard.setRbFile2(rset.getString("rb_file2"));
+				reviewboard.setpNo(rset.getInt("p_no"));
+				
+				list.add(reviewboard);
+				
+			if(list.size() == 0){
+				throw new MemberException("게시글이 없습니다.");
+			}
+			
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new MemberException(e.getMessage());
+		}finally{
+			close(rset);
+			close(pstmt);
+		}
+		return list;
+	}
+	
+	
 
 	//관리자용 ---------------------------------------------------------
 	
@@ -557,7 +672,8 @@ public class MemberDao {
 		return result;
 	}
 	//관리자용 end
-	
+
+
 
 	
 }

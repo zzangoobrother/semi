@@ -36,7 +36,19 @@ String aId = (String)session.getAttribute("a_Id");
 			function goPage(){
 				location.href = "/semi/index.jsp";
 			}
-			
+
+			$(function(){
+				$("#loginradio").mouseenter(function(){
+					$("#loginradio").css("background", "#aaaaaa")
+					$("#loginradio").css("color", "black")
+				})
+			});
+			$(function(){
+				$("#loginradio").mouseleave(function(){
+					$("#loginradio").css("background", "white")
+					$("#loginradio").css("color", "white")
+				})	
+			});
 		</script>
 
      <style type="text/css">
@@ -54,15 +66,15 @@ String aId = (String)session.getAttribute("a_Id");
                     <div class="col-md-5 col-sm-8  col-xs-12">
                         <div class="header-half header-call">
                             <p>
-                                <span><i class="pe-7s-call"></i> 010-1234-5678</span>
-                                <span><i class="pe-7s-mail"></i> hongildong@iei	.org</span>
+                                <span><i class="pe-7s-call"></i> 1544-9970</span>
+                                <span><i class="pe-7s-mail"></i> Project09@iei.or.kr</span>
                             </p>
                         </div>
                     </div>
-                    <div class="col-md-2 col-md-offset-5  col-sm-3 col-sm-offset-1  col-xs-12">
+                    <div class="col-md-2 col-md-offset-5  col-sm-3 col-sm-offset-1  col-xs-12" style="margin-left: 50%;">
                         <div class="header-half header-social">
                             <ul class="list-inline">
-                                
+                                <input type="button" id="loginradio" name="loginradio" value="회원페이지로" onclick="goPage();" style="border : 0px; color : white; background : white;">
                             </ul>
                         </div>
                     </div>
@@ -81,8 +93,8 @@ String aId = (String)session.getAttribute("a_Id");
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="index.jsp">
-                    <img src="/semi/resource/images/common/09.svg" alt="">
+                    <a class="navbar-brand" href="/semi/adminIndex.jsp">
+                    <img src="/semi/resources/images/common/mainlogo.png" alt="" width="150px;">
                     </a>
                 </div>
 
@@ -91,19 +103,19 @@ String aId = (String)session.getAttribute("a_Id");
                     <div class="button navbar-right" id="ajax_load_indicator">
                   
                          <% if(aName == null){ %>
-                         <input type="button" id="loginradio" name="loginradio" value="회원페이지로" onclick="goPage();">
+                         
                         <form action="/semi/alogin" method="post">
                         <table width="250" height="75" cellspacing="0" cellpadding="0">
 					<tr><td width="200">
 
-					  <input type="text"  id="aid" name="aid" size="15" required placeholder="아이디를 입력하세요">
+					  <input type="text"  id="aid" name="aid" size="15" required placeholder="아이디를 입력하세요" style="border : 0px;">
 					</td>
 					<td width="50" rowspan="2">
 					<input type="submit" value="로그인" class= "navbar-btn nav-button wow bounceInRight login" id="btnLogin">
 					</td></tr>
 				<tr><td>
 					
-					<input type="password" id="apassword" name="apassword" size="15" required placeholder="비밀번호를 입력하세요">
+					<input type="password" id="apassword" name="apassword" size="15" required placeholder="비밀번호를 입력하세요" style="border : 0px;">
 				   </td></tr>
 				   <tr><td colspan="2">
 					<a href="#">회원가입</a> &nbsp;
@@ -122,8 +134,7 @@ String aId = (String)session.getAttribute("a_Id");
 					<tr><td>	메일 개 </td> <td>쪽지  개</td></tr>
 				<tr><td colspan="2">
 					<a href="/semi/admininfo?aid=<%= aId %>">내 정보보기</a>	
-					&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-					<a href="#">문의사항</a>
+					
 					
 				</td></tr>
 				</table>
@@ -180,13 +191,14 @@ String aId = (String)session.getAttribute("a_Id");
                         	<a href="index.html" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="200">관   리 <b class="caret"></b></a>
                         <ul class="dropdown-menu navbar-nav">
                                 <li>
-                                    <a href="/semi/views/manager/memberManagementView.jsp">- 회원관리</a>
+                                    <a href="/semi/views/manager/memberManagement.jsp">- 회원관리</a>
                                 </li>
                                 <li>
-                                    <a href="/semi/views/manager/toolManagementView.jsp">- 재고관리</a>
+                                    <a href="#">- 재고관리</a>
                                 </li>
                                 <li>
-                                    <a href="/semi/views/manager/rentalManagementView.jsp">- 대여관리</a>
+                                    <a href="/semi/views/manager/rentalManagement.jsp">- 대여관리</a>
+
                                 </li> 
 
                             </ul>

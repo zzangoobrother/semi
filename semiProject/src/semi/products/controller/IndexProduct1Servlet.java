@@ -1,4 +1,4 @@
-package semi.member.member.controller;
+package semi.products.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,20 +12,18 @@ import javax.servlet.http.HttpServletResponse;
 
 import semi.products.model.service.ProductsService;
 import semi.products.model.vo.Product;
-import semi.rental.model.service.RentalService;
-import semi.rental.model.vo.Rental;
 
 /**
- * Servlet implementation class MyRentServlet
+ * Servlet implementation class IndexProduct1Servlet
  */
-@WebServlet("/myrent")
-public class MyRentServlet extends HttpServlet {
+@WebServlet("/ipdetail1.bd")
+public class IndexProduct1Servlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public MyRentServlet() {
+    public IndexProduct1Servlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -34,27 +32,31 @@ public class MyRentServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String mId = request.getParameter("mid");
+		response.setContentType("text/html; charset=utf-8");
+		System.out.println("servlet");
+		
+		String pName = request.getParameter("pname");
+		ProductsService pservice = new ProductsService();
 		
 		RequestDispatcher view = null;
+		
 		try {
-			ArrayList<Rental> list = new RentalService().myrent(mId);
-			//Member member = new MemberService().myRent(mId);
-			ArrayList<Product> list2 = new ProductsService().myrent(mId);
-			System.out.println("myrent : " + list);
-			System.out.println("product : " + list2);
-			if(list != null && list2 != null){
-				view = request.getRequestDispatcher("views/member/myRentView.jsp");
-				request.setAttribute("list2", list2);
+			Product product = pservice.selectProducts1(pName);
+			
+			ArrayList<String> list = pservice.selectOffice(pName);
+			
+			if(product != null){
+				view = request.getRequestDispatcher("views/product/IndexProductDetailView.jsp");
+				request.setAttribute("product1", product);
 				request.setAttribute("list", list);
 				view.forward(request, response);
 			}else{
-				view = request.getRequestDispatcher("views/member/memberError.jsp");
-				request.setAttribute("message", mId + "에 대한 조회실패!");
+				view = request.getRequestDispatcher("views/product/productsError.jsp");
+				request.setAttribute("message", pName + " 글 조회실패!");
 				view.forward(request, response);
 			}
 		} catch (Exception e) {
-			view = request.getRequestDispatcher("views/member/memberError.jsp");
+			view = request.getRequestDispatcher("views/product/productsError.jsp");
 			request.setAttribute("message", e.getMessage());
 			view.forward(request, response);
 		}

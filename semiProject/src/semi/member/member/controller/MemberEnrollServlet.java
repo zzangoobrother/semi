@@ -50,9 +50,11 @@ public class MemberEnrollServlet extends HttpServlet {
 		String birth3 = request.getParameter("birth3");	
 		String m_Sno = birth1 + birth2 + birth3;
 		String m_Gender = request.getParameter("m_gender");
+		String m_Pwd = request.getParameter("m_password2");
 		
 		
-		System.out.println("비밀번호는 : " + m_Password);
+		System.out.println("암호화비밀번호는 : " + m_Password);
+		System.out.println("비밀번호 :" + m_Pwd);
 
 		Member m = new Member();
 		m.setmId(m_Id);
@@ -65,7 +67,8 @@ public class MemberEnrollServlet extends HttpServlet {
 		/*m.setM_Point(0);*/
 		m.setmSno(m_Sno);
 		m.setmGender(m_Gender);
-
+		m.setmPwd(m_Pwd);
+		System.out.println("암호화 안됨 : " + m.getmPwd());
 		System.out.println(m.toString());
 
 		response.setContentType("text/html; charset=utf-8");

@@ -8,6 +8,8 @@ import semi.member.exception.MemberException;
 import semi.member.model.dao.MemberDao;
 import semi.member.model.vo.Member;
 
+import semi.review.model.vo.ReviewBoard;
+
 public class MemberService {
 
 	public MemberService() {}
@@ -59,6 +61,13 @@ public class MemberService {
 		close(con);
 		return member;
 	}
+	public ArrayList<ReviewBoard> myboard(String mId) throws MemberException{
+		Connection con = getConnection();
+		ArrayList<ReviewBoard> list = new MemberDao().myboard(con, mId);
+		close(con);
+		return list;
+	}
+	
 
 	public String aloginCheck(String aId, String aPassword) throws MemberException{
 		Connection con = getConnection();
@@ -78,13 +87,25 @@ public class MemberService {
 		return result;
 	}
 
-	public int selectCheckId(String m_Id) throws MemberException {
+	public int selectCheckId(String m_Id) {
 		Connection con = getConnection();
 		
 		int result = new MemberDao().selectCheckId(con, m_Id);
 		
 		close(con);
 		return result;
+	}
+	public String findId(String fName, String fEmail) throws MemberException{
+		Connection con = getConnection();
+		String result = new MemberDao().findId(con, fName, fEmail);
+		close(con);
+		return result;
+	}
+	public String findPw(String fName, String fEmail, String fId) throws MemberException{
+		Connection con = getConnection();
+		String resultpw = new MemberDao().findPw(con, fName, fEmail, fId);
+		close(con);
+		return resultpw;
 	}
 	
 	//관리자용------------------------------------------------------------
@@ -141,4 +162,11 @@ public class MemberService {
 			return result;
 		}
 		//관리자용 end
+
+		
+
+		
+
+		
+
 }

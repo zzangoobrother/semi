@@ -1,7 +1,11 @@
 package semi.review.model.service;
 
+import static semi.common.JDBCTemplat.*;
+
+import java.sql.Connection;
 import java.util.ArrayList;
 
+import semi.review.model.dao.ReviewDao;
 import semi.review.model.vo.ReviewBoard;
 
 public class ReviewService {
@@ -25,4 +29,15 @@ public class ReviewService {
 	public int insertBoard(ReviewBoard review) {
 		return 0;
 	}
+
+	public ArrayList<ReviewBoard> selectTop3(String mId) {
+		Connection con = getConnection();
+		ArrayList<ReviewBoard> list = new ReviewDao().selectTop3(con, mId);
+		close(con);
+		return list;
+	}
+
+	
+
+	
 }

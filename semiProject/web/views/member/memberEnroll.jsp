@@ -58,14 +58,14 @@
 							<div class="form-group">
 							<tr>
 							<td>비밀번호</td>
-							<td><input type="password" name="m_password1"
+							<td><input type="password" name="m_password1" id="pwd1"
 										class="form-control" style="width: 200px; height: 25px; border-radius: 4px;"></td>
 							</tr>
 								</div>	
 							<div class="form-group">
 							<tr>
 							<td>비밀번호 확인</td>
-							<td><input type="password" name="m_password2"
+							<td><input type="password" name="m_password2" id="pwd2"
 											class="form-control" style="width: 200px; height: 25px; border-radius: 4px;"></td>
 							</tr>
 							</div>	

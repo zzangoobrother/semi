@@ -2,12 +2,11 @@
     pageEncoding="UTF-8" errorPage="productsError.jsp"%>
 <%@ page import="semi.products.model.vo.Product, java.util.ArrayList" %>
 <%
-
-   Product product = (Product)request.getAttribute("product");
+   Product product = (Product)request.getAttribute("product1");
    ArrayList<String> list = (ArrayList<String>)request.getAttribute("list");
    String[] slideimg = product.getP_main_image().split(",");
    
-	
+
    
 %>
 <%@ include file="../../header.jsp" %>
@@ -19,51 +18,198 @@
          
       
        <script>
+         (function () {
+             "use strict";       
+             
+               $(function() {
+                  
+                      /* 달력 */
+                      $('input[name="daterange"]').daterangepicker({
+                         autoUpdateInput: false,
+                        opens: 'left'
+                        
+                      }, function(start, end, label) {
+                        console.log("selected date " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+                                          
+                         
+                          var startDate = new Date(start.format('YYYY-MM-DD'));
+                          var endDate = new Date(end.format('YYYY-MM-DD'));
+                          
+                          var diffDay = endDate - startDate;
+                          var currDay = 24 * 60 * 60 * 1000;
+                          
+                          var totalHours = endDate.getDate() - startDate.getDate();
+                          
+                           var pPrice = <%= product.getP_price() %>;
+                       
+                          console.log("일 가격" + pPrice);
+                          console.log("몇 박 며칠 인가염? : " + totalHours);
+                          
+                          
+                          if(endDate < startDate){
+                             
+                             alert("날짜를 다시 선택 해주세요.");
+                             
+                          }else{
+                             document.getElementById("dateSelected").innerHTML = start.format('YYYY-MM-DD') + "부터 " + end.format('YYYY-MM-DD') + "까지";
+                                
+                             document.getElementById("rentaldate").innerHTML = parseInt(diffDay/currDay) + "일";
+                             
+                             document.getElementById("totalPrice").innerHTML = (parseInt(diffDay/currDay)) * (pPrice);  
+                          };       
+                          
+                          
+                      });
+                      
+                         /* 장바구니 버튼 클릭시 */
 
-       
-         $(function() {
-            
-            
-           $('input[name="daterange"]').daterangepicker({
-              autoUpdateInput: false,
-             opens: 'left'
-             
-           }, function(start, end, label) {
-             console.log("selected date " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
-             
-             
-              
-               var startDate = new Date(start.format('YYYY-MM-DD'));
-               var endDate = new Date(end.format('YYYY-MM-DD'));
+                          $("#add").click(function(){
+                             
+                              localStorage.removeItem('<%= product.getP_name() %>');
+                          
+                             /* localStorage 저장 */
+                             if( !localStorage.<%= product.getP_name() %> ){
+                                 localStorage.<%= product.getP_name() %> = "[]";
+                               }
+
+                               var list = JSON.parse(localStorage.<%= product.getP_name() %>);   
+                               
+                              if( list.indexOf($(".pdname").text()) == -1 ){
+                                 list.push($(".pdname").text());  
+                               }
+
+                              if( list.indexOf($(".dateSelected").text()) == -1 ){
+                                 list.push($(".dateSelected").text());
+                               }
+
+                              if( list.indexOf($(".selected").text()) == -1 ){
+                                  list.push($(".selected").text());
+                                }
+
+                              if( list.indexOf($(".pdimg").text()) == -1 ){
+                                  list.push($(".pdimg").text());
+                               }
+                               
+                               if( list.indexOf($(".totalPrice").text()) == -1 ){
+                                list.push($(".totalPrice").text());
+                             }
+                               
+                               localStorage.<%= product.getP_name() %> = JSON.stringify(list);
+                               $("#display").html(localStorage.<%= product.getP_name() %>);
+
+                               /* 서블릿 */
+                              var plocal = document.getElementById("selectpicker").value;        
+
+                              $.ajax({
+                                  url : "/semi/select",
+                                  type : "post",
+                                  data : {
+                                      pname: "<%= product.getP_name()%>"
+                                      , plocal: plocal
+                                  },
+                                  success: function(){
+                                     
+                                      var cartOk = confirm('장바구니에 담겼습니다. 장바구니로 이동하시겠습니까?');
+
+                                      if(cartOk){
+                                          location.href = 'views/cart/cart1.jsp';
+                                      }
+                                  },error : function(jqXHR, textstatus, errorThrown){
+                                      console.dir("error : " + jqXHR + textstatus + errorThrown);
+                                  }
+                                
+                              });
+                          });
+
+                        /* 장바구니 add 버튼 클릭시 */
+                     <%--  $("#add").click(function(){
+
+                         if( !localStorage.<%= product.getP_name() %> ){
+                           localStorage.<%= product.getP_name() %> = "[]";
+                         }
+
+                         var list = JSON.parse(localStorage.<%= product.getP_name() %>);   
+                         
+                          if( list.indexOf($(".pdname").text()) == -1 ){
+                           list.push($(".pdname").text());  
+                         }
+
+                          if( list.indexOf($(".dateSelected").text()) == -1 ){
+                           
+                           list.push($(".dateSelected").text());
+                           
+                           
+                         }
+
+                          if( list.indexOf($(".selected").text()) == -1 ){
+                             
+                             list.push($(".selected").text());
+                             
+                             
+                           }
+
+                          if( list.indexOf($(".pdimg").text()) == -1 ){
+                             
+                             list.push($(".pdimg").text());
+                             
+                           }
+                         
+                         if( list.indexOf($(".totalPrice").text()) == -1 ){
+                             
+                             list.push($(".totalPrice").text());
+                             
+                           }
+                         
+                         
+                         localStorage.<%= product.getP_name() %> = JSON.stringify(list);
+                         $("#display").html(localStorage.<%= product.getP_name() %>);
+                        
+                       })  --%>
+                       
+
+                        /*장바구니 remove 버튼 클릭시*/
+                       $("#remove").click(function(){
+                          if(localStorage.<%= product.getP_name() %>){
+                            var list = JSON.parse(localStorage.<%= product.getP_name() %>);
+                            var idx = list.indexOf($(".pdname").text());
+                            if( idx > -1 ){
+                              list.splice(idx,1);
+                            }
+                            localStorage.<%= product.getP_name() %> = JSON.stringify(list);
+                          }
+                          
+                       });
+                       
+                       
+                       
+                        /*장바구니 removeall 버튼 클릭시*/
+                       $("#removeAll").click(function(){
+                          
+                          localStorage.clear("<%= product.getP_name() %>");
+                          
+                       });
+                      
+                       
+                      
+                       
+                        /*$(".showme").html("<img src='" + JSON.parse(localStorage.getItem('포터블그라인더').split(",")[3]) + "'>'");*/
+                       
+
+                        for(var i =0; i < localStorage.length; i++){
+                            console.log(localStorage.getItem(localStorage.key(i)));
+                         }
+                        
+                       /* console.log(JSON.parse(localStorage.getItem('포터블그라인더').split(",")[3]));*/
+                     
                
-               var diffDay = endDate - startDate;
-               var currDay = 24 * 60 * 60 * 1000;
-               
-               var totalHours = endDate.getDate() - startDate.getDate();
-               
-                var pPrice = <%= product.getP_price() %>;
-            
-               console.log("일 가격" + pPrice);
-               console.log("몇 박 며칠 인가염? : " + totalHours);
-               
-               
-               if(endDate < startDate){
-                  
-                  alert("날짜를 다시 선택 해주세요.");
-                  
-               }else{
-                  document.getElementById("dateSelected").innerHTML = start.format('YYYY-MM-DD') + "부터 " + end.format('YYYY-MM-DD') + "까지";
-                  
-                  document.getElementById("rentaldate").innerHTML = parseInt(diffDay/currDay) + "일";
-                  
-                  document.getElementById("totalPrice").innerHTML = (parseInt(diffDay/currDay)) * (pPrice);  
-               };       
-               
-               
-               
-             
-           });
-         });
+               /*function centerSelect(){
+                    var x = document.getElementById("selectpicker").value;
+                    document.getElementById("selected").innerHTML = x;
+                    
+                 } 
+               */
+              }); 
+         }());
          </script>  
       
       
@@ -84,15 +230,16 @@
 
                 <div class="clearfix padding-top-40" >
 
-                    <div class="col-md-8 single-property-content prp-style-1" style="width: 66.66666667%">
-                        <div class="row">
-                            <div class="light-slide-item">            
+                    <div class="col-md-8 single-property-content prp-style-1" style="width: 66.66666667%; ">
+                        <div class="row" >
+                            <div class="light-slide-item" >            
                                 <div class="clearfix">
-                                    <ul id="image-gallery" class="gallery list-unstyled cS-hidden" style="width:3756px;">
+                                   <ul id="bg-slider" class="owl-carousel owl-theme" >
+                                    <!-- <ul id="image-gallery" class="gallery list-unstyled cS-hidden" > -->
                                     <% for(String si : slideimg ) {%>
                                        
-                                        <li data-thumb="<%= si %>"> 
-                                            <img src="<%= si %>" />
+                                        <li data-thumb="<%= si %>" > 
+                                            <img src="<%= si %>" style="margin-left: 30%" />
                                         </li>
                                     <% } %>   
              
@@ -111,14 +258,7 @@
 
 
 
-                            <div class="section">
-                                <h4 class="s-property-title">Description</h4>
-                                <div class="s-property-content">
-                                    <p>Nulla quis dapibus nisl. Suspendisse ultricies Nulla quis dapibus nisl. Suspendisse ultricies commodo arcu nec pretium. Nullam sed arcu ultricies commodo arcu nec pretium. Nullam sed arcu ultricies Nulla quis dapibus nisl. Suspendisse ultricies commodo arcu nec pretium. Nullam sed arcu ultricies Nulla quis dapibus nisl. Suspendisse ultricies commodo arcu nec pretium. Nullam sed arcu ultricies                                </p>
-                                 
-                                </div>
-                            </div>
-                            
+                                                     
                      
                           
                           
@@ -148,20 +288,13 @@
 
                                     <li>
                                         <span class="col-xs-6 col-sm-4 col-md-4 add-d-title">보유한 동사무소</span>
-                                        <span class="col-xs-6 col-sm-8 col-md-8 add-d-entry"></span>
+                                        <span class="col-xs-6 col-sm-8 col-md-8 add-d-entry"><% for(String of : list ) { %>
+                                              <%= of %>/
+                                              <% } %></span>
                                     </li>
 
 
-                                    <li>
-                                        <span class="col-xs-6 col-sm-4 col-md-4 add-d-title">View</span>
-                                        <span class="col-xs-6 col-sm-8 col-md-8 add-d-entry">Intracoastal View,Direct ew</span>
-                                    </li>
-
-                                    <li>
-                                        <span class="col-xs-6 col-sm-4 col-md-4 add-d-title">Waterfront Description:</span>
-                                        <span class="col-xs-6 col-sm-8 col-md-8 add-d-entry">Intracoastal Front,Ocean Access</span>
-                                    </li> 
-
+                                   
                                 </ul>
                             </div>  
                             
@@ -179,20 +312,14 @@
                                     </a>
                                 </div>
                             </div>
-                            <!-- End video area  -->
+                           
                             
                             
                             
                             
                             
 
-                            <div class="section property-share"> 
-                                <h4 class="s-property-title">Share width your friends </h4> 
-                                <div class="roperty-social">
-                                    
-                                </div>
-                            </div>
-                            <!-- End video area  -->
+                           
                             
                         </div>
                     </div>
@@ -262,23 +389,7 @@
                                             
                                             
                                             
-                                            <script>
-                                                function centerSelect(){
-                                                  var x = document.getElementById("selectpicker").value;
-                                                  document.getElementById("selected").innerHTML = x;
-                                                  
-                                               } 
-                                            
-                                            /*    function dateSelect(){
-                                                  var d = document.getElementById("dateSelect").value;
-                                                  document.getElementById("dateSelected").innerHTML = "선택 날짜 : " + d;
-                                               } */
-                                               
-                                               
-                                               
-                                               
-                                               
-                                            </script>
+                                           
                                         </li>
                                         
                                         
@@ -305,124 +416,6 @@
                             
                             
                             
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                      <script type="text/javascript">
-                      
-                      $(document).ready(function(){
-                         $("#add").click(function(){
-                           if( !localStorage.<%= product.getP_name() %> ){
-                             localStorage.<%= product.getP_name() %> = "[]";
-                           }               
-                           var list = JSON.parse(localStorage.<%= product.getP_name() %>);   
-                           if( list.indexOf($(".pdname").text()) == -1 ){
-                             list.push($(".pdname").text());
-                             
-                             
-                           }if( list.indexOf($(".rentaldate").text()) == -1 ){
-                             
-                             list.push($(".rentaldate").text());
-                             console.log(list.pop($("localStorage.<%= product.getP_name() %>")));
-                             
-                           }if( list.indexOf($(".pdimg").text()) == -1 ){
-                               
-                               list.push($(".pdimg").text());
-                               
-                             }
-                            if( list.indexOf($(".selected").text()) == -1 ){
-                                 
-                                 list.push($(".selected").text());
-                                 
-                               } 
-                          
-                           
-                           if( list.indexOf($(".totalPrice").text()) == -1 ){
-                               
-                               list.push($(".totalPrice").text());
-                               
-                             }
-                           
-                             
-                           
-                           
-                           
-                           
-                           localStorage.<%= product.getP_name() %> = JSON.stringify(list);
-                           $("#display").html(localStorage.<%= product.getP_name() %>);
-                         }) 
-                         
-                         $("#remove").click(function(){
-                            if(localStorage.<%= product.getP_name() %>){
-                              var list = JSON.parse(localStorage.<%= product.getP_name() %>);
-                              var idx = list.indexOf($(".pdname").text());
-                              if( idx > -1 ){
-                                list.splice(idx,1);
-                              }
-                              localStorage.<%= product.getP_name() %> = JSON.stringify(list);
-                            }
-                            $("#display").html(localStorage.<%= product.getP_name() %>);
-                         });
-                         
-                         
-                         
-                         $("#removeAll").click(function(){
-                            
-                            localStorage.clear("<%= product.getP_name() %>");
-                            
-                         });
-                         $("#display").html(localStorage.<%= product.getP_name() %>);
-                         
-                        
-                         
-                         
-                         
-                         
-                       }); 
-                      
-                      
-                      
-                      
-                      
-                      </script>    
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
                                              
 
                             <div class="panel panel-default sidebar-menu wow fadeInRight animated">
@@ -430,14 +423,14 @@
                                     <h3 class="panel-title"> 선택 정보  </h3>
                                 </div>
                                 
-                                <div class="col-md-3 col-sm-3 col-xs-3 blg-thumb p0" style="width: 85px; height: 35px;">
+                                <!-- <div class="col-md-3 col-sm-3 col-xs-3 blg-thumb p0" style="width: 85px; height: 35px;">
                                                 <h6>동사무소 : &nbsp;</h6>
                                                 
                                 </div>
                                 <div class="col-md-8 col-sm-8 col-xs-8 blg-entry" style="width: 226.66px; height: 71px; line-height: 35px;">
                                                  
                                    <a id="selected" class="selected" ></a><br>
-                                </div>
+                                </div> -->
                                 
                                 
                                 <div class="col-md-3 col-sm-3 col-xs-3 blg-thumb p0" style="width: 85px; height: 35px;">
@@ -476,11 +469,11 @@
                                    <a id="dateSelected" class="dateSelected"></a><br>
                                    <a id="rentaldate" class="rentaldate" ></a><br>
                                    <a id="totalPrice" class="totalPrice" ></a ><br><br>
-                                   <a class="pdimg"><%= product.getP_main_image().split(",")[0] %></a><br>
-                                   <a class="pdname"><%= product.getP_name() %></a>
+                                    <a class="pdimg" hidden><%= product.getP_main_image().split(",")[0] %></a><br>
+                                   <a class="pdname" hidden><%= product.getP_name() %></a> 
 
                   <div style="width: 100%;">
-                                  <input type="button" id="add" value="add">
+                                  
                                            <input type="button" id="remove" value="remove">
                                            <input type="button" id="removeAll" value="removeAll"> 
 
@@ -488,9 +481,9 @@
                         <fieldset>
                            <div class="row" >
                               
-                                 <input class="button btn largesearch-btn" style="width: 25%;  margin-left:5%;" type="button" value="장바구니" onclick="location.href='/semi/select'"> 
+                                 <a  ><input class="button btn largesearch-btn" id="add" style="width: 25%;  margin-left:5%;" type="button" value="장바구니" onclick="location.href='/semi/select'"> </a>
                                  <input class="button btn largesearch-btn" style="width: 25%; margin-left:5%;" type="button" value="목록보기" onclick="location.href='/semi/plist'"> 
-                                 <input class="button btn largesearch-btn" style="width: 25%; margin-left:5%;" type="button" value="대여하기" onclick="location.href='/semi/views/payment/paymentProgressView.jsp'">
+                                 <input class="button btn largesearch-btn" style="width: 25%; margin-left:5%;" type="button" value="대여하기" onclick="location.href='/semi/detailpay'">
                               
                            </div>
                         </fieldset>
@@ -506,7 +499,6 @@
 
 
                
-
 
                         </aside>
                     </div>
