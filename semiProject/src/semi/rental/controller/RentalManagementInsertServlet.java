@@ -2,8 +2,6 @@ package semi.rental.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URLEncoder;
-import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,24 +9,25 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
-import semi.locationInfo.model.vo.LocationInfo;
 import semi.rental.exception.RentalException;
 import semi.rental.model.service.RentalService;
+import semi.rental.model.vo.Rental;
 
 /**
- * Servlet implementation class RentalManagementLocalNameSelectServlet
+ * Servlet implementation class RentalManagementInsertServlet
  */
-@WebServlet("/rmlnselect")
-public class RentalManagementLocalNameSelectServlet extends HttpServlet {
+@WebServlet("/rmrinsert")
+public class RentalManagementInsertServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public RentalManagementLocalNameSelectServlet() {
+	public RentalManagementInsertServlet() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -39,48 +38,43 @@ public class RentalManagementLocalNameSelectServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// 동사무소 조회용 컨트롤러
-		System.out.println("RentalManagementLocalNameSelectServlet 실행");
+		// 관리자용 대여등록 컨트롤러
 		response.setContentType("text/html; charset=utf-8");
-
-		ArrayList<LocationInfo> list = null;
-		JSONObject json = null;
-		JSONArray jarr = null;
 		PrintWriter out = response.getWriter();
+		int result = 0;
+		String json1 = request.getParameter("jsonStr");
+		Rental r = null;
 
 		try {
+			JSONParser jsonParser = new JSONParser();
+			JSONObject job = (JSONObject) jsonParser.parse(json1);
 			
-			String localName = (String) request.getParameter("local");
-			list = new RentalService().rentalLocalNameList(localName);
+			r = new Rental();
+			r.setrNo((String)job.get("rno"));
+			r.setpNo(Integer.parseInt((String)job.get("pno")));
+			r.setmId((String)job.get("mid"));
+			r.setpCount(Integer.parseInt((String)job.get("pcount")));
+			r.setrPrice(Integer.parseInt((String)job.get("rprice")));
+			r.setrReturnDate((String)job.get("rreturn"));
+	
+			// 전송 값 저장 확인
+			System.out.println(r.toString());
 
-			json = new JSONObject();
-			jarr = new JSONArray();
+			result = new RentalService().mInsertRental(r);
 
-			for (LocationInfo l : list) {
-				JSONObject job = new JSONObject();
-				job.put("lname", URLEncoder.encode(l.getL_Name(), "UTF-8"));
-				//
-				//
-				//
-				//
-				
-				l.setL_Address("동작구");
+			if (result <= 0)
+				throw new RentalException("서블릿 : 등록실패");
 
-				if (job.size() > 0) {
-					jarr.add(job);
-				}
-			}
-			
-			json.put("list", jarr);
-
-			response.setContentType("application/json; charset=utf-8");
-			out.print(json.toJSONString());
+			out.print(result);
+			out.flush();
 
 		} catch (RentalException e) {
 			e.printStackTrace();
 			e.getMessage();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} finally {
-			out.flush();
 			out.close();
 		}
 

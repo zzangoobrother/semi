@@ -2,11 +2,19 @@ package semi.rental.model.dao;
 
 import static semi.common.JDBCTemplat.close;
 
+import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.json.simple.JSONObject;
 
 import semi.locationInfo.model.vo.LocationInfo;
 import semi.products.model.vo.Product;
@@ -210,8 +218,8 @@ public class RentalDao {
 
 		return list;
 	}
-	
-	//물품정보 조회용
+
+	// 물품정보 조회용
 	public Product rentalProductInfoList(Connection con, String pName, String lName) throws RentalException {
 		PreparedStatement pstmt = null;
 		ResultSet rset = null;
@@ -222,8 +230,8 @@ public class RentalDao {
 
 		try {
 			pstmt = con.prepareStatement(query);
-			pstmt.setString(1, "'" + pName + "'");
-			pstmt.setString(2, "'" + lName + "'");
+			pstmt.setString(1, pName);
+			pstmt.setString(2, lName);
 
 			rset = pstmt.executeQuery();
 
@@ -246,5 +254,387 @@ public class RentalDao {
 		}
 
 		return p;
+	}
+
+	// 대여목록 카운팅
+	public int rGetListCount(Connection con) throws RentalException {
+		int listCount = 0;
+		Statement stmt = null;
+		ResultSet rset = null;
+
+		String query = "select count(*) from tb_rental";
+
+		try {
+			stmt = con.createStatement();
+			rset = stmt.executeQuery(query);
+
+			if (rset.next()) {
+				listCount = rset.getInt(1);
+			} else {
+				throw new RentalException("count 해서 페이지를 측정할만한 대여목록 없음.");
+			}
+
+		} catch (Exception e) {
+			// 일단 나도 exception 보고
+			e.printStackTrace();
+			// 던져주자
+			throw new RentalException(e.getMessage());
+		} finally {
+			close(rset);
+			close(stmt);
+		}
+		// listCount = 10;
+		return listCount;
+	}
+
+	// 대여목록 전체조회
+	public ArrayList<Rental> rSelectList(Connection con, int currentPage, int limit) throws RentalException {
+		ArrayList<Rental> list = new ArrayList<Rental>();
+		PreparedStatement pstmt = null;
+		ResultSet rset = null;
+
+		String query = "select * from ("
+				+ "select rownum rnum, "
+				+ "r_no, "
+				+ "p_no, "
+				+ "m_id, "
+				+ "p_count, "
+				+ "r_price, "
+				+ "to_char(rental_date, 'yyyy-mm-dd') rental_date, "
+				+ "to_char(rental_start_date, 'yyyy-mm-dd') rental_start_date, "
+				+ "to_char(r_return_date, 'yyyy-mm-dd') r_return_date, "
+				+ "to_char(nvl(r_return_last_date, to_date(?)), 'yyyy-mm-dd') r_return_last_date, "
+				+ "to_char(nvl(r_booking_date, to_date(?)), 'yyyy-mm-dd') r_booking_date, "
+				+ "p_state "
+				+ "from (select * from tb_rental)) "
+				+ "where rnum >= ? and rnum <= ?";
+		
+		int startRow = (currentPage - 1) * limit + 1;
+		int endRow = startRow + limit - 1;
+
+		try {
+			pstmt = con.prepareStatement(query);
+			pstmt.setString(1, "11/11/11");
+			pstmt.setString(2, "11/11/11");
+			pstmt.setInt(3, startRow);
+			pstmt.setInt(4, endRow);
+
+			rset = pstmt.executeQuery();
+
+			while (rset.next()) {
+				Rental r = new Rental();
+				r.setrNo(rset.getString("r_no"));
+				r.setpNo(rset.getInt("p_no"));
+				r.setmId(rset.getString("m_id"));
+				r.setpCount(rset.getInt("p_count"));
+				r.setrPrice(rset.getInt("r_price"));
+				r.setrDate(rset.getString("rental_date"));
+				r.setrStartDate(rset.getString("rental_start_date"));
+				r.setrReturnDate(rset.getString("r_return_date"));
+				r.setRReturnLastDate(rset.getString("r_return_last_date"));
+				r.setrBookingDate(rset.getString("r_booking_date"));
+				r.setpState(rset.getString("p_state"));
+
+				list.add(r);
+			}
+			
+			if (list.size() == 0)
+				throw new RentalException("전체 조회할 대여목록이 없습니다.");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RentalException(e.getMessage());
+		} finally {
+			close(rset);
+			close(pstmt);
+		}
+
+		return list;
+	}
+	
+	// 대여목록 필터조회
+	public ArrayList<Rental> rFilterSelectList(Connection con, HashMap filter) throws RentalException {
+		ArrayList<Rental> list = new ArrayList<Rental>();
+		PreparedStatement pstmt = null;
+		ResultSet rset = null;
+		
+		String mainFilter = (String)filter.get("mainFilter");	//월별, 일별, 전체
+		String value = (String)filter.get("value");	//검색필드 값
+		String fVal = (String)filter.get("fVal");	//날짜 값
+		String sFilter = (String)filter.get("sFilter");	//필터선택 값
+		
+		String query = "select r_no, "
+					+ "p_no, "
+					+ "m_id, "
+					+ "p_count, "
+					+ "r_price, "
+					+ "to_char(rental_date, 'yyyy-mm-dd') rental_date, "
+					+ "to_char(rental_start_date, 'yyyy-mm-dd') rental_start_date, "
+					+ "to_char(r_return_date, 'yyyy-mm-dd') r_return_date, "
+					+ "to_char(nvl(r_return_last_date, to_date(?)), 'yyyy-mm-dd') r_return_last_date, "
+					+ "to_char(nvl(r_booking_date, to_date(?)), 'yyyy-mm-dd') r_booking_date, "
+					+ "p_state "
+					+ "from tb_rental where ";
+		
+		switch(mainFilter){
+		case "all" : 
+			switch(sFilter){
+			case "대여번호" : query += "r_no = ?";
+			break;
+			case "아이디" : query += "m_id = ?";
+			break;
+			}		
+		break;
+		
+		case "month" :
+			switch(sFilter){
+			case "전체" : query += "rental_date like ?";
+			break;
+			case "대여번호" : query += "rental_date like ? and r_no = ?";
+			break;
+			case "아이디" : query += "rental_date like ? and m_id = ?";
+			break;
+			}
+			fVal = "___%" + fVal + "___";
+		break;
+		
+		case "day" : 
+			switch(sFilter){
+			case "전체" : query += "rental_date like to_date(?, ?)";
+			break;
+			case "대여번호" : query += "rental_date like to_date(?, ?) and r_no = ?";
+			break;
+			case "아이디" : query += "rental_date like to_date(?, ?) and m_id = ?";
+			break;
+			}
+		break;
+		
+		default : System.out.println("멍미");
+		}
+		
+		try {
+			pstmt = con.prepareStatement(query);
+			switch(mainFilter){
+			case "all" : 
+				pstmt.setString(1, "11/11/11");
+				pstmt.setString(2, "11/11/11");
+				pstmt.setString(3, value);
+			break;
+			case "month" :
+				if(sFilter == "전체"){
+					pstmt.setString(1, "11/11/11");
+					pstmt.setString(2, "11/11/11");
+					pstmt.setString(3, value);
+				}else{
+					pstmt.setString(1, "11/11/11");
+					pstmt.setString(2, "11/11/11");
+					pstmt.setString(3, fVal);
+					pstmt.setString(4, value);
+				}
+			break;
+			case "day" : 
+				if(sFilter == "전체"){
+					pstmt.setString(1, "11/11/11");
+					pstmt.setString(2, "11/11/11");
+					pstmt.setString(3, value);
+				}else{
+					pstmt.setString(1, "11/11/11");
+					pstmt.setString(2, "11/11/11");
+					pstmt.setString(3, fVal);
+					pstmt.setString(4, "yy/mm/dd");
+					pstmt.setString(5, value);
+				}
+			break;
+			default : System.out.println("멍미");
+			}
+			
+			rset = pstmt.executeQuery();
+
+			while (rset.next()) {
+				Rental r = new Rental();
+
+				r.setrNo(rset.getString("r_no"));
+				r.setpNo(rset.getInt("p_no"));
+				r.setmId(rset.getString("m_id"));
+				r.setpCount(rset.getInt("p_count"));
+				r.setrPrice(rset.getInt("r_price"));
+				r.setrDate(rset.getString("rental_date"));
+				r.setrStartDate(rset.getString("rental_start_date"));
+				r.setrReturnDate(rset.getString("r_return_date"));
+				r.setRReturnLastDate(rset.getString("r_return_last_date"));
+				r.setrBookingDate(rset.getString("r_booking_date"));
+				r.setpState(rset.getString("p_state"));
+
+				list.add(r);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RentalException(e.getMessage());
+		} finally {
+			close(rset);
+			close(pstmt);
+		}
+
+		return list;
+	}
+
+	public JSONObject rentalTablePrintInfo(Connection con, int pno) throws RentalException{
+		JSONObject json = null;
+		PreparedStatement pstmt = null;
+		ResultSet rset = null;
+		
+		String query = "select "
+				+ "(select l_local from tb_local where l_name in (select p_local from tb_product where p_no = ?)) local1, "
+				+ "(select p_local from tb_product where p_no = ?) local2, "
+				+ "(select p_name from tb_product where p_no = ?) pname, "
+				+ "(select p_item from tb_product where p_no = ?) pitem, "
+				+ "(select to_char(nvl(r_booking_date, to_date('11/11-11')), 'yyyy-mm-dd') as rbookdate from tb_rental where p_no = ?) rbookdate "
+				+ "from tb_rental join tb_product using (p_no) join tb_local on (l_name = p_local)";
+
+		try {
+			pstmt = con.prepareStatement(query);
+			pstmt.setInt(1, pno);
+			pstmt.setInt(2, pno);
+			pstmt.setInt(3, pno);
+			pstmt.setInt(4, pno);
+			pstmt.setInt(5, pno);
+			
+			rset = pstmt.executeQuery();
+			
+			while(rset.next()){
+				json = new JSONObject();
+				json.put("local1", URLEncoder.encode(rset.getString("local1"), "UTF-8"));
+				json.put("local2", URLEncoder.encode(rset.getString("local2"), "UTF-8"));
+				json.put("pname", URLEncoder.encode(rset.getString("pname"), "UTF-8"));
+				json.put("pitem", URLEncoder.encode(rset.getString("pitem"), "UTF-8"));	
+				json.put("rbookdate", URLEncoder.encode(rset.getString("rbookdate"), "UTF-8"));	
+				break;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RentalException(e.getMessage());
+		} finally {
+			close(rset);
+			close(pstmt);
+		}
+		
+		return json;
+	}
+	
+	//반납 처리용
+	public int updateProductState(Connection con, int pNo, String rNo) throws RentalException {
+		PreparedStatement pstmt = null;
+		ResultSet rset = null;
+		int result = 0;
+		
+		String query = "update tb_rental set p_state = '대여가능' where p_no = ?";
+		String query2 = "update tb_product set p_state = '대여가능' where p_no = ?";
+		
+		try {
+			pstmt = con.prepareStatement(query);
+			pstmt.setInt(1, pNo);
+			result = pstmt.executeUpdate();
+			
+			if(result > 0){
+				pstmt = con.prepareStatement(query2);
+				pstmt.setInt(1, pNo);
+				result = pstmt.executeUpdate();
+			}else
+				throw new RentalException("product state 변경 실패");
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RentalException(e.getMessage());
+		} finally {
+			close(rset);
+			close(pstmt);
+		}
+		
+		return result;
+	}
+	
+	//대여기간 연장용
+	public int updateReturnDate(Connection con, String rNo, String returnDate) throws RentalException {
+		PreparedStatement pstmt = null;
+		int result = 0;
+		
+		String query = "update tb_rental "
+				+ "set r_return_date = to_date(?, 'yyyy-mm-dd') "
+				+ "where r_no = ?";
+		
+		try {
+			pstmt = con.prepareStatement(query);
+			pstmt.setString(1, returnDate);
+			pstmt.setString(2, rNo);
+			
+			result = pstmt.executeUpdate();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RentalException(e.getMessage());
+		} finally {
+			close(pstmt);
+		}
+		
+		return result;
+	}
+	
+	
+	//관리자용 대여 등록
+	public int mInsertRental(Connection con, Rental r) throws RentalException {
+		PreparedStatement pstmt = null;
+		ResultSet rset = null;
+		int result = 0;
+		
+		/*//
+		String rentalNo = "R";
+		
+		Date today = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		
+		System.out.println(sdf.format(today));
+		
+		String rNo = selectRNo(con);
+		
+		if(sdf.format(today).equals(rNo.substring(1, 9))) {
+			rentalNo += sdf.format(today);
+			if((count + Integer.parseInt(rNo.substring(9))) < 10) {
+				rentalNo += ("0" + (count + Integer.parseInt(rNo.substring(9))));
+			} else {
+				rentalNo += ((count + Integer.parseInt(rNo.substring(9))));
+			}
+			
+		} else {
+			rentalNo += sdf.format(today);
+			rentalNo += ("0" + count);
+		}
+		
+		System.out.println(rentalNo);
+		//
+		*/
+		String query = "insert into tb_rental values (?, ?, ?, ?, ?, sysdate, sysdate, "
+				+ "to_date(?, 'yyyy-mm-dd'), null, null, '대여중')";
+		
+		try {
+			pstmt = con.prepareStatement(query);
+			pstmt.setString(1, r.getrNo());	//대여번호
+			pstmt.setInt(2, r.getpNo());	//물품번호
+			pstmt.setString(3, r.getmId());	//아이디
+			pstmt.setInt(4, r.getpCount());	//물품수량
+			pstmt.setInt(5, r.getrPrice()); //대여소계
+			pstmt.setString(6, r.getrReturnDate());
+				
+			result = pstmt.executeUpdate();
+			
+			if(result <= 0)
+				throw new RentalException("대여등록 실패. result 0");
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RentalException(e.getMessage());
+		}
+		
+		return result;
 	}
 }

@@ -3,7 +3,7 @@ package semi.rental.controller;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLEncoder;
-import java.util.ArrayList;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -19,16 +19,16 @@ import semi.rental.exception.RentalException;
 import semi.rental.model.service.RentalService;
 
 /**
- * Servlet implementation class RentalManagementLocalNameSelectServlet
+ * Servlet implementation class RentalManagementTablePrintServlet
  */
-@WebServlet("/rmlnselect")
-public class RentalManagementLocalNameSelectServlet extends HttpServlet {
+@WebServlet("/rmtp")
+public class RentalManagementTablePrintServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public RentalManagementLocalNameSelectServlet() {
+	public RentalManagementTablePrintServlet() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -39,51 +39,30 @@ public class RentalManagementLocalNameSelectServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// 동사무소 조회용 컨트롤러
-		System.out.println("RentalManagementLocalNameSelectServlet 실행");
-		response.setContentType("text/html; charset=utf-8");
-
-		ArrayList<LocationInfo> list = null;
+		//뷰에 존재하지않는 대여 관련 정보 조회용 컨트롤러
+		System.out.println("RentalManagementTablePrintServlet 실행");
+		response.setContentType("text/html; charset=utf-8"); 
+		
+		int pno = Integer.parseInt((String)request.getParameter("pno"));
 		JSONObject json = null;
-		JSONArray jarr = null;
 		PrintWriter out = response.getWriter();
 
 		try {
-			
-			String localName = (String) request.getParameter("local");
-			list = new RentalService().rentalLocalNameList(localName);
-
-			json = new JSONObject();
-			jarr = new JSONArray();
-
-			for (LocationInfo l : list) {
-				JSONObject job = new JSONObject();
-				job.put("lname", URLEncoder.encode(l.getL_Name(), "UTF-8"));
-				//
-				//
-				//
-				//
-				
-				l.setL_Address("동작구");
-
-				if (job.size() > 0) {
-					jarr.add(job);
-				}
-			}
-			
-			json.put("list", jarr);
+			json = new RentalService().rentalTablePrintInfo(pno);
 
 			response.setContentType("application/json; charset=utf-8");
+			System.out.println(json.toJSONString());
 			out.print(json.toJSONString());
 
-		} catch (RentalException e) {
+		} catch (
+
+		RentalException e) {
 			e.printStackTrace();
 			e.getMessage();
 		} finally {
 			out.flush();
 			out.close();
 		}
-
 	}
 
 	/**
