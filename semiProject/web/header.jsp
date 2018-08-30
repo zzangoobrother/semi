@@ -4,7 +4,7 @@
 	String mName = (String)session.getAttribute("m_Name");
 	String mId = (String)session.getAttribute("m_Id");
 	String mPassword = (String)session.getAttribute("m_password");
-	String loginm = (String) session.getAttribute("loginmode");
+	String loginmod = (String) session.getAttribute("loginmode");
 %>
    <%@ include file="head.jsp" %>
 		<script type="text/javascript">
@@ -97,7 +97,7 @@
 					  <input type="text"  id="mid" name="mid" size="15" required placeholder="아이디를 입력하세요">
 					</td>
 					<td width="50" rowspan="2">
-					<input type="submit" value="로그인" class= "navbar-btn nav-button wow bounceInRight login" id="btnLogin" name="btnLogin" onclick="loginm()">
+					<input type="submit" value="로그인" class= "navbar-btn nav-button wow bounceInRight login" id="btnLogin" name="btnLogin">
 					</td></tr>
 				<tr><td>
 					<!-- <input type="password" name="userpwd" size="15"> -->
@@ -173,7 +173,7 @@
                         <li class="wow fadeInDown" data-wow-delay="0.4s">
                             <a href="/semi/views/location/locationMapView.jsp" class="dropdown-toggle">오시는길</a><!-- /semi/maplist -->
                         </li>
-						<% if(loginm != null && loginm.equals("관리자")) { %>
+						<% if(loginmod != null && loginmod.equals("관리자")) { %>
 						<li class="dropdown ymm-sw " data-wow-delay="0.2s">
                         	<a href="index.html" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="200">관   리 <b class="caret"></b></a>
                         <ul class="dropdown-menu navbar-nav">

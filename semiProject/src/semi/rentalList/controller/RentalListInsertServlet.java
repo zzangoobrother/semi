@@ -1,7 +1,6 @@
 package semi.rentalList.controller;
 
 import java.io.IOException;
-import java.sql.Date;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -10,7 +9,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import semi.rental.controller.RentalManagementAreaSelectServlet;
 import semi.rentalList.exception.RentalListException;
 import semi.rentalList.model.service.RentalListService;
 import semi.rentalList.model.vo.RentalList;

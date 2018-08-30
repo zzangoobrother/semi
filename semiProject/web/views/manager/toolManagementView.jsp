@@ -274,11 +274,11 @@
 		return false;
 	}
 	
-	function enrollClick() {		
+	/* function enrollClick() {		
 	$.ajax({
 			url : "/semi/pmenroll",
-			type : "post",
 			contentType : false,
+			enctype : "multipart/form-data",
 			success : function(data) {
 				if (data >= 1) {
 					alert("물품 등록 완료");
@@ -290,7 +290,9 @@
 				console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
 			} //error
 		});//ajax
-	}
+		
+		return false;
+	} */
 	
 	function editClick() {
 		var name = $("#tname").val();
@@ -360,7 +362,7 @@
 												<input type="radio" id="radio3" name="radioC" onclick="deleteChecked();">삭제
                                             </div>
                                         </div>
-                                        <form action="/semi/pmenroll" method="post" enctype="multipart/form-data">
+                                        <form action="/semi/pmenroll" method="post" enctype = "multipart/form-data">
                                         <div class="row">
                                         	<div class="col-xs-12"> 
                                             </div>
@@ -460,7 +462,7 @@
                                        
                                         <div class="row" style="display:flex;align-items:center;justify-content:center;">
                                             <div class="col-xs-12">
-                                               <input class="btn btn-finish btn-primary" type="submit" id="enrollBtn" name="enrollBtn"  onclick="enrollClick();" style="display:none;" value="저장">
+                                               <input class="btn btn-finish btn-primary" type="submit" id="enrollBtn" name="enrollBtn" style="display:none;" value="저장">
 												<input class="btn btn-finish btn-primary" type="button" id="editBtn" name="editBtn" onclick="editClick();" style="display:none;" value="수정">
 												<input class="btn btn-finish btn-primary" type="button" id="deleteBtn" name="deleteBtn" onclick="deleteClick();" style="display:none;" value="삭제">
 												<button class="btn btn-finish btn-primary" type="reset" id="cancleBtn" name="cancleBtn">취소</button>
