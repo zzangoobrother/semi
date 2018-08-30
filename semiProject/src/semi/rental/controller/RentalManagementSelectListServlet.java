@@ -44,7 +44,7 @@ public class RentalManagementSelectListServlet extends HttpServlet {
 		// 페이지 값 처리용 변수
 		int currentPage = 1;
 		// 한 페이지당 출력할 목록 갯수
-		int limit = 20;
+		int limit = 10;
 		
 		if(request.getParameter("page") != null){
 			currentPage = Integer.parseInt(request.getParameter("page"));
@@ -64,7 +64,7 @@ public class RentalManagementSelectListServlet extends HttpServlet {
 			listCount = rservice.rGetListCount();
 			list = rservice.rSelectList(currentPage, limit);
 			maxPage = (int) ((double) listCount / limit + 0.9);
-			startPage = (((int) ((double) currentPage / limit + 1.8)) - 1) * limit + 1;
+			startPage = (((int) ((double) currentPage / limit + 0.9)) - 1) * limit + 1;
 			endPage = startPage + limit - 1;
 			
 			if (maxPage < endPage)

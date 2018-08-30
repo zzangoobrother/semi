@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import semi.member.exception.MemberException;
 import semi.member.model.service.MemberService;
 /**
  * Servlet implementation class MemberIdCheckServlet
@@ -30,24 +31,32 @@ public class MemberIdCheckServlet extends HttpServlet {
 	 *      response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
-		String m_Id = request.getParameter("m_id");
-		
-		int result = new MemberService().selectCheckId(m_Id);
-		
-		String returnValue = null;
-		System.out.println("값 :" + result);
-		if(result == 0)
-			returnValue = "ok";
-		
-		else
-			returnValue = "dup";
-		System.out.println("값 : " + returnValue);
-		response.setContentType("text/html; charset=utf-8");
+		String m_Id = (String)request.getParameter("m_id");
+		int result = 0;
+		String returnValue = "";
 		PrintWriter out = response.getWriter();
-		out.append(returnValue);
-		out.flush();
-		out.close();
 		
+		try {
+			result = new MemberService().selectCheckId(m_Id);
+			System.out.println("값 :" + result);
+			
+			if(result == 0)
+				returnValue = "ok";
+			else
+				returnValue = "dup";
+			System.out.println("값 : " + returnValue);
+			
+			response.setContentType("text/html; charset=utf-8");
+			out.append(returnValue);
+			
+		} catch (MemberException e) {
+			e.printStackTrace();
+			e.getMessage();
+		} finally {
+			out.flush();
+			out.close();
+		}
+
 	}
 
 	

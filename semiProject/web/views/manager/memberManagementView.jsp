@@ -93,7 +93,7 @@
 			memberInfo.memail = $("#memail").val();
 			
 			var adr1 = $("#sample4_postcode").val();
-			var adr2 = $("$sample4_roadAddress").val();
+			var adr2 = $("#sample4_roadAddress").val();
 			memberInfo.maddress = (adr1 + ", " + adr2);
 			
 			memberInfo.mpoint = $("#mpoint").val(); 
@@ -140,7 +140,7 @@
 			else
 				b3 = birth3;
 			memberInfo.mname = $("#mname").val();
-			memberInfo.mid = $("#mid").val();
+			memberInfo.mid = $("#mid1").val();
 			memberInfo.mnick = $("#mnick").val();
 			memberInfo.mpwd = $("#mpwd").val();
 			memberInfo.msno = (birth1 + "-" + b2 + "-" + b3);
@@ -154,7 +154,7 @@
 			memberInfo.memail = $("#memail").val();
 			
 			var adr1 = $("#sample4_postcode").val();
-			var adr2 = $("$sample4_roadAddress").val();
+			var adr2 = $("#sample4_roadAddress").val();
 			memberInfo.maddress = (adr1 + ", " + adr2);
 			
 			memberInfo.mpoint = $("#mpoint").val(); 
@@ -187,11 +187,11 @@
 	//회원 삭제
 	function deleteClick(memberInfo){
 		if(confirm("해당 회원을 정말 삭제하시겠습니까?")){
-			var mid = memberInfo.mid;
+			alert(memberInfo.mid);
 			$.ajax({
 				url : "/semi/mmdelete",
 				type : "post",
-				data : {"mid" : mid},
+				data : {"mid" : memberInfo.mid},
 				success : function(data){
 					if(data >= 1)
 						alert("회원 정보 삭제 완료");
@@ -246,12 +246,10 @@
 		$("#birth3").val(day);
 
 		if(memberInfo.mgender == "남"){
-			//$("#F").attr("checked", false);
-			$("#T").attr("checked", true);
+			$("#T").prop("checked", true);
 			
-		}else if(memberInfo.mgender == "여"){
-			//$("#T").attr("checked", false);
-			$("#F").attr("checked", true);
+		}else/*  if(memberInfo.mgender == "여") */{
+			$("#F").prop("checked", true);
 		}
 		
 		$("#mphone").val(memberInfo.mphone);
@@ -264,7 +262,6 @@
 		$("#mpoint").val(memberInfo.mpoint);
 		
 		return false;
-
 	}
 	//-------------------------------------------------------------
 	
@@ -292,6 +289,9 @@
 				
 				var values = "";
 				for(var i in json.list){
+					for(var j = 0; j < json.list[i].maddress.length; j++){
+					json.list[i].maddress = json.list[i].maddress.replace("+", " ");
+					}
 					values += "<tr><td><input type='radio' onclick='radioCheck(" + i + ")' name='choice' id='choice" + i + "'></td>"
 					+ "<td id='nametd" + i + "'>" + decodeURIComponent(json.list[i].mname) + "</td>"
 					+ "<td id='idtd" + i + "'>" + decodeURIComponent(json.list[i].mid) + "</td>"
@@ -353,6 +353,9 @@
 				
 				var values = "";
 				for(var i in json.list){
+					for(var j = 0; j < json.list[i].maddress.length; j++){
+						json.list[i].maddress = json.list[i].maddress.replace("+", " ");
+						}
 					values += "<tr><td><input type='radio' onclick='radioCheck(" + i + ")' name='choice' id='choice" + i + "'></td>"
 					+ "<td id='nametd" + i + "'>" + decodeURIComponent(json.list[i].mname) + "</td>"
 					+ "<td id='idtd" + i + "'>" + decodeURIComponent(json.list[i].mid) + "</td>"
@@ -662,11 +665,11 @@
 								<th width="100">이름</th>
 								<th width="100">아이디</th>
 								<th width="100">닉네임</th>
-								<th width="100">생년월일</th>
-								<th width="100">성별</th>
+								<th width="140">생년월일</th>
+								<th width="70">성별</th>
 								<th width="100">전화번호</th>
 								<th width="100">이메일</th>
-								<th width="100">주소</th>
+								<th width="300">주소</th>
 								<th width="100">포인트</th>
 							</tr>
 							</thead>

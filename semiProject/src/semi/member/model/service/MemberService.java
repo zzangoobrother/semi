@@ -78,7 +78,7 @@ public class MemberService {
 		return result;
 	}
 
-	public int selectCheckId(String m_Id) {
+	public int selectCheckId(String m_Id) throws MemberException {
 		Connection con = getConnection();
 		
 		int result = new MemberDao().selectCheckId(con, m_Id);

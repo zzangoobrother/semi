@@ -122,7 +122,6 @@ public class RentalDao {
 		ResultSet rset = null;
 		ArrayList<LocationInfo> list = new ArrayList<LocationInfo>();
 
-		// String query = "select distinct l_local, l_name from tb_local";
 		String query = "select distinct l_local from tb_local order by 1";
 
 		try {
@@ -301,7 +300,7 @@ public class RentalDao {
 				+ "p_count, "
 				+ "r_price, "
 				+ "to_char(rental_date, 'yyyy-mm-dd') rental_date, "
-				+ "to_char(rental_start_date, 'yyyy-mm-dd') rental_start_date, "
+				+ "to_char(nvl(rental_start_date, to_date(?)), 'yyyy-mm-dd') rental_start_date, "
 				+ "to_char(r_return_date, 'yyyy-mm-dd') r_return_date, "
 				+ "to_char(nvl(r_return_last_date, to_date(?)), 'yyyy-mm-dd') r_return_last_date, "
 				+ "to_char(nvl(r_booking_date, to_date(?)), 'yyyy-mm-dd') r_booking_date, "
@@ -316,8 +315,9 @@ public class RentalDao {
 			pstmt = con.prepareStatement(query);
 			pstmt.setString(1, "11/11/11");
 			pstmt.setString(2, "11/11/11");
-			pstmt.setInt(3, startRow);
-			pstmt.setInt(4, endRow);
+			pstmt.setString(3, "11/11/11");
+			pstmt.setInt(4, startRow);
+			pstmt.setInt(5, endRow);
 
 			rset = pstmt.executeQuery();
 
@@ -329,10 +329,19 @@ public class RentalDao {
 				r.setpCount(rset.getInt("p_count"));
 				r.setrPrice(rset.getInt("r_price"));
 				r.setrDate(rset.getString("rental_date"));
-				r.setrStartDate(rset.getString("rental_start_date"));
+				if(rset.getString("rental_start_date") == "2011-11-11")
+					r.setrStartDate("없음");
+				else
+					r.setrStartDate(rset.getString("rental_start_date"));
 				r.setrReturnDate(rset.getString("r_return_date"));
-				r.setRReturnLastDate(rset.getString("r_return_last_date"));
-				r.setrBookingDate(rset.getString("r_booking_date"));
+				if(rset.getString("r_return_last_date") == "2011-11-11")
+					r.setRReturnLastDate("없음");
+				else
+					r.setRReturnLastDate(rset.getString("r_return_last_date"));
+				if(rset.getString("r_booking_date") == "2011-11-11")
+					r.setrBookingDate("없음");
+				else
+					r.setrBookingDate(rset.getString("r_booking_date"));
 				r.setpState(rset.getString("p_state"));
 
 				list.add(r);
@@ -369,10 +378,10 @@ public class RentalDao {
 					+ "p_count, "
 					+ "r_price, "
 					+ "to_char(rental_date, 'yyyy-mm-dd') rental_date, "
-					+ "to_char(rental_start_date, 'yyyy-mm-dd') rental_start_date, "
+					+ "to_char(nvl(rental_start_date, to_date('11/11/11')), 'yyyy-mm-dd') rental_start_date, "
 					+ "to_char(r_return_date, 'yyyy-mm-dd') r_return_date, "
-					+ "to_char(nvl(r_return_last_date, to_date(?)), 'yyyy-mm-dd') r_return_last_date, "
-					+ "to_char(nvl(r_booking_date, to_date(?)), 'yyyy-mm-dd') r_booking_date, "
+					+ "to_char(nvl(r_return_last_date, to_date('11/11/11')), 'yyyy-mm-dd') r_return_last_date, "
+					+ "to_char(nvl(r_booking_date, to_date('11/11/11')), 'yyyy-mm-dd') r_booking_date, "
 					+ "p_state "
 					+ "from tb_rental where ";
 		
@@ -388,7 +397,7 @@ public class RentalDao {
 		
 		case "month" :
 			switch(sFilter){
-			case "전체" : query += "rental_date like ?";
+			case "전체" : query += "rental_date like ?"; 
 			break;
 			case "대여번호" : query += "rental_date like ? and r_no = ?";
 			break;
@@ -411,38 +420,45 @@ public class RentalDao {
 		
 		default : System.out.println("멍미");
 		}
-		
+		System.out.println("mainFilter" + mainFilter + ", sFilter : " + sFilter + ", fVal : " + fVal + ", value : " + value);
 		try {
+			System.out.println("query : " + query);
 			pstmt = con.prepareStatement(query);
 			switch(mainFilter){
 			case "all" : 
-				pstmt.setString(1, "11/11/11");
-				pstmt.setString(2, "11/11/11");
-				pstmt.setString(3, value);
+				pstmt.setString(1, value);
 			break;
 			case "month" :
-				if(sFilter == "전체"){
-					pstmt.setString(1, "11/11/11");
-					pstmt.setString(2, "11/11/11");
-					pstmt.setString(3, value);
-				}else{
-					pstmt.setString(1, "11/11/11");
-					pstmt.setString(2, "11/11/11");
-					pstmt.setString(3, fVal);
-					pstmt.setString(4, value);
+				switch(sFilter){
+				case "전체" : 
+					pstmt.setString(1, fVal);
+				break;
+				case "대여번호" : 
+					pstmt.setString(1, fVal);
+					pstmt.setString(2, value);
+				break;
+				case "아이디" : 
+					pstmt.setString(1, fVal);
+					pstmt.setString(2, value);
+				break;
 				}
 			break;
 			case "day" : 
-				if(sFilter == "전체"){
-					pstmt.setString(1, "11/11/11");
-					pstmt.setString(2, "11/11/11");
+				switch(sFilter){
+				case "전체" :
+					pstmt.setString(1, fVal);
+					pstmt.setString(2, "yy/mm/dd");		
+				break;
+				case "대여번호" :
+					pstmt.setString(1, fVal);
+					pstmt.setString(2, "yy/mm/dd");
 					pstmt.setString(3, value);
-				}else{
-					pstmt.setString(1, "11/11/11");
-					pstmt.setString(2, "11/11/11");
-					pstmt.setString(3, fVal);
-					pstmt.setString(4, "yy/mm/dd");
-					pstmt.setString(5, value);
+				break;
+				case "아이디" :
+					pstmt.setString(1, fVal);
+					pstmt.setString(2, "yy/mm/dd");
+					pstmt.setString(3, value);
+				break;
 				}
 			break;
 			default : System.out.println("멍미");
@@ -467,6 +483,10 @@ public class RentalDao {
 
 				list.add(r);
 			}
+			
+			if(list.size() < 0){
+				throw new RentalException("조회 조건에 맞는 대여 list 없음");
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -478,7 +498,8 @@ public class RentalDao {
 
 		return list;
 	}
-
+	
+	//대여상세정보 조회용
 	public JSONObject rentalTablePrintInfo(Connection con, int pno) throws RentalException{
 		JSONObject json = null;
 		PreparedStatement pstmt = null;
@@ -531,6 +552,7 @@ public class RentalDao {
 		
 		String query = "update tb_rental set p_state = '대여가능' where p_no = ?";
 		String query2 = "update tb_product set p_state = '대여가능' where p_no = ?";
+		String query3 = "update tb_rental set r_return_last_date = sysdate where p_no = ?";
 		
 		try {
 			pstmt = con.prepareStatement(query);
@@ -541,6 +563,10 @@ public class RentalDao {
 				pstmt = con.prepareStatement(query2);
 				pstmt.setInt(1, pNo);
 				result = pstmt.executeUpdate();
+				if(result > 0){
+					pstmt = con.prepareStatement(query3);
+					pstmt.setInt(1, pNo);
+				}
 			}else
 				throw new RentalException("product state 변경 실패");
 			
@@ -587,33 +613,7 @@ public class RentalDao {
 		PreparedStatement pstmt = null;
 		ResultSet rset = null;
 		int result = 0;
-		
-		/*//
-		String rentalNo = "R";
-		
-		Date today = new Date();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-		
-		System.out.println(sdf.format(today));
-		
-		String rNo = selectRNo(con);
-		
-		if(sdf.format(today).equals(rNo.substring(1, 9))) {
-			rentalNo += sdf.format(today);
-			if((count + Integer.parseInt(rNo.substring(9))) < 10) {
-				rentalNo += ("0" + (count + Integer.parseInt(rNo.substring(9))));
-			} else {
-				rentalNo += ((count + Integer.parseInt(rNo.substring(9))));
-			}
-			
-		} else {
-			rentalNo += sdf.format(today);
-			rentalNo += ("0" + count);
-		}
-		
-		System.out.println(rentalNo);
-		//
-		*/
+	
 		String query = "insert into tb_rental values (?, ?, ?, ?, ?, sysdate, sysdate, "
 				+ "to_date(?, 'yyyy-mm-dd'), null, null, '대여중')";
 		
@@ -633,6 +633,9 @@ public class RentalDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RentalException(e.getMessage());
+		} finally {
+			close(rset);
+			close(pstmt);
 		}
 		
 		return result;
