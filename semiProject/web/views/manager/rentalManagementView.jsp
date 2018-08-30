@@ -246,6 +246,7 @@
 						jRstartdate = " ";
 					else
 						jRstartdate = decodeURIComponent(json.list[i].rstartdate);
+					
 					if(decodeURIComponent(json.list[i].rlastdate) == "2011-11-11")
 						jRlastdate = " ";
 					else
@@ -378,6 +379,7 @@
 						jRstartdate = " ";
 					else
 						jRstartdate = decodeURIComponent(json.list[i].rstartdate);
+					
 					if(decodeURIComponent(json.list[i].rlastdate) == "2011-11-11")
 						jRlastdate = " ";
 					else
@@ -390,9 +392,9 @@
 					+ "<td id='rpricetd" + i + "'>" + json.list[i].rprice + "</td>"
 					+ "<td id='midtd" + i + "'>" + decodeURIComponent(json.list[i].mid) + "</td>"
 					+ "<td id='rdatetd" + i + "'>" + decodeURIComponent(json.list[i].rdate) + "</td>"
-					+ "<td id='rstartdatetd" + i + "'>" + decodeURIComponent(json.list[i].rstartdate) + "</td>"
+					+ "<td id='rstartdatetd" + i + "'>" + jRstartdate + "</td>"
 					+ "<td id='rreturntd" + i + "'>" + decodeURIComponent(json.list[i].rreturndate) + "</td>"
-					+ "<td id='rlasttd" + i + "'>" + decodeURIComponent(json.list[i].rlastdate) + "</td>"
+					+ "<td id='rlasttd" + i + "'>" + jRlastdate + "</td>"
 					+ "<td id='pstatetd" + i + "'>" +  decodeURIComponent(json.list[i].pstate) + "</td></tr>";
 										
 				} //for

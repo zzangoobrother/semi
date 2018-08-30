@@ -7,12 +7,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 
 import org.json.simple.JSONObject;
 
@@ -243,7 +239,7 @@ public class RentalDao {
 			} else {
 				throw new RentalException("물품정보 존재하지 않음");
 			}
-
+			System.out.println("물품정보 : " + p.toString());
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RentalException(e.getMessage());
@@ -551,21 +547,15 @@ public class RentalDao {
 		int result = 0;
 		
 		String query = "update tb_rental set p_state = '대여가능' where p_no = ?";
-		String query2 = "update tb_product set p_state = '대여가능' where p_no = ?";
-		String query3 = "update tb_rental set r_return_last_date = sysdate where p_no = ?";
-		
 		try {
 			pstmt = con.prepareStatement(query);
 			pstmt.setInt(1, pNo);
 			result = pstmt.executeUpdate();
 			
 			if(result > 0){
-				pstmt = con.prepareStatement(query2);
-				pstmt.setInt(1, pNo);
-				result = pstmt.executeUpdate();
-				if(result > 0){
-					pstmt = con.prepareStatement(query3);
-					pstmt.setInt(1, pNo);
+				result = returnLastdate(con, pNo, rNo);
+				if(result >0){
+					productStateChange(con, pNo, rNo);
 				}
 			}else
 				throw new RentalException("product state 변경 실패");
@@ -580,6 +570,50 @@ public class RentalDao {
 		
 		return result;
 	}
+	
+	//반납시 반납실행일자 변경
+	public int returnLastdate(Connection con, int pNo, String rNo) throws RentalException {
+		PreparedStatement pstmt = null;
+		ResultSet rset = null;
+		int result = 0;
+		
+		String query = "update tb_product set p_state = '대여가능' where p_no = ?";
+		
+		try {
+			pstmt = con.prepareStatement(query);
+			pstmt.setInt(1, pNo);
+			result = pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RentalException(e.getMessage());
+		} finally {
+			close(rset);
+			close(pstmt);
+		}
+		return result;
+	}
+	
+	//반납시 물품 대여상태 변경
+	public int productStateChange(Connection con, int pNo, String rNo) throws RentalException {
+		PreparedStatement pstmt = null;
+		ResultSet rset = null;
+		int result = 0;
+		
+		String query = "update tb_rental set r_return_last_date = sysdate where p_no = ?";
+		
+		try {
+			pstmt = con.prepareStatement(query);
+			pstmt.setInt(1, pNo);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RentalException(e.getMessage());
+		} finally {
+			close(rset);
+			close(pstmt);
+		}
+		return result;
+	}
+	
 	
 	//대여기간 연장용
 	public int updateReturnDate(Connection con, String rNo, String returnDate) throws RentalException {
@@ -612,24 +646,32 @@ public class RentalDao {
 	public int mInsertRental(Connection con, Rental r) throws RentalException {
 		PreparedStatement pstmt = null;
 		ResultSet rset = null;
-		int result = 0;
+		int result = mProductStateCheck(con, r);
 	
 		String query = "insert into tb_rental values (?, ?, ?, ?, ?, sysdate, sysdate, "
 				+ "to_date(?, 'yyyy-mm-dd'), null, null, '대여중')";
-		
+		System.out.println("대여등록 r : " + r.toString());
+	
 		try {
-			pstmt = con.prepareStatement(query);
-			pstmt.setString(1, r.getrNo());	//대여번호
-			pstmt.setInt(2, r.getpNo());	//물품번호
-			pstmt.setString(3, r.getmId());	//아이디
-			pstmt.setInt(4, r.getpCount());	//물품수량
-			pstmt.setInt(5, r.getrPrice()); //대여소계
-			pstmt.setString(6, r.getrReturnDate());
-				
-			result = pstmt.executeUpdate();
+			if(result > 0){
+				result = 0;
+				pstmt = con.prepareStatement(query);
+				pstmt.setString(1, r.getrNo());	//대여번호
+				pstmt.setInt(2, r.getpNo());	//물품번호
+				pstmt.setString(3, r.getmId());	//아이디
+				pstmt.setInt(4, r.getpCount());	//물품수량
+				pstmt.setInt(5, r.getrPrice()); //대여소계
+				pstmt.setString(6, r.getrReturnDate());
+					
+				result = pstmt.executeUpdate();
+			}else{
+				throw new RentalException("물품상태 대여중인듯");
+			}
 			
 			if(result <= 0)
-				throw new RentalException("대여등록 실패. result 0");
+				throw new RentalException("대여목록 생성했으나 대여못함");
+			
+		
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RentalException(e.getMessage());
@@ -640,4 +682,27 @@ public class RentalDao {
 		
 		return result;
 	}
+	
+	//대여등록시 물품 대여상태 확인
+	public int mProductStateCheck(Connection con, Rental r) throws RentalException{
+		PreparedStatement pstmt = null;
+		int result = 0;
+		String query = "update tb_product set p_state = '대여중' where p_no = ?";
+		
+		try {
+			pstmt = con.prepareStatement(query);
+			pstmt.setInt(1, r.getpNo());
+			
+			result = pstmt.executeUpdate();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RentalException(e.getMessage());
+		} finally {
+			close(pstmt);
+		}
+
+		return result;
+	}
+	
 }

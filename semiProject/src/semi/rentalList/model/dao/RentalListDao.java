@@ -128,7 +128,7 @@ public class RentalListDao {
 			rentalNo += ("0" + count);
 		}
 
-		System.out.println(rentalNo);
+		System.out.println("생성될 대여번호 : " + rentalNo);
 
 		String query = "insert into tb_rentallist values (?, ?, ?, ?)";
 
