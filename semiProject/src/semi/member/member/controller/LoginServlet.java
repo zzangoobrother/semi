@@ -36,8 +36,9 @@ public class LoginServlet extends HttpServlet {
 		String mId = request.getParameter("mid");
 		
 		String mPassword = request.getParameter("m_password1");
+		System.out.println("mPass : " + mPassword);
 		String loginmode = request.getParameter("loginmode");
-		System.out.println(loginmode);
+		
 		
 		try {
 			String mName = "";
@@ -56,7 +57,7 @@ public class LoginServlet extends HttpServlet {
 				session.setAttribute("loginmode", loginmode);
 				
 				
-					response.sendRedirect("/semi/index.jsp");
+				response.sendRedirect("/semi/index.jsp");
 				
 				
 			}
