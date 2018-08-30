@@ -3,11 +3,11 @@
 <%@ page import="semi.products.model.vo.Product, java.util.ArrayList"%>
 <%
 	ArrayList<Product> list = (ArrayList<Product>)request.getAttribute("list");	
-	int listCount = ((Integer)request.getAttribute("listCount")).intValue();
+	/* int listCount = ((Integer)request.getAttribute("listCount")).intValue();
 	int startPage = ((Integer)request.getAttribute("startPage")).intValue();
 	int endPage = ((Integer)request.getAttribute("endPage")).intValue();
 	int maxPage = ((Integer)request.getAttribute("maxPage")).intValue();
-	int currentPage = ((Integer)request.getAttribute("currentPage")).intValue();
+	int currentPage = ((Integer)request.getAttribute("currentPage")).intValue(); */
 %>
 <%@ include file="../../header.jsp"%>
 
@@ -117,55 +117,7 @@
 			</div>
 
 
-			<div class="col-md-12 clear">
-				<div class="pull-right">
-					<div class="pagination">
-						<ul>
-							<% if (currentPage > 1){ %>
-							<li>
-								<a href="/semi/plist?page=1"><<</a>
-							<li>
-							<% } %> 
-							
-							<% if (currentPage == 1) { %>
-								
-							<% } else {%>
-								<li>
-									<a href="/semi/plist?page=<%=currentPage - 1%>"><</a>
-								</li>
-							<% } %>
-
-							<% for (int p = startPage; p <= endPage; p++) {
-									if (p == currentPage) { %>
-										<li><a href="#"><font color="red"><%=p%></font></a></li>
-									<% } else { %>
-										<li><a href="/semi/plist?page=<%=p%>"><%=p%></a></li>
-							<%
-									}
-								}
-							%>
-
-
-
-							<% if (currentPage == maxPage) { %>
-								
-							<% } else { %>
-								<li>
-									<a href="/semi/plist?page=<%= currentPage + 1 %>">></a>
-								</li>
-							<% } %>
-
-							<% if (currentPage >= maxPage) { %>
-								
-							<% } else {%>
-							<li>
-								<a href="/semi/plist?page=<%= maxPage %>">>></a>
-							</li>
-							<% } %>
-						</ul>
-					</div>
-				</div>
-			</div>
+			
 		</div>
 	</div>
 </div>

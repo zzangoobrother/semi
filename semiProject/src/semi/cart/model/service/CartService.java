@@ -25,6 +25,12 @@ public class CartService {
 		return list;
 	}
 
+	public int selectPno(String pName, String pLocal) throws CartException {
+		Connection con = getConnection();
+		int pno = new CartDao().getListCount(con, pName, pLocal);
+		close(con);
+		return pno;
+	}
 
 	
 	

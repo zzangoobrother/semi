@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 import semi.member.exception.MemberException;
 import semi.member.model.vo.Member;
+import semi.review.model.vo.ReviewBoard;
 
 public class MemberDao {
 	
@@ -305,7 +306,48 @@ public class MemberDao {
 		
 		return idCount;
 	}
-
+	public ArrayList<ReviewBoard> myboard(Connection con, String mId) throws MemberException{
+		
+		PreparedStatement pstmt = null;
+		ResultSet rset = null;
+		ArrayList<ReviewBoard> list = new ArrayList<ReviewBoard>();
+		
+		String query = "select * from tb_reviewboard where m_id = ?";
+		try {
+			pstmt = con.prepareStatement(query);
+			pstmt.setString(1, mId);
+			
+			rset = pstmt.executeQuery();
+			
+			while(rset.next()){
+				ReviewBoard reviewboard = new ReviewBoard();
+				
+				reviewboard.setmId(mId);
+				reviewboard.setRbNo(rset.getInt("rb_no"));
+				reviewboard.setRbTitle(rset.getString("rb_title"));
+				reviewboard.setRbContent(rset.getString("rb_content"));
+				reviewboard.setRbCount(rset.getInt("rb_count"));
+				reviewboard.setRbDate(rset.getDate("rb_date"));
+				reviewboard.setRbFile1(rset.getString("rb_file1"));
+				reviewboard.setRbFile2(rset.getString("rb_file2"));
+				reviewboard.setpNo(rset.getInt("p_no"));
+				
+				list.add(reviewboard);
+				
+				if(list.size() == 0){
+					throw new MemberException("게시글이 없습니다.");
+				}
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new MemberException(e.getMessage());
+		}finally{
+			close(rset);
+			close(pstmt);
+		}
+		return list;
+	}
 	//관리자용 ---------------------------------------------------------
 	
 	//관리자용 회원등록
@@ -556,7 +598,9 @@ public class MemberDao {
 		return result;
 	}
 	//관리자용 end
-	
+
 
 	
 }
+
+

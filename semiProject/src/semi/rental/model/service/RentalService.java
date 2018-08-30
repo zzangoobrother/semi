@@ -107,4 +107,11 @@ public class RentalService {
 		close(con);
 		return p;
 	}
+
+	public ArrayList<Rental> myrent(String mId) throws RentalException{
+        Connection con = getConnection();
+        ArrayList<Rental> list = new RentalDao().myrent(con, mId);
+        close(con);
+        return list;
+     }
 }

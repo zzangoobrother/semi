@@ -139,19 +139,19 @@
                                     <a href="/semi/plist">전체보기</a>
                                 </li>
                                 <li>
-                                    <a href="/semi/views/payment/paymentProgressView.jsp">- 절단공구</a>
+                                    <a href="/semi/cutoff">- 절단공구</a>
                                 </li>
                                 <li>
-                                    <a href="#">- 드릴공구</a>
+                                    <a href="/semi/drill">- 드릴공구</a>
                                 </li>
                                 <li>
-                                    <a href="#">- 충전공구</a>
+                                    <a href="/semi/charge">- 충전공구</a>
                                 </li>
                                 <li>
-                                    <a href="#">- 기타공구</a>
+                                    <a href="/semi/etc">- 기타공구</a>
                                 </li>
                                 <li>
-                                    <a href="#">- 기타생활공구</a>
+                                    <a href="/semi/lifeetc">- 기타생활공구</a>
                                 </li>
 
                             </ul>

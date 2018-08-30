@@ -3,6 +3,7 @@ package semi.cart.model.dao;
 import static semi.common.JDBCTemplat.close;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -64,4 +65,38 @@ public class CartDao {
 		return list;
 	}
 
+public int getListCount(Connection con, String pName, String pLocal) throws CartException {
+		
+		int pNo = 0;
+		PreparedStatement pstmt = null;
+		ResultSet rset = null;
+		
+		String query = "SELECT P_NO FROM TB_PRODUCT WHERE P_NAME = ? AND P_LOCAL = ?";
+		
+		try {
+			pstmt = con.prepareStatement(query);
+			pstmt.setString(1, pName);
+			pstmt.setString(2, pLocal);
+			
+			rset = pstmt.executeQuery();
+			
+			if(rset.next()){
+				pNo = rset.getInt(1);
+			}else{
+				throw new CartException("상품이 존재하지 않습니다.");
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new CartException(e.getMessage());
+		}finally{
+			close(rset);
+			close(pstmt);
+		}
+		
+		return pNo;
+		
+	}
+	
+	
 }

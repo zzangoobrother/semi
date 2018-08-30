@@ -144,9 +144,7 @@ public class ProductsDao {
 		PreparedStatement pstmt = null;
 		ResultSet rset = null;
 		
-		String query = "select P_LOCAL from tb_product where P_NAME = ? ";
-		
-		
+		String query = "select P_LOCAL  from tb_product where P_NAME = ? ";
 		
 		try {
 			pstmt = con.prepareStatement(query);
@@ -178,6 +176,294 @@ public class ProductsDao {
 		
 	}
 
-	
+	public ArrayList<Product> selectProduct(Connection con, String keyword, String localselect) throws ProductsException{
+	      ArrayList<Product> list = new ArrayList<Product>();
+	      PreparedStatement pstmt = null;
+	      ResultSet rset = null;
+	      
+	      String query1 = "select * from tb_product where rowid in (select max(rowid) from tb_product group by p_name)";
+	      String query2 = "select * from tb_product where p_name like ? and rowid in (select max(rowid) from tb_product group by p_name)";
+	      String query3 = "select * from tb_product join tb_local on (p_local = l_name) where l_local like ?";
+	      String query4 = "select * from tb_product join tb_local on (p_local = l_name) where l_local like ? and p_name like ?";
+	      
+	      try {
+	         if(keyword.equals("no1") && localselect.equals("no2")){
+	            pstmt = con.prepareStatement(query1);
+	         }else if(!keyword.equals("no1") && localselect.equals("no2")){
+	            pstmt = con.prepareStatement(query2);
+	            pstmt.setString(1, "%" + keyword + "%");
+	            System.out.println(keyword);
+	            System.out.println(localselect);
+	         }else if(keyword.equals("no1") && (!localselect.equals("no2"))){
+	            pstmt = con.prepareStatement(query3);
+	            pstmt.setString(1, "%" + localselect + "%");
+	            System.out.println(keyword);
+	            System.out.println(localselect);
+	            
+	         }else if((!keyword.equals("no1")) && (!localselect.equals("no2"))){
+	            pstmt = con.prepareStatement(query4);
+	            pstmt.setString(1, "%" + localselect + "%");
+	            pstmt.setString(2, "%" + keyword + "%");
+	            System.out.println(keyword);
+	            System.out.println(localselect);
+	         }
+	         
+	         rset = pstmt.executeQuery();
+	         
+	         while(rset.next()){
+	            Product p = new Product();
+	            
+	            p.setP_no(rset.getInt("p_no"));
+	            p.setP_name(rset.getString("p_name"));
+	            p.setP_price(rset.getInt("p_price"));
+	            p.setP_count(rset.getInt("p_count"));
+	            p.setP_local(rset.getString("p_local"));
+	            p.setP_main_image(rset.getString("p_main_image"));
+	            p.setP_detail_image(rset.getString("p_detail_image"));
+	            p.setP_item(rset.getString("p_item"));
+	            p.setP_state(rset.getString("p_state"));
+	            
+	            list.add(p);
+	            
+	            if(list.size() == 0)
+	               throw new ProductsException("제품이 없습니다.");
+	         }
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	         throw new ProductsException(e.getMessage());
+	      }finally{
+	         close(rset);
+	         close(pstmt);
+	      }
+	      return list;
+	   }
 
+	public ArrayList<Product> cutOffSelectList(Connection con, int currentPage, int limit) throws ProductsException {
+		
+		
+		 
+		  ArrayList<Product> list = new ArrayList<Product>();
+	      PreparedStatement pstmt = null;
+	      ResultSet rset = null;
+	      
+	      String query = "select * from tb_product where p_item=? and rowid in (select max(rowid) from tb_product group by p_name)";
+	      
+	      try {
+	    	  pstmt = con.prepareStatement(query);
+				pstmt.setString(1, "절단공구");
+				
+				
+				 rset = pstmt.executeQuery();
+	         
+	         
+	        
+	         
+	         while(rset.next()){
+	            Product p = new Product();
+	            
+	            p.setP_no(rset.getInt("p_no"));
+	            p.setP_name(rset.getString("p_name"));
+	            p.setP_price(rset.getInt("p_price"));
+	            p.setP_count(rset.getInt("p_count"));
+	            p.setP_local(rset.getString("p_local"));
+	            p.setP_main_image(rset.getString("p_main_image"));
+	            p.setP_detail_image(rset.getString("p_detail_image"));
+	            p.setP_item(rset.getString("p_item"));
+	            p.setP_state(rset.getString("p_state"));
+	            
+	            list.add(p);
+	            
+	            if(list.size() == 0)
+	               throw new ProductsException("제품이 없습니다.");
+	         }
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	         throw new ProductsException(e.getMessage());
+	      }finally{
+	         close(rset);
+	         close(pstmt);
+	      }
+	      return list;
+	
+	}
+
+	public ArrayList<Product> drillSelectList(Connection con, int currentPage, int limit) throws ProductsException {
+		 ArrayList<Product> list = new ArrayList<Product>();
+	      PreparedStatement pstmt = null;
+	      ResultSet rset = null;
+	      
+	      String query = "select * from tb_product where p_item=? and rowid in (select max(rowid) from tb_product group by p_name)";
+	      
+	      try {
+	    	  pstmt = con.prepareStatement(query);
+				pstmt.setString(1, "드릴공구");
+				
+				
+				 rset = pstmt.executeQuery();
+	         
+	         
+	        
+	         
+	         while(rset.next()){
+	            Product p = new Product();
+	            
+	            p.setP_no(rset.getInt("p_no"));
+	            p.setP_name(rset.getString("p_name"));
+	            p.setP_price(rset.getInt("p_price"));
+	            p.setP_count(rset.getInt("p_count"));
+	            p.setP_local(rset.getString("p_local"));
+	            p.setP_main_image(rset.getString("p_main_image"));
+	            p.setP_detail_image(rset.getString("p_detail_image"));
+	            p.setP_item(rset.getString("p_item"));
+	            p.setP_state(rset.getString("p_state"));
+	            
+	            list.add(p);
+	            
+	            if(list.size() == 0)
+	               throw new ProductsException("제품이 없습니다.");
+	         }
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	         throw new ProductsException(e.getMessage());
+	      }finally{
+	         close(rset);
+	         close(pstmt);
+	      }
+	      return list;
+	}
+
+	public ArrayList<Product> chargeSelectList(Connection con, int currentPage, int limit) throws ProductsException {
+		ArrayList<Product> list = new ArrayList<Product>();
+	      PreparedStatement pstmt = null;
+	      ResultSet rset = null;
+	      
+	      String query = "select * from tb_product where p_item=? and rowid in (select max(rowid) from tb_product group by p_name)";
+	      
+	      try {
+	    	  pstmt = con.prepareStatement(query);
+				pstmt.setString(1, "충전공구");
+				
+				
+				 rset = pstmt.executeQuery();
+	         
+	         
+	        
+	         
+	         while(rset.next()){
+	            Product p = new Product();
+	            
+	            p.setP_no(rset.getInt("p_no"));
+	            p.setP_name(rset.getString("p_name"));
+	            p.setP_price(rset.getInt("p_price"));
+	            p.setP_count(rset.getInt("p_count"));
+	            p.setP_local(rset.getString("p_local"));
+	            p.setP_main_image(rset.getString("p_main_image"));
+	            p.setP_detail_image(rset.getString("p_detail_image"));
+	            p.setP_item(rset.getString("p_item"));
+	            p.setP_state(rset.getString("p_state"));
+	            
+	            list.add(p);
+	            
+	            if(list.size() == 0)
+	               throw new ProductsException("제품이 없습니다.");
+	         }
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	         throw new ProductsException(e.getMessage());
+	      }finally{
+	         close(rset);
+	         close(pstmt);
+	      }
+	      return list;
+	}
+
+	public ArrayList<Product> etcSelectList(Connection con, int currentPage, int limit) throws ProductsException {
+		ArrayList<Product> list = new ArrayList<Product>();
+	      PreparedStatement pstmt = null;
+	      ResultSet rset = null;
+	      
+	      String query = "select * from tb_product where p_item=? and rowid in (select max(rowid) from tb_product group by p_name)";
+	      
+	      try {
+	    	  pstmt = con.prepareStatement(query);
+				pstmt.setString(1, "기타공구");
+				
+				
+				 rset = pstmt.executeQuery();
+	         
+	         
+	        
+	         
+	         while(rset.next()){
+	            Product p = new Product();
+	            
+	            p.setP_no(rset.getInt("p_no"));
+	            p.setP_name(rset.getString("p_name"));
+	            p.setP_price(rset.getInt("p_price"));
+	            p.setP_count(rset.getInt("p_count"));
+	            p.setP_local(rset.getString("p_local"));
+	            p.setP_main_image(rset.getString("p_main_image"));
+	            p.setP_detail_image(rset.getString("p_detail_image"));
+	            p.setP_item(rset.getString("p_item"));
+	            p.setP_state(rset.getString("p_state"));
+	            
+	            list.add(p);
+	            
+	            if(list.size() == 0)
+	               throw new ProductsException("제품이 없습니다.");
+	         }
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	         throw new ProductsException(e.getMessage());
+	      }finally{
+	         close(rset);
+	         close(pstmt);
+	      }
+	      return list;
+	}
+
+	public ArrayList<Product> lifeEtcSelectList(Connection con, int currentPage, int limit) throws ProductsException {
+		ArrayList<Product> list = new ArrayList<Product>();
+	      PreparedStatement pstmt = null;
+	      ResultSet rset = null;
+	      
+	      String query = "select * from tb_product where p_item=? and rowid in (select max(rowid) from tb_product group by p_name)";
+	      
+	      try {
+	    	  pstmt = con.prepareStatement(query);
+				pstmt.setString(1, "기타생활용품");
+				
+				
+				 rset = pstmt.executeQuery();
+	         
+	         
+	        
+	         
+	         while(rset.next()){
+	            Product p = new Product();
+	            
+	            p.setP_no(rset.getInt("p_no"));
+	            p.setP_name(rset.getString("p_name"));
+	            p.setP_price(rset.getInt("p_price"));
+	            p.setP_count(rset.getInt("p_count"));
+	            p.setP_local(rset.getString("p_local"));
+	            p.setP_main_image(rset.getString("p_main_image"));
+	            p.setP_detail_image(rset.getString("p_detail_image"));
+	            p.setP_item(rset.getString("p_item"));
+	            p.setP_state(rset.getString("p_state"));
+	            
+	            list.add(p);
+	            
+	            if(list.size() == 0)
+	               throw new ProductsException("제품이 없습니다.");
+	         }
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	         throw new ProductsException(e.getMessage());
+	      }finally{
+	         close(rset);
+	         close(pstmt);
+	      }
+	      return list;
+	}
 }

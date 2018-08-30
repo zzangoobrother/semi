@@ -247,4 +247,56 @@ public class RentalDao {
 
 		return p;
 	}
+	
+	public ArrayList<Rental> myrent(Connection con, String mId) throws RentalException{
+	      PreparedStatement pstmt = null;
+	      ResultSet rset = null;
+	      ArrayList<Rental> list = new ArrayList<Rental>();
+	      
+	      String query = "select * from tb_rental join tb_product using (p_no) where m_id = ?";
+	      try {
+	         pstmt = con.prepareStatement(query);
+	         pstmt.setString(1, mId);
+	         
+	         rset = pstmt.executeQuery();
+	         
+	         while(rset.next()){
+	            Rental rental = new Rental();
+	            
+	            
+	            rental.setmId(mId);
+	            rental.setrNo(rset.getString("r_no"));
+	            rental.setpCount(rset.getInt("p_count"));
+	            rental.setpNo(rset.getInt("p_no"));
+	            rental.setrPrice(rset.getInt("r_price"));
+	            rental.setrDate(rset.getString("rental_date"));
+	            rental.setrStartDate(rset.getString("rental_start_date"));
+	            rental.setrReturnDate(rset.getString("r_return_date"));
+	            rental.setRReturnLastDate(rset.getString("r_return_last_date"));
+	            rental.setrBookingDate(rset.getString("r_booking_date"));
+	            rental.setpState(rset.getString("p_state"));
+	            
+
+	            list.add(rental);
+	            
+	            if(list.size() == 0){
+	               throw new RentalException("내역이 없습니다.");
+	            }
+	         
+	      
+	         }
+	      } catch (Exception e) {
+	         e.printStackTrace();
+	         throw new RentalException(e.getMessage());
+	      }finally{
+	         close(rset);
+	         close(pstmt);
+	      }
+	      return list;
+	   }
+	
+	
+	
+	
+	
 }

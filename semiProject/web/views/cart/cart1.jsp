@@ -1,18 +1,16 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@	page import="semi.cart.model.vo.Cart, java.util.ArrayList" %>
+<%@	page import="semi.cart.model.vo.Cart, java.util.ArrayList, semi.products.model.vo.Product" %>
 <%
-	ArrayList<Cart> list = (ArrayList<Cart>)request.getAttribute("list");
+	
+    Product product = (Product)request.getAttribute("product");
+    ArrayList<String> list = (ArrayList<String>)request.getAttribute("list");
+    String[] slideimg = product.getP_main_image().split(",");
 	
 	//String p_Name = (String)request.getAttribute("p_Name");
 	//int p_Price = Integer.parseInt(request.getAttribute("p_Price"));
 	
-	Cart c1 = new Cart();
-	for(Cart c : list){
-		c = list.get(0);
-		System.out.print(c);
-		c1 = c;
-	}
+	
 %>
 
 <%@ include file="../../header.jsp" %>
@@ -38,6 +36,14 @@
  
 <script type="text/javascript"> 
 $(function(){ 
+	$(".showme").html("<img src='" + JSON.parse(localStorage.getItem('<%= product.getP_name() %>').split(",")[3]) + "'>'");
+	
+	
+	
+	
+	
+	
+	
 	//전체선택 체크박스 클릭 
 	$("#allCheck").click(function(){ 
 
@@ -52,7 +58,23 @@ $(function(){
 		}
 		});
 	}); 
+	
+	
+
+for(var i =0; i < localStorage.length; i++){
+	   console.log(localStorage.getItem(localStorage.key(i)));
+	}
+	
+
+	
 	</script>
+	
+	
+	  
+                            
+	
+	
+	
 	<h2>장바구니</h2>
 <div class='left-box' style="overflow-y: scroll; height:60%;">
 <table border="0" cellspacing="0" width="100%" >
@@ -70,24 +92,24 @@ $(function(){
 <input type="checkbox">
 </td>
 <td rowspan="3" colspan="0" width="200">
-<img src="/semi/resources/images/main/01_1.jpg" width="200" height="150" value="<%= c1.getP_Main_Image() %>">
+
 </td>
 <td>대여 물품명</td>
 <td> 
 <input type="text" style="width: 200px; height: 30px; text-align: right;" class="form-control"
-			value="<%= c1.getP_Name() %>">
+			value="">
 </td></tr>
 <tr>
 <td>대여 물품가격</td>
 <td>
 <input type="text" style="width: 200px; height: 30px; text-align: right;" class="form-control"
-		value="<%= c1.getP_Price() %>">
+		value="">
 </td></tr>
 <tr>
 <td>대여 가능일</td>
 <td>
 <input type="text" style="width: 200px; height: 30px; text-align: right;" class="form-control"
-		value="<%= c1.getP_State() %>">
+		value="">
 </td></tr>
 <!-- 두번째 정보 -->
 <tr>
@@ -95,24 +117,25 @@ $(function(){
 <input type="checkbox" name="box">
 </td>
 <td rowspan="3" colspan="0" width="200">
-<img src="/semi/resources/images/main/01._1.png" width="200" height="150" value="<%= c1.getP_Main_Image() %>">
+<div class="showme"></div>
+<img src="/semi/resources/images/main/01._1.png" width="200" height="150" value="">
 </td>
 <td>대여 물품명</td>
 <td> 
 <input type="text" style="width: 200px; height: 30px; text-align: right;" class="form-control" 
-			value="<%= c1.getP_Name() %>">
+			value="">
 </td></tr>
 <tr>
 <td>대여 물품가격</td>
 <td>
 <input type="text" style="width: 200px; height: 30px; text-align: right;" class="form-control"
-			 value="<%= c1.getP_Price() %>">
+			 value="">
 </td></tr>
 <tr>
 <td>대여 가능일</td>
 <td>
 <input type="text" style="width: 200px; height: 30px; text-align: right;" class="form-control"
-			 value="<%= c1.getP_State() %>">
+			 value="">
 </td></tr>
 
 </table><br>

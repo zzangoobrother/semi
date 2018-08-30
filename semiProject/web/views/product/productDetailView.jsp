@@ -13,42 +13,145 @@
 
 		<script type="text/javascript" src="/semi/resources/js/moment.min.js"></script>
 		<script type="text/javascript" src="/semi/resources/js/daterangepicker.js"></script>
+		
 		<link rel="stylesheet" href="/semi/resources/css/daterangepicker.css">
 			
-		<!-- <script type="text/javascript">
-		$(function() {
 		
-		  $('input[name="datefilter"]').daterangepicker({
-		      autoUpdateInput: false,
-		      locale: {
-		          cancelLabel: 'Clear'
-		      }
-		  });
-		
-		  $('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {
-		      $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
-		  });
-		
-		  $('input[name="datefilter"]').on('cancel.daterangepicker', function(ev, picker) {
-		      $(this).val('');
-		  });
-		
-		});
-		</script> -->
 		 <script>
+			(function () {
+				 "use strict";		 
+				 
+					$(function() {
+						
+						    /* 달력 */
+		        		  $('input[name="daterange"]').daterangepicker({
+		        			  autoUpdateInput: false,
+		        		    opens: 'left'
+		        		    
+		        		  }, function(start, end, label) {
+		        		    console.log("selected date " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
+		        		            		    
+		        		     
+		        	         var startDate = new Date(start.format('YYYY-MM-DD'));
+		        	         var endDate = new Date(end.format('YYYY-MM-DD'));
+		        	         
+		        	         var diffDay = endDate - startDate;
+		        	         var currDay = 24 * 60 * 60 * 1000;
+		        	         
+		        	         var totalHours = endDate.getDate() - startDate.getDate();
+		        	         
+		        	          var pPrice = <%= product.getP_price() %>;
+		        	      
+		        	         console.log("일 가격" + pPrice);
+		        	         console.log("몇 박 며칠 인가염? : " + totalHours);
+		        	         
+		        	         
+		        	         if(endDate < startDate){
+		        	        	 
+		        	        	 alert("날짜를 다시 선택 해주세요.");
+		        	        	 
+		        	         }else{
+		        	        	 document.getElementById("dateSelected").innerHTML = start.format('YYYY-MM-DD') + "부터 " + end.format('YYYY-MM-DD') + "까지";
+		        	           	 
+		        	        	 document.getElementById("rentaldate").innerHTML = parseInt(diffDay/currDay) + "일";
+		        	        	 
+		        	        	 document.getElementById("totalPrice").innerHTML = (parseInt(diffDay/currDay)) * (pPrice);  
+		        	         };   	 
+		        	         
+		        	         
+		        		  });
+		        		  
+		                   /* 장바구니 버튼 클릭시 */
 
-		 
-			$(function() {
-			  $('input[name="daterange"]').daterangepicker({
-				  autoUpdateInput: false,
-			    opens: 'left'
-			    
-			  }, function(start, end, label) {
-			    console.log("selected date " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
-			    document.getElementById("dateSelected").innerHTML = "선택 날짜 : " + start.format('YYYY-MM-DD') + "부터 " + end.format('YYYY-MM-DD') + "까지";
-			    
-			  });
-			});
+		                    $("#add").click(function(){
+		                    	
+		                    	 localStorage.removeItem('<%= product.getP_name() %>');
+		                    
+		                    	/* localStorage 저장 */
+		                    	if( !localStorage.<%= product.getP_name() %> ){
+		                  	      localStorage.<%= product.getP_name() %> = "[]";
+		                  	    }
+
+		                  	    var list = JSON.parse(localStorage.<%= product.getP_name() %>);	
+		                  	    
+		                        if( list.indexOf($(".pdname").text()) == -1 ){
+		                  	      list.push($(".pdname").text());  
+		                  	    }
+
+		                        if( list.indexOf($(".dateSelected").text()) == -1 ){
+		                  	      list.push($(".dateSelected").text());
+		                  	    }
+
+		                        if( list.indexOf($(".selected").text()) == -1 ){
+		                   	      list.push($(".selected").text());
+		                   	    }
+
+		                        if( list.indexOf($(".pdimg").text()) == -1 ){
+		                   	      list.push($(".pdimg").text());
+		                   		}
+		                  	    
+		                  	    if( list.indexOf($(".totalPrice").text()) == -1 ){
+		                    		list.push($(".totalPrice").text());
+		                    	}
+		                  	    
+		                  	    localStorage.<%= product.getP_name() %> = JSON.stringify(list);
+		                  	    $("#display").html(localStorage.<%= product.getP_name() %>);
+
+		                  	    /* 서블릿 */
+		                        var plocal = document.getElementById("selectpicker").value;        
+
+		                        $.ajax({
+		                            url : "/semi/select",
+		                            type : "post",
+		                            data : {
+		                                pname: "<%= product.getP_name()%>"
+		                                , plocal: plocal
+		                            },
+		                            success: function(){
+		                               
+		                                var cartOk = confirm('장바구니에 담겼습니다. 장바구니로 이동하시겠습니까?');
+
+		                                if(cartOk){
+		                                    location.href = 'views/cart/cart1.jsp';
+		                                }
+		                            },error : function(jqXHR, textstatus, errorThrown){
+		                                console.dir("error : " + jqXHR + textstatus + errorThrown);
+		                            }
+		                          
+		                        });
+		                    });
+
+		                  
+		            	  
+		            	  
+		                  /*장바구니 removeall 버튼 클릭시*/
+		            	  $("#removeAll").click(function(){
+		            		  
+		            		  localStorage.clear("<%= product.getP_name() %>");
+		            		  
+		            	  });
+		            	 
+		            	  
+		            	 
+		            	  
+		                  /*$(".showme").html("<img src='" + JSON.parse(localStorage.getItem('포터블그라인더').split(",")[3]) + "'>'");*/
+		            	  
+
+		                  for(var i =0; i < localStorage.length; i++){
+		                	   console.log(localStorage.getItem(localStorage.key(i)));
+		                	}
+		                  
+		                 /* console.log(JSON.parse(localStorage.getItem('포터블그라인더').split(",")[3]));*/
+		               
+					
+					/*function centerSelect(){
+		        		var x = document.getElementById("selectpicker").value;
+		        		document.getElementById("selected").innerHTML = x;
+		        		
+		        	} 
+					*/
+		        }); 
+			}());
 			</script>  
 		
 		
@@ -58,7 +161,7 @@
 	<div class="container">
 		<div class="row">
 			<div class="page-head-content">
-				<h1 class="page-title"><%=product.getP_name() %></h1>
+				<h1 class="page-title"><%= product.getP_name() %></h1>
 			</div>
 		</div>
 	</div>
@@ -69,15 +172,16 @@
 
                 <div class="clearfix padding-top-40" >
 
-                    <div class="col-md-8 single-property-content prp-style-1" style="width: 66.66666667%">
-                        <div class="row">
-                            <div class="light-slide-item">            
+                    <div class="col-md-8 single-property-content prp-style-1" style="width: 66.66666667%; ">
+                        <div class="row" >
+                            <div class="light-slide-item" >            
                                 <div class="clearfix">
-                                    <ul id="image-gallery" class="gallery list-unstyled cS-hidden" style="width:3756px;">
+                                	<ul id="bg-slider" class="owl-carousel owl-theme" >
+                                    <!-- <ul id="image-gallery" class="gallery list-unstyled cS-hidden" > -->
                                     <% for(String si : slideimg ) {%>
                                     	
-                                        <li data-thumb="<%= si %>"> 
-                                            <img src="<%= si %>" />
+                                        <li data-thumb="<%= si %>" > 
+                                            <img src="<%= si %>" style="margin-left: 30%" />
                                         </li>
                                     <% } %>   
              
@@ -96,14 +200,7 @@
 
 
 
-                            <div class="section">
-                                <h4 class="s-property-title">Description</h4>
-                                <div class="s-property-content">
-                                    <p>Nulla quis dapibus nisl. Suspendisse ultricies Nulla quis dapibus nisl. Suspendisse ultricies commodo arcu nec pretium. Nullam sed arcu ultricies commodo arcu nec pretium. Nullam sed arcu ultricies Nulla quis dapibus nisl. Suspendisse ultricies commodo arcu nec pretium. Nullam sed arcu ultricies Nulla quis dapibus nisl. Suspendisse ultricies commodo arcu nec pretium. Nullam sed arcu ultricies                                </p>
-                                 
-                                </div>
-                            </div>
-                            
+                                                     
                      
                           
                           
@@ -133,20 +230,13 @@
 
                                     <li>
                                         <span class="col-xs-6 col-sm-4 col-md-4 add-d-title">보유한 동사무소</span>
-                                        <span class="col-xs-6 col-sm-8 col-md-8 add-d-entry"></span>
+                                        <span class="col-xs-6 col-sm-8 col-md-8 add-d-entry"><% for(String of : list ) { %>
+                                        		<%= of %>/
+                                        		<% } %></span>
                                     </li>
 
 
-                                    <li>
-                                        <span class="col-xs-6 col-sm-4 col-md-4 add-d-title">View</span>
-                                        <span class="col-xs-6 col-sm-8 col-md-8 add-d-entry">Intracoastal View,Direct ew</span>
-                                    </li>
-
-                                    <li>
-                                        <span class="col-xs-6 col-sm-4 col-md-4 add-d-title">Waterfront Description:</span>
-                                        <span class="col-xs-6 col-sm-8 col-md-8 add-d-entry">Intracoastal Front,Ocean Access</span>
-                                    </li> 
-
+                                   
                                 </ul>
                             </div>  
                             
@@ -154,22 +244,7 @@
                             
                             <!-- End additional-details area  -->
 
-                            <div class="section property-features">      
-
-                                <h4 class="s-property-title">Features</h4>                            
-                                <ul>
-                                    <li><a href="properties.html">Swimming Pool</a></li>   
-                                    <li><a href="properties.html">3 Stories</a></li>
-                                    <li><a href="properties.html">Central Cooling</a></li>
-                                    <li><a href="properties.html">Jog Path 2</a></li>
-                                    <li><a href="properties.html">2 Lawn</a></li>
-                                    <li><a href="properties.html">Bike Path</a></li>
-                                    
-                                       
-                                </ul>
-									   
-                            </div>
-                            <!-- End features area  -->
+                            
 
                             <div class="section property-video"> 
                                 <h4 class="s-property-title">상세이미지</h4> 
@@ -179,20 +254,14 @@
                                     </a>
                                 </div>
                             </div>
-                            <!-- End video area  -->
+                           
                             
                             
                             
                             
                             
 
-                            <div class="section property-share"> 
-                                <h4 class="s-property-title">Share width your friends </h4> 
-                                <div class="roperty-social">
-                                    
-                                </div>
-                            </div>
-                            <!-- End video area  -->
+                           
                             
                         </div>
                     </div>
@@ -224,24 +293,27 @@
 						
                          <div class="panel panel-default sidebar-menu similar-property-wdg wow fadeInRight animated">
                                 <div class="panel-heading">
-                                    <h3 class="panel-title">Similar Products</h3>
+                                    <h3 class="panel-title">물품 선택</h3>
                                 </div>
                                 <div class="panel-body recent-property-widget">
                                         <ul>
                                         <li>
                                             <div class="col-md-3 col-sm-3 col-xs-3 blg-thumb p0" style="width: 85px; height: 35px;">
-                                                <h6>물품&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</h6>
+                                                <h6>물품&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h6>
                                                 
                                             </div>
                                             <div class="col-md-8 col-sm-8 col-xs-8 blg-entry" style="width: 226.66px; height: 71px;">
-                                                <h6><select id="centerSelect" onchange="centerSelect()">
-                                        		<option>주민센터 선택</option>
+                                                 
+                                        	
+                                        	<select id="selectpicker" class="selectpicker" data-live-search="true" data-live-search-style="begins" title="주민센터 선택" onchange="centerSelect()">
+
+                                                
                                         		<% for(String of : list ) { %>
                                         		<option value="<%= of %>"><%= of %></option>
                                         		<% } %>
-                                        	</select></h6>
-                                        	
-                                        	
+                                             </select> 
+                                              
+                                             
                                         	
                                                 
                                             </div>
@@ -259,21 +331,7 @@
                                             
                                             
                                             
-                                            <script>
-                                            	function centerSelect(){
-                                            		var x = document.getElementById("centerSelect").value;
-                                            		document.getElementById("selected").innerHTML = "선택 동사무소 : " + x;
-                                            		
-                                            	}
-                                            
-                                            	function dateSelect(){
-                                            		var d = document.getElementById("dateSelect").value;
-                                            		document.getElementById("dateSelected").innerHTML = "선택 날짜 : " + d;
-                                            	}
-                                            	
-                                            	
-                                            	
-                                            </script>
+                                           
                                         </li>
                                         
                                         
@@ -287,14 +345,7 @@
 																																	    font-size: 16px;
 																																	    padding: 5px 15px;
 																																	    border-radius: 3px;"/> 
-                                        	<!-- <input type="text" id="dateSelect" name="datefilter" onchange="dateSelect()" value="대여날짜를 선택하세요" style="outline: 0;
-																																	    border: none;
-																																	    width: 100%;
-																																	    height: inherit;
-																																	    color: #333333;
-																																	    font-size: 16px;
-																																	    padding: 5px 15px;
-																																	    border-radius: 3px;" /> -->
+                                        	
                                         	</div>
                                         </li>
                                         
@@ -307,82 +358,6 @@
                             
                             
                             
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                      <script type="text/javascript">
-                      
-                      $(document).ready(function(){
-                    	  $("#add").click(function(){
-                    	    if( !localStorage.test ){
-                    	      localStorage.test = "[]";
-                    	    }               
-                    	    var list = JSON.parse(localStorage.test);
-                    	    if( list.indexOf($(".pdname").text()) == -1 ){
-                    	      list.push($(".pdname").text());
-                    	    }
-                    	    localStorage.test = JSON.stringify(list);
-                    	    $("#display").html(localStorage.test);
-                    	  }) 
-                    	  
-                    	  $("#remove").click(function(){
-                    	     if(localStorage.test){
-                    	       var list = JSON.parse(localStorage.test);
-                    	       var idx = list.indexOf($(".pdname").val());
-                    	       if( idx > -1 ){
-                    	         list.splice(idx,1);
-                    	       }
-                    	       localStorage.test = JSON.stringify(list);
-                    	     }
-                    	     $("#display").html(localStorage.test);
-                    	  });
-                    	  $("#display").html(localStorage.test);
-                    	});
-                      
-                      
-                      
-                      
-                      
-                      </script>      
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
-                            
                                              
 
                             <div class="panel panel-default sidebar-menu wow fadeInRight animated">
@@ -390,193 +365,74 @@
                                     <h3 class="panel-title"> 선택 정보  </h3>
                                 </div>
                                 
-                                	<a id="selected"></a><br>
-                                	<a id="dateSelected"></a><br>
-                                	<a id="totalprice">총 금액 : </a><br><br>
-                                	<a class="pdimg"><%= product.getP_main_image().split(",")[0] %></a>
-                                	<a class="pdname"><%= product.getP_name() %></a>
-                                
-                                <div style="width: 100%; ">
-                                        	<input type="button" id="add" value="add">
-                                        	<input type="button" id="remove" value="remove">
-                                        	<a><input style="width: 30%; border-radius: 3px;" type="button" value="장바구니" onclick="location.href='/semi/select'"  ></a>  &nbsp; 
-                                        	<a><input style="width: 30%;" type="button" value="목록보기" onclick="location.href='/semi/plist'"></a> &nbsp; 
-                                         	<a><input style="width: 30%;" type="button" value="대여하기" onclick="location.href='/semi/views/payment/paymentProgressView.jsp'"></a>
-                                         	
-                                </div> 
-                                <div id="display" style="border:1px solid gray"></div>
+                               
                                 
                                 
-                                
-                            </div>
-                            
-
-                            <div class="panel panel-default sidebar-menu wow fadeInRight animated" >
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">Smart search</h3>
+                                <div class="col-md-3 col-sm-3 col-xs-3 blg-thumb p0" style="width: 85px; height: 35px;">
+                                                <h6>선택 날짜 :</h6>
+                                                
                                 </div>
-                                <div class="panel-body search-widget">
-                                    <form action="" class=" form-inline"> 
-                                        <fieldset>
-                                            <div class="row">
-                                                <div class="col-xs-12">
-                                                    <input type="text" class="form-control" placeholder="Key word">
-                                                </div>
-                                            </div>
-                                        </fieldset>
-
-                                        <fieldset>
-                                            <div class="row">
-                                                <div class="col-xs-6">
-
-                                                    <select id="lunchBegins" class="selectpicker" data-live-search="true" data-live-search-style="begins" title="Select Your City">
-
-                                                        <option>New york, CA</option>
-                                                        <option>Paris</option>
-                                                        <option>Casablanca</option>
-                                                        <option>Tokyo</option>
-                                                        <option>Marraekch</option>
-                                                        <option>kyoto , shibua</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-xs-6">
-
-                                                    <select id="basic" class="selectpicker show-tick form-control">
-                                                        <option> -Status- </option>
-                                                        <option>Rent </option>
-                                                        <option>Boy</option>
-                                                        <option>used</option>  
-
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </fieldset>
-
-                                        <fieldset class="padding-5">
-                                            <div class="row">
-                                                <div class="col-xs-6">
-                                                    <label for="price-range">Price range ($):</label>
-                                                    <input type="text" class="span2" value="" data-slider-min="0" 
-                                                           data-slider-max="600" data-slider-step="5" 
-                                                           data-slider-value="[0,450]" id="price-range" ><br />
-                                                    <b class="pull-left color">2000$</b> 
-                                                    <b class="pull-right color">100000$</b>                                                
-                                                </div>
-                                                <div class="col-xs-6">
-                                                    <label for="property-geo">Property geo (m2) :</label>
-                                                    <input type="text" class="span2" value="" data-slider-min="0" 
-                                                           data-slider-max="600" data-slider-step="5" 
-                                                           data-slider-value="[50,450]" id="property-geo" ><br />
-                                                    <b class="pull-left color">40m</b> 
-                                                    <b class="pull-right color">12000m</b>                                                
-                                                </div>                                            
-                                            </div>
-                                        </fieldset>                                
-
-                                        <fieldset class="padding-5">
-                                            <div class="row">
-                                                <div class="col-xs-6">
-                                                    <label for="price-range">Min baths :</label>
-                                                    <input type="text" class="span2" value="" data-slider-min="0" 
-                                                           data-slider-max="600" data-slider-step="5" 
-                                                           data-slider-value="[250,450]" id="min-baths" ><br />
-                                                    <b class="pull-left color">1</b> 
-                                                    <b class="pull-right color">120</b>                                                
-                                                </div>
-
-                                                <div class="col-xs-6">
-                                                    <label for="property-geo">Min bed :</label>
-                                                    <input type="text" class="span2" value="" data-slider-min="0" 
-                                                           data-slider-max="600" data-slider-step="5" 
-                                                           data-slider-value="[250,450]" id="min-bed" ><br />
-                                                    <b class="pull-left color">1</b> 
-                                                    <b class="pull-right color">120</b>
-
-                                                </div>
-                                            </div>
-                                        </fieldset>
-
-                                        <fieldset class="padding-5">
-                                            <div class="row">
-                                                <div class="col-xs-6">
-                                                    <div class="checkbox">
-                                                        <label> <input type="checkbox" checked> Fire Place</label>
-                                                    </div> 
-                                                </div>
-
-                                                <div class="col-xs-6">
-                                                    <div class="checkbox">
-                                                        <label> <input type="checkbox"> Dual Sinks</label>
-                                                    </div>
-                                                </div>                                            
-                                            </div>
-                                        </fieldset>
-
-                                        <fieldset class="padding-5">
-                                            <div class="row">
-                                                <div class="col-xs-6"> 
-                                                    <div class="checkbox">
-                                                        <label> <input type="checkbox" checked> Swimming Pool</label>
-                                                    </div>
-                                                </div>  
-                                                <div class="col-xs-6"> 
-                                                    <div class="checkbox">
-                                                        <label> <input type="checkbox" checked> 2 Stories </label>
-                                                    </div>
-                                                </div>  
-                                            </div>
-                                        </fieldset>
-
-                                        <fieldset class="padding-5">
-                                            <div class="row">
-                                                <div class="col-xs-6"> 
-                                                    <div class="checkbox">
-                                                        <label><input type="checkbox"> Laundry Room </label>
-                                                    </div>
-                                                </div>  
-                                                <div class="col-xs-6"> 
-                                                    <div class="checkbox">
-                                                        <label> <input type="checkbox"> Emergency Exit</label>
-                                                    </div>
-                                                </div>  
-                                            </div>
-                                        </fieldset>
-
-                                        <fieldset class="padding-5">
-                                            <div class="row">
-                                                <div class="col-xs-6"> 
-                                                    <div class="checkbox">
-                                                        <label>  <input type="checkbox" checked> Jog Path </label>
-                                                    </div>
-                                                </div>  
-                                                <div class="col-xs-6"> 
-                                                    <div class="checkbox">
-                                                        <label>  <input type="checkbox"> 26' Ceilings </label>
-                                                    </div>
-                                                </div>  
-                                            </div>
-                                        </fieldset>
-
-                                        <fieldset class="padding-5">
-                                            <div class="row">
-                                                <div class="col-xs-12"> 
-                                                    <div class="checkbox">
-                                                        <label>  <input type="checkbox"> Hurricane Shutters </label>
-                                                    </div>
-                                                </div>  
-                                            </div>
-                                        </fieldset>
-
-                                        <fieldset >
-                                            <div class="row">
-                                                <div class="col-xs-12">  
-                                                    <input class="button btn largesearch-btn" value="Search" type="submit">
-                                                </div>  
-                                            </div>
-                                        </fieldset>                                     
-                                    </form>
+                                <div class="col-md-8 col-sm-8 col-xs-8 blg-entry" style="width: 226.66px; height: 71px; line-height: 35px;">
+                                                 
+                                	<a id="dateSelected" class="dateSelected"></a><br>
                                 </div>
-                            </div>
+                                
+                                
+                                <div class="col-md-3 col-sm-3 col-xs-3 blg-thumb p0" style="width: 85px; height: 35px;">
+                                                <h6>대여 기간 :  &nbsp;</h6>
+                                                
+                                </div>
+                                <div class="col-md-8 col-sm-8 col-xs-8 blg-entry" style="width: 226.66px; height: 71px; line-height: 35px;">
+                                                 
+                                	<a id="rentaldate" class="rentaldate" ></a><br>
+                                </div>
+                                
+                                <div class="col-md-3 col-sm-3 col-xs-3 blg-thumb p0" style="width: 85px; height: 35px;">
+                                                <h6> &nbsp; &nbsp;총 가격 :  &nbsp;</h6>
+                                                
+                                </div>
+                                <div class="col-md-8 col-sm-8 col-xs-8 blg-entry" style="width: 226.66px; height: 71px; line-height: 35px;">
+                                                 
+                                	<a id="totalPrice" class="totalPrice" ></a ><br><br>
+                                </div>
+                                
+                                
+                                
+                                
+                                
+                                	<a id="selected" class="selected" ></a><br>
+                                	<a id="dateSelected" class="dateSelected"></a><br>
+                                	<a id="rentaldate" class="rentaldate" ></a><br>
+                                	<a id="totalPrice" class="totalPrice" ></a ><br><br>
+                                	 <a class="pdimg" hidden><%= product.getP_main_image().split(",")[0] %></a><br>
+                                	<a class="pdname" hidden><%= product.getP_name() %></a> 
+
+						<div style="width: 100%;">
+							 				
+                                     
+
+							<div >
+								 
+									<div  >
+								
+											<input class="button btn largesearch-btn"  style="width: 33%; margin-left: 10%; color: #fff; background-color: #fdc600; border-color: fdc600;  font-weight: 600%;  border-radius: 10px;"id="add"  type="button" value="대여하기" onclick="location.href='/semi/select'">
+											<input class="button btn largesearch-btn"  style="width: 33%; margin-left: 10%; color: #fff; background-color: #fdc600; border-color: fdc600;  font-weight: 600%;   border-radius: 10px;" type="button" value="목록보기" onclick="location.href='/semi/plist'"> 
+											
+										
+										</div> 
+								 
+							</div>
+						 </div> 
+
+
+
+
+					</div>
+					
+
+
+
+					
 
                         </aside>
                     </div>

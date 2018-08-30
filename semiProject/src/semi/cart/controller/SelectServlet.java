@@ -1,17 +1,17 @@
 package semi.cart.controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.io.PrintWriter;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.simple.JSONObject;
+
 import semi.cart.model.service.CartService;
-import semi.cart.model.vo.Cart;
 
 
 
@@ -37,7 +37,24 @@ public class SelectServlet extends HttpServlet {
 		
 		response.setContentType("text/html; charset=utf-8");
 		
-		CartService cservice = new CartService();
+		String pName = request.getParameter("pname");
+		String pLocal = request.getParameter("plocal");
+		
+		CartService cartService = new CartService();
+		
+		try {
+			int pNo = cartService.selectPno(pName, pLocal);
+			System.out.println("pNo 테스트 : " + pNo);
+
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		
+		
+		
+		/*CartService cservice = new CartService();
 		
 		RequestDispatcher view = null;
 		try {
@@ -56,7 +73,14 @@ public class SelectServlet extends HttpServlet {
 			view = request.getRequestDispatcher("views/cart/cartError.jsp");
 			request.setAttribute("message", e.getMessage());
 			view.forward(request, response);
-		}
+		}*/
+	
+	
+	
+	
+	
+	
+	
 	}
 		
 		

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import semi.member.exception.MemberException;
 import semi.member.model.dao.MemberDao;
 import semi.member.model.vo.Member;
+import semi.review.model.vo.ReviewBoard;
 
 public class MemberService {
 
@@ -87,6 +88,13 @@ public class MemberService {
 		return result;
 	}
 	
+	public ArrayList<ReviewBoard> myboard(String mId) throws MemberException{
+		Connection con = getConnection();
+		ArrayList<ReviewBoard> list = new MemberDao().myboard(con, mId);
+		close(con);
+		return list;
+	}
+	
 	//관리자용------------------------------------------------------------
 		//페이지 당 조회 회원 리밋걸기 위해 회원 수 count(*) 조회
 		public int mGetListCount() throws MemberException {
@@ -141,4 +149,5 @@ public class MemberService {
 			return result;
 		}
 		//관리자용 end
+
 }

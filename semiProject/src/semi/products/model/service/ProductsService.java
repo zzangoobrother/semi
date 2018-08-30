@@ -49,6 +49,52 @@ public class ProductsService {
 	
 	}
 
+	public ArrayList<Product> selectProduct(String keyword, String localselect) throws ProductsException{
+	      Connection con = getConnection();
+	      ArrayList<Product> list = new ProductsDao().selectProduct(con, keyword, localselect);
+	      close(con);
+	      return list;
+	   }
+
+	public ArrayList<Product> cutOffSelectList(int currentPage, int limit) throws ProductsException {
+		Connection con = getConnection();
+		ArrayList<Product> list = new ProductsDao().cutOffSelectList(con, currentPage, limit);
+		close(con);
+		System.out.println("servicecutOffSelectList");
+		return list;
+	}
+
+	public ArrayList<Product> drillSelectList(int currentPage, int limit) throws ProductsException {
+		Connection con = getConnection();
+		ArrayList<Product> list = new ProductsDao().drillSelectList(con, currentPage, limit);
+		close(con);
+		
+		return list;
+	}
+
+	public ArrayList<Product> chargeSelectList(int currentPage, int limit) throws ProductsException {
+		Connection con = getConnection();
+		ArrayList<Product> list = new ProductsDao().chargeSelectList(con, currentPage, limit);
+		close(con);
+		
+		return list;
+	}
+
+	public ArrayList<Product> etcSelectList(int currentPage, int limit) throws ProductsException {
+		Connection con = getConnection();
+		ArrayList<Product> list = new ProductsDao().etcSelectList(con, currentPage, limit);
+		close(con);
+		
+		return list;
+	}
+
+	public ArrayList<Product> lifeEtcSelectList(int currentPage, int limit) throws ProductsException {
+		Connection con = getConnection();
+		ArrayList<Product> list = new ProductsDao().lifeEtcSelectList(con, currentPage, limit);
+		close(con);
+		
+		return list;
+	}
 	
 
 }
