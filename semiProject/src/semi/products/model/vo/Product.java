@@ -13,8 +13,17 @@ public class Product implements java.io.Serializable {
 	private String p_detail_image;
 	private String p_item;
 	private String p_state;
+	private String gu;
 	
 	
+	public String getGu() {
+		return gu;
+	}
+
+	public void setGu(String gu) {
+		this.gu = gu;
+	}
+
 	public Product() {
 		// TODO Auto-generated constructor stub
 	}

@@ -6,6 +6,19 @@
 <%@ include file="../../header.jsp" %>
 
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=b07804eb6c910b861023a656cfa85814&libraries=services"></script>
+<style type="text/css">
+	#astyle {
+		float: left;
+		padding: 0 14px;
+		line-height: 38px;
+		text-decoration: none;
+		background-color: #ffffff;
+		border: 1px solid #dddddd;
+		color: #d27e04;
+		outline: 0;
+		
+	}
+</style>
 
 <div>
 	<!-- 검색구역 -->
@@ -72,38 +85,37 @@
 					$(".page").html("");
 					if(currentPage <= 1) {	
 					} else {
-						$(".page").append("<li><a href='#' onclick='paging(1)'><<</a></li>");
+						$(".page").append("<li><a id='astyle' href='#' onclick='paging(1)'><<</a></li>");
 					}
 					
 					if(currentPage == 1) {
 					} else {
-						$(".page").append("<li><a href='#' onclick='paging(" + currentPage + " - 1)'><</a></li>");
+						$(".page").append("<li><a id='astyle' href='#' onclick='paging(" + currentPage + " - 1)'><</a></li>");
 					}
 					
 					for (var p = startPage; p <= endPage; p++) { 
 						if (p == currentPage) {
-							$(".page").append("<li><a href='#'><font color='red'>" + p + "</font></a></li>");
+							$(".page").append("<li><a id='astyle' href='#'><font color='red'>" + p + "</font></a></li>");
 						} else {
-							$(".page").append("<li><a href='#' onclick='paging(" + p + ")'>" + p + "</a></li>");
+							$(".page").append("<li><a id='astyle' href='#' onclick='paging(" + p + ")'>" + p + "</a></li>");
 						}
 					}
 					
 					if (currentPage == maxPage) {
 					} else {
-						$(".page").append("<li><a href='#' onclick='paging(" + currentPage + " + 1)'> ></a></li>");
+						$(".page").append("<li><a id='astyle' href='#' onclick='paging(" + currentPage + " + 1)'> ></a></li>");
 					}
 
 					if (currentPage >= maxPage) {
 					} else {
-						$(".page").append("<li><a href='#' onclick='paging(" + maxPage + ")'> >> </a></li>");
+						$(".page").append("<li><a id='astyle' href='#' onclick='paging(" + maxPage + ")'> >> </a></li>");
 					}
 				},
 					error : function(jqXHR, textstatus, errorThrown){
 						console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
 					}
-			});		
+			});	
 		});
-		
 		
 		function paging(page) {
 			var currentPage;
@@ -169,7 +181,7 @@
 
 			var values = "<tr><th style='width: 15%; border-bottom: 2px solid rgb(221, 221, 221);'>구 이름</th><th style='width: 65%; border-bottom: 2px solid rgb(221, 221, 221);'>상세 주소</th><th style='width: 20%; border-bottom: 2px solid rgb(221, 221, 221);'>주민센터</th></tr>";
 			for(var i in json.list){
-				values += "<tr class='markadd'><td style='border-bottom: 2px solid rgb(221, 221, 221); padding: .75rem;'>" + 
+				values += "<tr><td style='border-bottom: 2px solid rgb(221, 221, 221); padding: .75rem;'>" + 
 				decodeURIComponent(json.list[i].local) + "</td><td class='address' style='border-bottom: 2px solid rgb(221, 221, 221); padding: .75rem;'>" + 
 				decodeURIComponent(json.list[i].address).replace("+", " ").replace("+", " ").replace("+", " ").replace("+", " ").replace("+", " ").replace("+", " ").replace("+", " ").replace("+", " ") + 
 				"</td><td class='servicecenter' style='border-bottom: 2px solid rgb(221, 221, 221); padding: .75rem;'>" + 
@@ -195,7 +207,7 @@
 			console.log(address);
 			var coords;
 			var marker;
-			
+			var infowindow;
 			// 지도를 재설정할 범위정보를 가지고 있을 LatLngBounds 객체를 생성합니다
 			var bounds = new daum.maps.LatLngBounds();
 			
@@ -208,6 +220,7 @@
 				geocoder.addressSearch(o.innerText, function(result, status) {
 					if(status == daum.maps.services.Status.OK) {
 						coords = new daum.maps.LatLng(result[0].y, result[0].x);
+						itemEl = $(".address");
 						
 						marker = new daum.maps.Marker({
 				            map: map,
@@ -222,23 +235,35 @@
 				        // 이때 지도의 중심좌표와 레벨이 변경될 수 있습니다
 				        map.setBounds(bounds);
 						
-						var infowindow = new daum.maps.InfoWindow({
+						infowindow = new daum.maps.InfoWindow({
 					        content: sc[i].innerText // 인포윈도우에 표시할 내용
 					    });
 						
 						daum.maps.event.addListener(marker, 'mouseover', makeOverListener(map, marker, infowindow));
 					    daum.maps.event.addListener(marker, 'mouseout', makeOutListener(infowindow));
-					   	$(".markadd").onmouseoveer = function () {
-					   		makeOverListener(map, marker, infowindow);
-					   	}
+					    
+					    $(this).onmouseover =  function () {
+			                displayInfowindow(marker, sc[i].innerText);
+			            };
+
+			            itemEl.onmouseout =  function () {
+			                infowindow.close();
+			            };
 					}
 				});
-				
 			});
+		}
+		
+		function displayInfowindow(marker, title) {
+		    var content = '<div style="padding:5px;z-index:1;">' + title + '</div>';
+
+		    infowindow.setContent(content);
+		    infowindow.open(map, marker);
 		}
 		
 		function makeOverListener(map, marker, infowindow) {
 		    return function() {
+		    	console.log("info");
 		        infowindow.open(map, marker);
 		    };
 		}
@@ -314,7 +339,7 @@
 
 					if (currentPage >= maxPage) {
 					} else {
-						$(".page").append("<li><a href='#' onclick='selectAddress(" + maxPage + ")'> >> </a></li>");
+						$(".page").append("<li><a id='astyle' href='#' onclick='selectAddress(" + maxPage + ")'> >> </a></li>");
 					}
 				},
 				error : function(jqXHR, textstatus, errorThrown){
@@ -325,14 +350,11 @@
 	</script>
 	<!-- 주소 리스트 -->	
 	<div align="center">
-		<table class="listtable" style="width: 60%; min-width:50%; margin-top: 20px; margin-bottom: 15px;">
+		<table class="listtable" style="width: 70%; min-width:50%; margin-top: 20px; margin-bottom: 15px;">
 		</table>
-	</div>
-
-	<div class="col-md-12 clear">
-		<div class="pull-right">
+		<div style="padding: 0; width: 70%; font-family: 'Open Sans', sans-serif;">
 			<div class="pagination">
-				<ul class="page" style="margin-left: 50%">
+				<ul class="page" style="padding: 0px; margin-top: 0px;">
 				</ul>
 			</div>
 		</div>

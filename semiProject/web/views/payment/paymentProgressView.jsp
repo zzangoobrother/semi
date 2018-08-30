@@ -158,12 +158,12 @@
 							pg : "inicis",
 							pay_method : "card",
 							merchant_uid : "merchant_" + new Date().getTime(),
-							name : "주문명: 결제테스트",
+							name : "포터블그라인더",
 							amount : $("#orderpay").val(),
 
 							buyer_email : "iamport@siot.do",
 							buyer_name : $("#sellname").html(),
-							buyer_tel : "010-1234-5678",
+							buyer_tel : "010-1234-5678", // session 으로 받기
 							buyer_addr : "서울특별시 강남구 삼성동",
 							buyer_postcode : "123-456",
 

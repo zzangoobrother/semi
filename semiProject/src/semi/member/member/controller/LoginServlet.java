@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import semi.admin.model.service.AdminService;
 import semi.member.model.service.MemberService;
 
 /**
@@ -35,18 +36,28 @@ public class LoginServlet extends HttpServlet {
 		String mId = request.getParameter("mid");
 		
 		String mPassword = request.getParameter("m_password1");
+		String loginmode = request.getParameter("loginmode");
+		System.out.println(loginmode);
 		
 		try {
+			String mName = "";
+			if(loginmode.equals("회원")) {
+				mName = new MemberService().loginCheck(mId, mPassword);
+			} else {
+				mName = new AdminService().aloginCheck(mId, mPassword);
+			}
 			
-			String mName = new MemberService().loginCheck(mId, mPassword);
 			
 			
 			if(mName != null){
 				HttpSession session = request.getSession();	
 				session.setAttribute("m_Name", mName);
-				session.setAttribute("m_Id", mId);	
+				session.setAttribute("m_Id", mId);
+				session.setAttribute("loginmode", loginmode);
 				
-				response.sendRedirect("/semi/index.jsp");
+				
+					response.sendRedirect("/semi/index.jsp");
+				
 				
 			}
 				

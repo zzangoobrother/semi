@@ -190,8 +190,8 @@
 			<div class="col-md-12 clear ">
 				<div id="list-type" class="proerty-th">
 					<% for (Product p : list) { %>
-					<div class="col-sm-6 col-md-3 p0">
-						<div class="box-two proerty-item">
+					<div class="col-sm-6 col-md-3 p0" >
+						<div class="box-two proerty-item" >
 							<div class="item-thumb">
 								<a
 									href="/semi/pdetail.bd?pname=<%=p.getP_name()%>"><img
