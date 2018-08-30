@@ -183,7 +183,7 @@ String aId = (String)session.getAttribute("a_Id");
                                     <a href="/semi/views/manager/memberManagementView.jsp">- 회원관리</a>
                                 </li>
                                 <li>
-                                    <a href="#">- 재고관리</a>
+                                    <a href="/semi/views/manager/toolManagementView.jsp">- 재고관리</a>
                                 </li>
                                 <li>
                                     <a href="/semi/views/manager/rentalManagementView.jsp">- 대여관리</a>
