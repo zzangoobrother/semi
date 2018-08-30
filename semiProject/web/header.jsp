@@ -3,7 +3,7 @@
 <%
 	String mName = (String)session.getAttribute("m_Name");
 	String mId = (String)session.getAttribute("m_Id");
-	String mPassword = (String)session.getAttribute("m_password");
+	String mPassword = (String)session.getAttribute("m_Password");
 
 %>
    <%@ include file="head.jsp" %>
@@ -36,7 +36,20 @@
 			
 			function goPage(){
 				location.href = "/semi/adminIndex.jsp";
-			}
+			};
+			$(function(){
+				$("#loginradio").mouseenter(function(){
+					$("#loginradio").css("background", "#aaaaaa")
+					$("#loginradio").css("color", "black")
+				})
+			});
+			$(function(){
+				$("#loginradio").mouseleave(function(){
+					$("#loginradio").css("background", "white")
+					$("#loginradio").css("color", "white")
+				})	
+			});
+			
 		</script>
         <style type="text/css">
         input::placeholder {
@@ -52,15 +65,15 @@
                     <div class="col-md-5 col-sm-8  col-xs-12">
                         <div class="header-half header-call">
                             <p>
-                                <span><i class="pe-7s-call"></i> 010-1234-5678</span>
-                                <span><i class="pe-7s-mail"></i> hongildong@iei	.org</span>
+                                <span><i class="pe-7s-call"></i> 1544-9970</span>
+                                <span><i class="pe-7s-mail"></i> Project09@iei.or.kr</span>
                             </p>
                         </div>
                     </div>
-                    <div class="col-md-2 col-md-offset-5  col-sm-3 col-sm-offset-1  col-xs-12">
+                    <div class="col-md-2 col-md-offset-5  col-sm-3 col-sm-offset-1  col-xs-12" style="margin-left: 50%;">
                         <div class="header-half header-social">
                             <ul class="list-inline">
-                             
+                              <input type="button" id="loginradio" name="loginradio" value="관리자로 전환" onclick="goPage();" style="border : 0px; color : white; background : white;">
                             </ul>
                         </div>
                     </div>
@@ -79,8 +92,8 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="index.jsp">
-                    <img src="/semi/resources/images/common/09.svg" alt="">
+                    <a class="navbar-brand" href="/semi/index.jsp">
+                    <img src="/semi/resources/images/common/mainlogo.png" alt="" width="150px;">
                     </a>
                 </div>
 				
@@ -89,26 +102,31 @@
                     <div class="button navbar-right" id="ajax_load_indicator">
                    
                         <% if(mName == null){ %>
-                        <input type="button" id="loginradio" name="loginradio" value="관리자로 전환" onclick="goPage();">
+                      
                         <form action="/semi/login.cp" method="post">
                         <table width="250" height="75" cellspacing="0" cellpadding="0">
 					<tr><td width="200">
 					
-					  <input type="text"  id="mid" name="mid" size="15" required placeholder="아이디를 입력하세요">
+					  <input type="text"  id="mid" name="mid" size="15" required placeholder="아이디를 입력하세요" style="border : 0px;">
 					</td>
 					<td width="50" rowspan="2">
 					<input type="submit" value="로그인" class= "navbar-btn nav-button wow bounceInRight login" id="btnLogin">
 					</td></tr>
 				<tr><td>
 					<!-- <input type="password" name="userpwd" size="15"> -->
-					<input type="password" id="mpassword" name="m_password1" size="15" required placeholder="비밀번호를 입력하세요">
+					<input type="password" id="mpassword" name="m_password1" size="15" required placeholder="비밀번호를 입력하세요" style="border : 0px;">
 				   </td></tr>
+			
 				   <tr><td colspan="2">
 					<a href="/semi/views/member/memberEnroll.jsp">회원가입</a> &nbsp;
-					<a href="#">아이디/암호조회</a>
-				</td></tr>
-				</table>
+					<a href="/semi/views/member/idAndPasswordSearchView.jsp">아이디/암호조회</a> 
+					
+				</td>
+				</tr>
+				</table> 
+				<br>
 				</form>
+			
 				<%}else{ %>
 				<table width="250" height="75" cellspacing="0" cellpadding="0">
 				<tr><td width="150">
@@ -160,18 +178,18 @@
                         	<a href="#" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-delay="200">게시판 <b class="caret"></b></a>
                         	<ul class="dropdown-menu navbar-nav">
                                 <li>
-                                    <a href="/semi/nglist">- 공지사항</a>
+                                    <a href="#">- 공지사항</a>
                                 </li>
                                 <li>
-                                    <a href="Qna.jsp">- 문    의</a>
+                                    <a href="#">- 문    의</a>
                                 </li>
                                 <li>
-                                    <a href="reboard.jsp">- 후    기</a>
+                                    <a href="#">- 후    기</a>
                                 </li>
                             </ul>
                         </li>
                         <li class="wow fadeInDown" data-wow-delay="0.4s">
-                            <a href="/semi/maplist" class="dropdown-toggle">오시는길</a>
+                            <a href="#" class="dropdown-toggle">오시는길</a>
                         </li>
 
                         <li class="wow fadeInDown" data-wow-delay="0.5s"><a href="#">이용안내</a></li>

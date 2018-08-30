@@ -40,15 +40,61 @@ public class ProductsService {
 		return product;
 	}
 
-	/*public void addReadCount(int pno) throws ProductsException {
+	/*public ArrayList<Product> selectProduct(String keyword) throws ProductsException{
 		Connection con = getConnection();
-		int result = new ProductsDao().addReadCount(
-				con, pno);
-		if(result > 0)
-			commit(con);
-		else
-			rollback(con);
+		ArrayList<Product> list = new ProductsDao().selectProduct(con, keyword);
 		close(con);
+		return list;
+	}*/
+	
+	
+	
+	/*public ArrayList<Product> selectLocal(String local) throws ProductsException{
+		Connection con = getConnection();
+		ArrayList<Product> list = new ProductsDao().selectLocal(con, local);
+		close(con);
+		return list;
 	}*/
 
+	public ArrayList<Product> selectProduct(String keyword, String localselect) throws ProductsException{
+		Connection con = getConnection();
+		ArrayList<Product> list = new ProductsDao().selectProduct(con, keyword, localselect);
+		close(con);
+		return list;
+	}
+
+	public Product selectProducts1(String pName) throws ProductsException{
+		Connection con = getConnection();
+		Product product = new ProductsDao().selectProducts1(con, pName);
+		close(con);
+		return product;
+	}
+
+
+
+	  public ArrayList<String> selectOffice(String pName) throws ProductsException{
+	      Connection con = getConnection();
+	      ArrayList<String> list = new ProductsDao().selectOffice(con, pName);
+	      close(con);
+	      
+	         return list;
+	   
+	   }
+
+	public ArrayList<Product> myrent(String mId) throws ProductsException{
+		Connection con = getConnection();
+		ArrayList<Product> list2 = new ProductsDao().myrent(con, mId);
+		close(con);
+		return list2;
+	}
+
+	public ArrayList<Product> selectTop3(String mId) {
+		Connection con = getConnection();
+		ArrayList<Product> list = new ProductsDao().selectTop3(con, mId);
+		close(con);
+		return list;
+	}
+
+
+	
 }

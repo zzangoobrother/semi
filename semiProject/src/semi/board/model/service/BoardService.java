@@ -7,6 +7,8 @@ import com.sun.corba.se.impl.ior.GenericTaggedComponent;
 
 import semi.board.model.dao.BoardDao;
 import semi.board.model.vo.Board;
+import semi.review.model.vo.ReviewBoard;
+
 import static semi.common.JDBCTemplat.*;
 
 public class BoardService {
@@ -44,5 +46,7 @@ public class BoardService {
 		
 		return board;
 	}
+
+	
 	
 }

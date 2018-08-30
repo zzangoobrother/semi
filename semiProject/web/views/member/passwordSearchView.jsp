@@ -1,7 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ include file = "../../header.jsp" %>
-
+<%@ include file ="../../header.jsp" %>
 <script type="text/javascript">
 function cancle(){
 	location.href = "/semi/index.jsp";
@@ -35,7 +34,7 @@ $(function(){
  <table width="1330px" height="430px" align="center">
     <tr>
      <td>
-     <form action="/semi/findid" method="post">
+     <form action="/semi/findpw" method="post">
       <table width="600px" align="center" border="0"
        style="color: black; background-color: white; font-size: 20px;">
        <tr>
@@ -44,7 +43,7 @@ $(function(){
           style="background-color: white; margin-top: 3%">
           <tr>
            <td align="center"></td> 
-           <td width = "750px"><h2 style="color : #777;">아이디 찾기</h2></td><br>
+           <td width = "750px"><h2 style="color : #777;">비밀번호 찾기</h2></td><br>
 
           </tr>
          </table>
@@ -76,6 +75,11 @@ $(function(){
           <td>
            <table width="380px" height="70px" align="center" border="0"
             style="font-size: 16px;">
+             <tr>
+             <td style = "background : #ececee;" align="center">아이디</td>
+             <td>&nbsp;&nbsp;<input type="text" name="id2" id="id2" style="width : 200px;"></td>  
+          	 </tr>
+
             <tr>
              <td style = "background : #ececee;" align="center">이름</td>
              <td>&nbsp;&nbsp;<input type="text" name="name2" id="name2" style="width : 200px;"></td>
@@ -129,4 +133,4 @@ $(function(){
     </tr>
    </table>
    <br>
-<%@ include file = "../../footer.jsp"%>
+<%@ include file ="../../footer.jsp" %>

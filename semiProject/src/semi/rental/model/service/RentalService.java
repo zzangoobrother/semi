@@ -1,12 +1,17 @@
 package semi.rental.model.service;
 
+import static semi.common.JDBCTemplat.close;
+import static semi.common.JDBCTemplat.commit;
+import static semi.common.JDBCTemplat.getConnection;
+import static semi.common.JDBCTemplat.rollback;
+
 import java.sql.Connection;
 import java.util.ArrayList;
 
+import semi.products.model.vo.Product;
 import semi.rental.exception.RentalException;
 import semi.rental.model.dao.RentalDao;
 import semi.rental.model.vo.Rental;
-import static semi.common.JDBCTemplat.*;
 
 public class RentalService {
 	
@@ -52,5 +57,19 @@ public class RentalService {
 				rollback(con);
 			return r;
 				
+		}
+
+		public ArrayList<Rental> myrent(String mId) throws RentalException{
+			Connection con = getConnection();
+			ArrayList<Rental> list = new RentalDao().myrent(con, mId);
+			close(con);
+			return list;
+		}
+
+		public ArrayList<Product> selectTop3(String mId) throws RentalException{
+			Connection con = getConnection();
+			ArrayList<Product> list = new RentalDao().selectTop3(con, mId);
+			close(con);
+			return list;
 		}
 }
