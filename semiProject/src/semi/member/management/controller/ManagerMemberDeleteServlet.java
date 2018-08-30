@@ -33,7 +33,8 @@ public class ManagerMemberDeleteServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		//관리자 - 회원 삭제용 컨트롤러
 		System.out.println("ManagerMemberDeleteServlet 서블릿 실행.");
-		String mId1 = request.getParameter("mId");
+		response.setContentType("text/html; charset=utf-8");
+		String mId1 = (String)request.getParameter("mid");
 		int result = 0;
 		MemberService mservice = new MemberService();
 		PrintWriter out = response.getWriter();

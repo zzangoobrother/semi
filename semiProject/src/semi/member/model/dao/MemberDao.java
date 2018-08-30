@@ -53,7 +53,7 @@ public class MemberDao {
 		PreparedStatement pstmt = null;
 		
 		String query = "delete from tb_member where m_id = ?";
-		
+		System.out.println("mid : " + mId);
 		try {
 			pstmt = con.prepareStatement(query);
 			pstmt.setString(1, mId);
@@ -279,7 +279,7 @@ public class MemberDao {
 		return result;
 	}
 
-	public int selectCheckId(Connection con, String m_Id) {
+	public int selectCheckId(Connection con, String m_Id) throws MemberException {
 		int idCount = -1;
 		PreparedStatement pstmt = null;
 		ResultSet rset = null;
@@ -296,6 +296,7 @@ public class MemberDao {
 			if(rset.next()) {
 				idCount = rset.getInt(1);
 			}
+			System.out.println("idCount: " + idCount);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally {

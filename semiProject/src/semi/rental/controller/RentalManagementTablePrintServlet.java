@@ -43,7 +43,7 @@ public class RentalManagementTablePrintServlet extends HttpServlet {
 		System.out.println("RentalManagementTablePrintServlet 실행");
 		response.setContentType("text/html; charset=utf-8"); 
 		
-		int pno = Integer.parseInt((String)request.getParameter("pno"));
+		int pno = Integer.parseInt(request.getParameter("pno"));
 		JSONObject json = null;
 		PrintWriter out = response.getWriter();
 

@@ -45,7 +45,7 @@ public class ManagerMemberListServlet extends HttpServlet {
 		//int currentPage = Integer.parseInt(request.getParameter("page"));
 		int currentPage = 1;
 		// 한 페이지당 출력할 목록 갯수
-		int limit = 20;
+		int limit = 10;
 		
 		if(request.getParameter("page") != null){
 			currentPage = Integer.parseInt(request.getParameter("page"));
@@ -65,7 +65,7 @@ public class ManagerMemberListServlet extends HttpServlet {
 			listCount = mservice.mGetListCount();
 			list = mservice.mSelectList(currentPage, limit);
 			maxPage = (int) ((double) listCount / limit + 0.9);
-			startPage = (((int) ((double) currentPage / limit + 1.8)) - 1) * limit + 1;
+			startPage = (((int) ((double) currentPage / limit + 0.9)) - 1) * limit + 1;
 			endPage = startPage + limit - 1;
 			
 			if (maxPage < endPage)

@@ -98,9 +98,10 @@
 		$("#editSaveBtn").attr("style", "display:inline-block");
 		$("#returnBtn").attr("style", "display:inline-block");	
 		$("#rstartdate").attr("readonly", false);
-		$("#rrastdate").attr("readonly", false);		
+		$("#rrastdate").attr("readonly", true);		
 		$("#rstartdate").attr("readonly", true);
 		$("#rreturndate").attr("readonly", false);
+		//$("#rlastdate").attr("readonly", true);
 		$("#idchkBtn").attr("style", "display:none");
 		$("#daydiv1").attr("style", "display:inline-block");
 		$("#daydiv2").attr("style", "display:inline-block");
@@ -236,8 +237,20 @@
 				jsonListSize = json.list.length;
 				jsonPwd = json.list;
 				
+				var jRstartdate;
+				var jRlastdate;
+				
 				var values = "";
 				for(var i in json.list){
+					if(decodeURIComponent(json.list[i].rstartdate) == "2011-11-11")
+						jRstartdate = " ";
+					else
+						jRstartdate = decodeURIComponent(json.list[i].rstartdate);
+					if(decodeURIComponent(json.list[i].rlastdate) == "2011-11-11")
+						jRlastdate = " ";
+					else
+						jRlastdate = decodeURIComponent(json.list[i].rlastdate);
+					
 					values += "<tr><td><input type='radio' onclick='radioCheck(" + i + ")' name='choice' id='choice" + i + "'></td>"
 					+ "<td id='rnotd" + i + "'>" + decodeURIComponent(json.list[i].rno) + "</td>"
 					+ "<td id='pnotd" + i + "'>" + decodeURIComponent(json.list[i].pno) + "</td>"
@@ -245,9 +258,9 @@
 					+ "<td id='rpricetd" + i + "'>" + json.list[i].rprice + "</td>"
 					+ "<td id='midtd" + i + "'>" + decodeURIComponent(json.list[i].mid) + "</td>"
 					+ "<td id='rdatetd" + i + "'>" + decodeURIComponent(json.list[i].rdate) + "</td>"
-					+ "<td id='rstartdatetd" + i + "'>" + decodeURIComponent(json.list[i].rstartdate) + "</td>"
+					+ "<td id='rstartdatetd" + i + "'>" + jRstartdate + "</td>"
 					+ "<td id='rreturntd" + i + "'>" + decodeURIComponent(json.list[i].rreturndate) + "</td>"
-					+ "<td id='rlasttd" + i + "'>" + decodeURIComponent(json.list[i].rlastdate) + "</td>"
+					+ "<td id='rlasttd" + i + "'>" + jRlastdate + "</td>"
 					+ "<td id='pstatetd" + i + "'>" +  decodeURIComponent(json.list[i].pstate) + "</td></tr>";
 										
 				} //for
@@ -287,12 +300,11 @@
 				m_id : $("#mid1").val()},
 			success : function(data) {
 				console.log("success : " + data);
-				if (data == "ok") {
-					alert("등록된 회원이 아닙니다.");
-					$("#m_name").focus();
+				
+				if (data == "ok") {		
+					alert("존재하지 않는 회원입니다");
 				} else {
-					alert("등록된 회원입니다.");
-					$("#m_id").select();
+					alert("회원 인증 완료");	
 				}
 			},
 			error : function(jqXHR, textstatus, errorthrown) {
@@ -316,6 +328,10 @@
 			allselectClick(1);
 		else if($("#allselect").is(":checked") == true && sFilter == "전체" && value != "no")
 			alert("조회항목을 선택하고 조회내용을 입력하십시오.");
+		else if($("#dayselect").is(":checked") == true && $("#dayselectinput").val() == "")
+			alert("조회할 날짜를 선택하십시오.");
+		else if($("#monthselect").is(":checked") == true && $("#monthselectinput").val() == "")
+			alert("조회할 달을 선택하십시오.");
 		else// if($("#dayselect").is(":checked") == true || $("#monthselect").is(":checked") == true)
 			filterSearch();
 		return false;
@@ -348,12 +364,25 @@
 				"sFilter" : sFilter},
 			dataType : "json",
 			success : function(data){
-				//회원 리스트 직렬화
 				var jsonStr = JSON.stringify(data);
 				var json = JSON.parse(jsonStr);
 				
+				if(json.result > 0){
+				
+				var jRstartdate;
+				var jRlastdate;
+				
 				var values = "";
 				for(var i in json.list){
+					if(decodeURIComponent(json.list[i].rstartdate) == "2011-11-11")
+						jRstartdate = " ";
+					else
+						jRstartdate = decodeURIComponent(json.list[i].rstartdate);
+					if(decodeURIComponent(json.list[i].rlastdate) == "2011-11-11")
+						jRlastdate = " ";
+					else
+						jRlastdate = decodeURIComponent(json.list[i].rlastdate);
+					
 					values += "<tr><td><input type='radio' onclick='radioCheck(" + i + ")' name='choice' id='choice" + i + "'></td>"
 					+ "<td id='rnotd" + i + "'>" + decodeURIComponent(json.list[i].rno) + "</td>"
 					+ "<td id='pnotd" + i + "'>" + decodeURIComponent(json.list[i].pno) + "</td>"
@@ -368,18 +397,21 @@
 										
 				} //for
 				$("#t1").html(values); 
-				
+				}else{
+					alert("조회 조건에 맞는 대여정보가 존재하지 않습니다.");
+				}
 			}, //success
 			error : function(jqXHR, textstatus, errorThrown){
 				console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
 			} //error
 		}); //ajax
+		
 		return false;	
 	}
 	
 	//대여정보 선택시 table1 필드에 출력
 	function radioCheck(num){	
-	
+		//$("#pstatediv").html("<div style='display:none'><input id='pstateinput' value='" + num + "'></div>");
 		//선택한 대여정보 담기
 		rentalInfo.rno = $("#rnotd" + num).text();
 		rentalInfo.pno = $("#pnotd" + num).text();
@@ -442,24 +474,30 @@
 	function returnClick(){
 		rentalInfo.rno = $("#rnum").val();
 		rentalInfo.pno = $("#pnum").val();
-		
-		$.ajax({
-			url : "/semi/rmpreturn",
-			type : "post",
-			data : {"rno" : rentalInfo.rno, 
-				"pno" : rentalInfo.pno},
-			success : function(data){
-				if(data > 0)
-					alert("반납 처리 완료");
-				else
-					alert("반납 처리 실패");
-			}, 
-			error : function(jqXHR, textstatus, errorThrown){
-				console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
+		if($("#rstate").val() == "대여중"){
+			if(confirm("정말 반납처리 하시겠습니까?")){
+				$.ajax({
+					url : "/semi/rmpreturn",
+					type : "post",
+					data : {"rno" : rentalInfo.rno, 
+						"pno" : rentalInfo.pno},
+					success : function(data){
+						if(data > 0)
+							alert("반납 처리 완료");
+						else
+							alert("반납 처리 실패");
+					}, 
+					error : function(jqXHR, textstatus, errorThrown){
+						console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
+					}
+				});
+			}else{
+				alert("반납이 취소되었습니다.");
 			}
-		});
-		
-		allselectClick(1);
+			allselectClick(1);
+		}else{
+			alert("이미 반납된 물품입니다.");
+		}
 		return false;
 	}
 	
@@ -469,6 +507,7 @@
 		rentalInfo.rreturn = $("#rreturndate").val();
 		//alert("return : " + rentalInfo.rreturn);
 		
+		if(confirm("대여기간을 " + rentalInfo.rreturn + "까지 연장하시겠습니까?")){
 		$.ajax({
 			url : "/semi/rmupreturn",
 			type : "post",
@@ -476,14 +515,17 @@
 				"returndate" : rentalInfo.rreturn},
 			success : function(data){
 				if(data > 0)
-					alert("반납기간이 연장되었습니다.");
+					alert("대여기간 연장 완료");
 				else
-					alert("반납기간 연장 실패");
+					alert("대여기간 연장 실패");
 			},
 			error : function(jqXHR, textstatus, errorThrown){
 				console.log("error : " + jqXHR + ", " + textstatus + ", " + errorThrown);
 			}
 		});
+		}else{
+			alert("대여기간 연장을 취소합니다.");
+		}
 		allselectClick(1);
 		return false;
 	}
@@ -554,7 +596,7 @@
 	<div class="container" style="width:1400px;height:1400px;">  
                 <div class="row">              
                 <div class="col-md-3 p0 padding-top-40" style="width:300px;height:800;">
-                    <div class="blog-asside-right pr0">
+                    <div class="blog-asside-right pr0" id="pstatediv">
                         <div class="panel panel-default sidebar-menu wow fadeInRight animated animated" style="visibility: visible; animation-name: fadeInRight;">
                             <div class="panel-heading">
                                 <h3 class="panel-title">대여관리</h3>

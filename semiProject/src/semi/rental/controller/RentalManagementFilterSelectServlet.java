@@ -51,6 +51,7 @@ public class RentalManagementFilterSelectServlet extends HttpServlet {
 		
 		RentalService rservice = new RentalService();
 		JSONObject json = null;
+		int result = 0;
 	
 		try{
 			ArrayList<Rental> list = rservice.rFilterSelectList(filter);
@@ -71,14 +72,19 @@ public class RentalManagementFilterSelectServlet extends HttpServlet {
 				job.put("rbookdate", URLEncoder.encode(r.getrBookingDate(), "UTF-8"));
 				job.put("pstate", URLEncoder.encode(r.getpState(), "UTF-8"));
 				//job.put("pname", URLEncoder.encode(r.getpName(), "UTF-8"));
-		
+
 				if(job.size() > 0){
 					jarr.add(job);
 				} 
 			}
-			
-			json.put("list", jarr);
-
+			System.out.println("jarr size : " + jarr.size());
+			if(jarr.size() > 0){
+				result = 1;
+				json.put("list", jarr);
+				json.put("result", result);
+			}else{
+				json.put("result", result);
+			}
 		} catch(RentalException e) {
 			e.printStackTrace();
 			e.getMessage();
